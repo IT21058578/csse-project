@@ -5,10 +5,18 @@ const ErrorMessage = {
   TOKEN_NOT_FOUND: 'Token not found',
   REVIEW_NOT_FOUND: 'Review not found',
   FILE_NOT_FOUND: 'File not found',
+  COMPANY_NOT_FOUND: 'Company not found',
+  SITE_NOT_FOUND: 'Site not found',
+  SUPPLIER_NOT_FOUND: 'Supplier not found',
+  ITEM_NOT_FOUND: 'Item not found',
 
   // Already exists
   PRODUCT_ALREADY_EXISTS: 'Product already exists',
   USER_ALREADY_EXISTS: 'User already exists',
+  COMPANY_ALREADY_EXISTS: 'Company already exists',
+  SITE_ALREADY_EXISTS: 'Site already exists',
+  SUPPLIER_ALREADY_EXISTS: 'Supplier already exists',
+  ITEM_ALREADY_EXISTS: 'Item already exists',
 
   // Authoriztion
   INVALID_CREDENTIALS: 'Invalid credentials',

@@ -4,8 +4,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
 import { UsersModule } from './users/users.module';
-import { OrdersService } from './item-request/orders.service';
-import { OrdersModule } from './item-request/orders.module';
 import { CompaniesModule } from './companies/companies.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
 import { ItemsModule } from './items/items.module';
@@ -17,10 +15,6 @@ import { AuthModule } from './auth/auth.module';
 import { UsersService } from './users/users.service';
 import { TokenService } from './token/token.service';
 import { TokenModule } from './token/token.module';
-import { ReviewModule } from './reviews/review.module';
-import { ReviewService } from './reviews/review.service';
-import { ProductsService } from './products/products.service';
-import { ProductsModule } from './products/products.module';
 import { ConfigModule } from '@nestjs/config';
 import { ConfigService } from '@nestjs/config/dist';
 import { JwtTokenModule } from './jwt-token/jwt-token.module';
@@ -30,28 +24,21 @@ import { AuthGuard } from './common/guards/auth-guard.guard';
 import { RolesGuard } from './common/guards/roles-guard.guard';
 import { EmailModule } from './email/email.module';
 import { EmailService } from './email/email.service';
-import { DataGenModule } from './data-gen/data-gen.module';
-import { DataGenService } from './data-gen/data-gen.service';
-import { FileModule } from './file/file.module';
-
 import { ConfigKey } from './common/constants/config-key';
-import { ReportsModule } from './reports/reports.module';
 import { HttpModule } from '@nestjs/axios';
 import { PDFModule } from '@t00nday/nestjs-pdf';
-import { OrdersModule } from './item-request/orders.module';
+import { ItemRequestsService } from './item-requests/item-requests.service';
+import { SitesService } from './sites/sites.service';
+import { ItemsService } from './items/ItemsService';
+import { CompaniesService } from './companies/companies.service';
 
 @Module({
   imports: [
     UsersModule,
-    OrdersModule,
     AuthModule,
-    ReviewModule,
-    ProductsModule,
     TokenModule,
     JwtTokenModule,
     EmailModule,
-    DataGenModule,
-    ReportsModule,
     HttpModule,
     ConfigModule.forRoot({
       isGlobal: true,
@@ -64,22 +51,22 @@ import { OrdersModule } from './item-request/orders.module';
         extension: 'hbs',
       },
     }),
-    FileModule.forRootAsync({
-      isGlobal: true,
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        authDomain: configService.get(ConfigKey.FIREBASE_AUTH_DOMAIN),
-        storageBucket: configService.get(ConfigKey.FIREBASE_BUCKET_NAME),
-        projectId: configService.get(ConfigKey.FIREBASE_PROJECT_ID),
-        appId: configService.get(ConfigKey.FIREBASE_APP_ID),
-        apiKey: configService.get(ConfigKey.FIREBASE_API_KEY),
-        measurementId: configService.get(ConfigKey.FIREBASE_MEASUREMENT_ID),
-        messagingSenderId: configService.get(
-          ConfigKey.FIREBASE_MESSAGING_SENDER_ID,
-        ),
-      }),
-    }),
+    // FileModule.forRootAsync({
+    //   isGlobal: true,
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: async (configService: ConfigService) => ({
+    //     authDomain: configService.get(ConfigKey.FIREBASE_AUTH_DOMAIN),
+    //     storageBucket: configService.get(ConfigKey.FIREBASE_BUCKET_NAME),
+    //     projectId: configService.get(ConfigKey.FIREBASE_PROJECT_ID),
+    //     appId: configService.get(ConfigKey.FIREBASE_APP_ID),
+    //     apiKey: configService.get(ConfigKey.FIREBASE_API_KEY),
+    //     measurementId: configService.get(ConfigKey.FIREBASE_MEASUREMENT_ID),
+    //     messagingSenderId: configService.get(
+    //       ConfigKey.FIREBASE_MESSAGING_SENDER_ID,
+    //     ),
+    //   }),
+    // }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -120,15 +107,16 @@ import { OrdersModule } from './item-request/orders.module';
     CompaniesModule,
   ],
   providers: [
-    OrdersService,
-    ProductsService,
     AuthService,
     UsersService,
     TokenService,
-    ReviewService,
     JwtTokenService,
     EmailService,
-    DataGenService,
+    ItemRequestsService,
+    SitesService,
+    ItemsService,
+    SuppliersService,
+    CompaniesService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
@@ -137,7 +125,6 @@ import { OrdersModule } from './item-request/orders.module';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
-    SuppliersService,
   ],
 })
 export class AppModule {}

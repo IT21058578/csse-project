@@ -10,7 +10,6 @@ export const ConfigKey = {
   FIREBASE_API_KEY: 'FIREBASE_API_KEY',
   FIREBASE_MESSAGING_SENDER_ID: 'FIREBASE_MESSAGING_SENDER_ID',
   FIREBASE_MEASUREMENT_ID: 'FIREBASE_MEASUREMENT_ID',
-  FLASK_URL: 'FLASK_URL'
 } as const;
 
 export type ConfigKey = keyof typeof ConfigKey;

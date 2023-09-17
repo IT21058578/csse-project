@@ -29,13 +29,16 @@ export class AuthGuard implements CanActivate {
     }
     try {
       const id = await this.jwtTokenService.verifyAccessToken(token);
-      const { password, ...user } = await this.usersService.getUser(id);
+      const user = await this.usersService.getUser(id);
+      const userJson = user.toJSON();
       this.logger.debug(`Authenticated user with id '${id}'`);
-      request['user'] = user;
+      request['user'] = userJson;
     } catch {
       this.logger.debug(`Could not authenticate user`);
     }
-    this.logger.warn(`User attempted to access resources with an invalid token`);
+    this.logger.warn(
+      `User attempted to access resources with an invalid token`,
+    );
     throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
   }
 

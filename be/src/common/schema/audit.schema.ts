@@ -1,15 +1,15 @@
 import { Prop } from '@nestjs/mongoose';
 
-export class AuditedModel {
+export class Audit {
   @Prop()
   createdBy: string;
 
   @Prop()
-  updatedBy: string;
+  updatedBy?: string;
 
   @Prop()
   createdAt: Date;
 
   @Prop()
-  updatedAt: Date;
+  updatedAt?: Date;
 }

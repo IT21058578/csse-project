@@ -1,15 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { ItemRequest } from './item-request.schema';
+import { ItemRequest, ItemRequestModel } from './item-request.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 
 @Injectable()
 export class ItemRequestsService {
   constructor(
     @InjectModel(ItemRequest.name)
-    private readonly itemRequestModel: Model<ItemRequest>,
-  ) { }
-  
+    private readonly itemRequestModel: ItemRequestModel,
+  ) {}
+
   async getItemRequest() {
     // Include names of anything refered to by id
   }
@@ -53,7 +52,7 @@ export class ItemRequestsService {
     // Only by Site managers
     // Can only be done if approved or partially delivered
   }
-  
+
   async createInvoice() {
     // Only by Site managers
     // Can only be done if pending invoice

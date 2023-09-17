@@ -1,11 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
-import { AuditedModel } from 'src/common/schema/audit.schema';
+import { HydratedDocument, Model, Types } from 'mongoose';
+import { Audit } from 'src/common/schema/audit.schema';
 
 export type CompanyDocument = HydratedDocument<Company>;
+export type CompanyModel = Model<CompanyDocument> & {
+  findBySiteId: (id: string) => Promise<CompanyDocument | null>;
+  findBySupplierId: (id: string) => Promise<CompanyDocument | null>;
+  findByItemId: (id: string) => Promise<CompanyDocument | null>;
+};
 
 @Schema()
-class Item extends AuditedModel {
+class Item extends Audit {
   @Prop({ unique: true })
   name: string;
 
@@ -14,7 +19,7 @@ class Item extends AuditedModel {
 }
 
 @Schema()
-class Site extends AuditedModel {
+class Site extends Audit {
   @Prop({ unique: true })
   name: string;
 
@@ -29,7 +34,7 @@ class Site extends AuditedModel {
 }
 
 @Schema()
-class Supplier extends AuditedModel {
+class Supplier extends Audit {
   @Prop({ unique: true })
   name: string;
 
@@ -40,9 +45,9 @@ class Supplier extends AuditedModel {
   mobiles: string[];
 
   @Prop([String])
-  accountNumber: string[];
+  accountNumbers: string[];
 
-  @Prop({ default: {} })
+  @Prop({ type: Map, of: { rate: Number }, default: {} })
   items: Record<string, { rate: number }>;
 }
 
@@ -58,22 +63,47 @@ const itemSchema = SchemaFactory.createForClass(Item);
 const siteSchema = SchemaFactory.createForClass(Site);
 const supplierSchema = SchemaFactory.createForClass(Supplier);
 
-@Schema({ collection: 'companies' })
-export class Company extends AuditedModel {
+@Schema({})
+export class Company extends Audit {
   @Prop({ unique: true })
   name: string;
 
   @Prop({ type: [itemSchema] })
-  items: Item[];
+  items: Types.DocumentArray<Item>;
 
   @Prop({ type: [siteSchema] })
-  sites: Site[];
+  sites: Types.DocumentArray<Site>;
 
   @Prop({ type: [supplierSchema] })
-  suppliers: Supplier[];
+  suppliers: Types.DocumentArray<Supplier>;
 
   @Prop({ default: {} })
   config: CompanyConfig;
 }
 
-export const CompanySchema = SchemaFactory.createForClass(Company);
+const CompanySchema = SchemaFactory.createForClass(Company);
+
+CompanySchema.statics = {
+  async findByItemId(id: string) {
+    const companies = (await this.find({
+      items: { $elemMatch: { id } },
+    })) as CompanyDocument[];
+    return companies.at(0) ?? null;
+  },
+
+  async findBySiteId(id: string) {
+    const companies = (await this.find({
+      sites: { $elemMatch: { id } },
+    })) as CompanyDocument[];
+    return companies.at(0) ?? null;
+  },
+
+  async findBySupplierId(id: string) {
+    const companies = (await this.find({
+      suppliers: { $elemMatch: { id } },
+    })) as CompanyDocument[];
+    return companies.at(0) ?? null;
+  },
+};
+
+export { CompanySchema };

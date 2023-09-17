@@ -1,10 +1,10 @@
 import { ExecutionContext, createParamDecorator } from '@nestjs/common';
-import { User as AppUser, UserDocument } from 'src/users/user.schema';
+import { UserDocument, UserFlattened } from 'src/users/user.schema';
 
 export const User = createParamDecorator(
-  (data: keyof UserDocument | undefined, ctx: ExecutionContext) => {
+  (data: keyof UserFlattened | undefined, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
-    const user = request.user as UserDocument & { _id: string };
+    const user: UserFlattened = request.user;
     return data ? user?.[data] : user;
   },
 );

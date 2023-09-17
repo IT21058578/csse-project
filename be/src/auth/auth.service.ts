@@ -40,8 +40,7 @@ export class AuthService {
         throw Error();
       }
 
-      // TODO: Change back to !existingUser.isAuthorized
-      if (false) {
+      if (!existingUser.isAuthorized) {
         this.logger.warn(
           `User with id ${existingUser.id} attempted login but has not verified their email`,
         );
@@ -71,7 +70,7 @@ export class AuthService {
       throw new BadRequestException(ErrorMessage.USER_ALREADY_EXISTS);
     }
     const createdUser = new this.userModel(userDto);
-    createdUser.roles = [UserRole.USER];
+    createdUser.roles = [UserRole.SYSTEM_ADMIN];
     createdUser.password = await hash(createdUser.password, 10);
     createdUser.isAuthorized = false;
     const savedUser = await createdUser.save();

@@ -10,6 +10,7 @@ import { ItemRequestsController } from './item-requests.controller';
       { name: ItemRequest.name, schema: ItemRequestSchema },
     ]),
   ],
+  exports: [MongooseModule],
   providers: [ItemRequestsService],
   controllers: [ItemRequestsController],
 })

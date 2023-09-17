@@ -6,14 +6,34 @@ import { Page, PageBuilder } from 'src/common/util/page-builder';
 import { CreateUserDto } from 'src/common/dtos/create-user.dto';
 import ErrorMessage from 'src/common/constants/error-message';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
+import { UserRole } from 'src/common/constants/user-roles';
+import { hashSync } from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
-  constructor(
-    @InjectModel(User.name) private readonly userModel: Model<User>,
-  ) {}
+  constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {
+    const existingSystemAdmin = this.userModel.findOne({
+      roles: { $in: [UserRole.SYSTEM_ADMIN] },
+    });
+    if (existingSystemAdmin === null) {
+      this.logger.log('System admin not found. Creating new system admin...');
+      this.createSystemAdmin();
+    }
+  }
+
+  async createSystemAdmin() {
+    const systemAdmin = new this.userModel();
+    systemAdmin.firstName = 'John';
+    systemAdmin.lastName = 'Doe';
+    systemAdmin.password = hashSync('password', 10);
+    systemAdmin.email = 'johndoe@gmail.com';
+    systemAdmin.isAuthorized = true;
+    systemAdmin.companyId = 'SYSTEM';
+    await systemAdmin.save();
+    this.logger.log('New system admin created');
+  }
 
   async updateUser(id: string, userDto: CreateUserDto): Promise<UserDocument> {
     this.logger.log(`Attempting to find user with id '${id}'`);
