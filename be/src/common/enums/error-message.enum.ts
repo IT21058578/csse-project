@@ -9,6 +9,7 @@ const ErrorMessage = {
   SITE_NOT_FOUND: 'Site not found',
   SUPPLIER_NOT_FOUND: 'Supplier not found',
   ITEM_NOT_FOUND: 'Item not found',
+  PROCUREMENT_NOT_FOUND: 'Procurement not found',
 
   // Already exists
   PRODUCT_ALREADY_EXISTS: 'Product already exists',
@@ -17,6 +18,7 @@ const ErrorMessage = {
   SITE_ALREADY_EXISTS: 'Site already exists',
   SUPPLIER_ALREADY_EXISTS: 'Supplier already exists',
   ITEM_ALREADY_EXISTS: 'Item already exists',
+  PROCUREMENT_ALREADY_EXISTS: 'Procurement already exists',
 
   // Authoriztion
   INVALID_CREDENTIALS: 'Invalid credentials',
@@ -28,6 +30,8 @@ const ErrorMessage = {
   // Misc
   NOT_ENOUGH_STOCK: 'Not enough stock',
   INVALID_FILE_NAME: 'Invalid file name',
+  NO_PROCUREMENT_ADMIN_CONFIGURED: 'No procurement administrator configured',
+  PROCUREMENT_ALREADY_APPROVED: 'Procurement already approved'
 } as const;
 
 export default ErrorMessage;

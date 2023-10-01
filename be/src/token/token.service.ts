@@ -3,15 +3,17 @@ import { Token, TokenDocument } from './token.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { v4 as uuid } from 'uuid';
-import { TokenPurpose } from 'src/common/constants/token-purpose';
-import { TokenStatus } from 'src/common/constants/token-status';
-import ErrorMessage from 'src/common/constants/error-message';
+import { TokenPurpose } from 'src/common/enums/token-purpose.enum';
+import { TokenStatus } from 'src/common/enums/token-status.enum';
+import ErrorMessage from 'src/common/enums/error-message.enum';
 
 @Injectable()
 export class TokenService {
   private readonly logger = new Logger(TokenService.name);
 
-  constructor(@InjectModel(Token.name) private readonly tokenModel: Model<Token>) {}
+  constructor(
+    @InjectModel(Token.name) private readonly tokenModel: Model<Token>,
+  ) {}
 
   async createSignUpToken(email: string): Promise<TokenDocument> {
     return await this.createTokenOfPurpose(email, TokenPurpose.SIGN_UP);

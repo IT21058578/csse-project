@@ -5,7 +5,7 @@ import { Company } from './company.schema';
 import { CreateCompanyDto } from './dtos/create-company.dto';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { UserDocument } from 'src/users/user.schema';
-import ErrorMessage from 'src/common/constants/error-message';
+import ErrorMessage from 'src/common/enums/error-message.enum';
 import { PageBuilder } from 'src/common/util/page-builder';
 
 @Injectable()
@@ -60,7 +60,7 @@ export class CompaniesService {
 
   async deleteCompany(id: string) {
     const company = await this.companyModel.findByIdAndDelete(id);
-    const etst = await this.companyModel.find()
+    const etst = await this.companyModel.find();
     if (company == null) {
       throw new BadRequestException(ErrorMessage.COMPANY_NOT_FOUND);
     }

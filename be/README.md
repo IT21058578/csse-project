@@ -1,6 +1,7 @@
 # Helpful resources
 - https://stackoverflow.com/questions/67044809/nestjs-correct-schema-for-array-of-subdocuments-in-mongoose-without-default-i
 - https://masteringjs.io/tutorials/mongoose/enum
+- https://dev.to/piyushkacha/mongoosemap-in-express-and-nestjs-4l31
 
 # How to configure Mongoose statics with NestJs
 Assume we have a `Cat` class.

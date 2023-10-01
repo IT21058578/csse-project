@@ -1,19 +1,19 @@
 import {
   BadRequestException,
-  Injectable,
-  InternalServerErrorException,
+  Injectable
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import ErrorMessage from 'src/common/constants/error-message';
-import { Company, CompanyModel } from 'src/companies/company.schema';
+import ErrorMessage from 'src/common/enums/error-message.enum';
 import { CreateSupplierDto } from './dtos/create-supplier.dto';
 import { UserFlattened } from 'src/users/user.schema';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
+import { Types } from 'mongoose';
+import { Supplier, SupplierModel } from './supplier.schema';
 
 @Injectable()
 export class SuppliersService {
   constructor(
-    @InjectModel(Company.name) private readonly companyModel: CompanyModel,
+    @InjectModel(Supplier.name) private readonly supplierModel: SupplierModel,
   ) {}
 
   async createSupplier(
@@ -22,23 +22,17 @@ export class SuppliersService {
   ) {
     const { accountNumbers, email, items, mobiles, name, companyId } =
       createSupplierDto;
-    const company = await this.companyModel.findById(companyId);
+    const suppliersWithSameName = await this.supplierModel.find({ name });
 
-    if (company == null) {
-      throw new BadRequestException(ErrorMessage.COMPANY_NOT_FOUND);
-    }
-
-    const hasSupplierWithName = company.suppliers.some(
-      (supplier) => supplier.name === name,
-    );
-    if (hasSupplierWithName) {
+    if (suppliersWithSameName?.length > 0) {
       throw new BadRequestException(
         ErrorMessage.SITE_ALREADY_EXISTS,
         `A supplier with the name '${name}' already exists`,
       );
     }
 
-    company.suppliers.push({
+    const newSupplier = new this.supplierModel({
+      companyId,
       name,
       mobiles,
       accountNumbers,
@@ -47,16 +41,8 @@ export class SuppliersService {
       createdAt: new Date(),
       createdBy: user._id,
     });
-    const savedCompany = await company.save();
-    const savedSupplier = savedCompany.suppliers.find(
-      (supplier) => supplier.name === name,
-    );
-
-    if (savedSupplier === undefined) {
-      throw new InternalServerErrorException();
-    }
-
-    return savedSupplier;
+    const savedSupplier = await newSupplier.save();
+    return savedSupplier.toJSON();
   }
 
   async editSupplier(
@@ -65,9 +51,9 @@ export class SuppliersService {
     editSupplierDto: CreateSupplierDto,
   ) {
     const { accountNumbers, email, items, mobiles, name } = editSupplierDto;
-    const company = await this.companyModel.findBySupplierId(id);
+    const supplier = await this.supplierModel.findById(id);
 
-    if (company == null) {
+    if (supplier == null) {
       throw new BadRequestException(
         ErrorMessage.SUPPLIER_NOT_FOUND,
         `Supplier with the id '${id}' was not found`,
@@ -75,53 +61,43 @@ export class SuppliersService {
     }
 
     // Must definitely be present
-    const supplierIdx = company.suppliers.findIndex((supplier) => supplier.id === id);
-    company.suppliers[supplierIdx].name = name;
-    company.suppliers[supplierIdx].accountNumbers = accountNumbers;
-    company.suppliers[supplierIdx].email = email;
-    company.suppliers[supplierIdx].items = items;
-    company.suppliers[supplierIdx].mobiles = mobiles;
-    company.suppliers[supplierIdx].updatedAt = new Date();
-    company.suppliers[supplierIdx].updatedBy = user._id;
-    const savedCompany = await company.save();
-
-    const savedSupplier = savedCompany.suppliers[supplierIdx];
-
-    if (savedSupplier === undefined) {
-      throw new InternalServerErrorException();
-    }
-
-    return savedSupplier;
+    supplier.name = name;
+    supplier.accountNumbers = accountNumbers;
+    supplier.email = email;
+    supplier.items = new Types.Map(Object.entries(items));
+    supplier.mobiles = mobiles;
+    supplier.updatedAt = new Date();
+    supplier.updatedBy = user._id;
+  
+    const savedSupplier = await supplier.save();
+    return savedSupplier.toJSON();
   }
 
   async deleteSupplier(id: string) {
     // Only company admin
-    const company = await this.companyModel.findBySupplierId(id);
+    const deletedSupplier = await this.supplierModel.findByIdAndDelete(id);
 
-    if (company == null) {
+    if (deletedSupplier == null) {
       throw new BadRequestException(
         ErrorMessage.SUPPLIER_NOT_FOUND,
         `Supplier with the id '${id}' was not found`,
       );
     }
 
-    // Must definetely be present
-    const deletedSupplier = await company.suppliers.id(id)?.deleteOne()!;
-    await company.save();
-    return deletedSupplier;
+    return deletedSupplier.toJSON();
   }
 
   async getSupplier(id: string) {
-    const company = await this.companyModel.findBySupplierId(id);
+    const supplier = await this.supplierModel.findById(id);
 
-    if (company == null) {
+    if (supplier == null) {
       throw new BadRequestException(
         ErrorMessage.SUPPLIER_NOT_FOUND,
         `Supplier with the id '${id}' was not found`,
       );
     }
 
-    return company.suppliers.id(id)!;
+    return supplier;
   }
 
   async getSuppliersPage(pageRequest: PageRequest) {}

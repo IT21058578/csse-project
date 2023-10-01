@@ -24,13 +24,21 @@ import { AuthGuard } from './common/guards/auth-guard.guard';
 import { RolesGuard } from './common/guards/roles-guard.guard';
 import { EmailModule } from './email/email.module';
 import { EmailService } from './email/email.service';
-import { ConfigKey } from './common/constants/config-key';
+import { ConfigKey } from './common/enums/config-key.enum';
 import { HttpModule } from '@nestjs/axios';
 import { PDFModule } from '@t00nday/nestjs-pdf';
 import { ItemRequestsService } from './item-requests/item-requests.service';
 import { SitesService } from './sites/sites.service';
-import { ItemsService } from './items/ItemsService';
+import { ItemsService } from './items/items.service';
 import { CompaniesService } from './companies/companies.service';
+import { FileModule } from './file/file.module';
+import { DataGenModule } from './data-gen/data-gen.module';
+import { DataGenService } from './data-gen/data-gen.service';
+import { DeliveriesModule } from './deliveries/deliveries.module';
+import { ApprovalsModule } from './approvals/approvals.module';
+import { InvoicesModule } from './invoices/invoices.module';
+import { DeliveriesService } from './deliveries/deliveries.service';
+import { ApprovalsService } from './approvals/approvals.service';
 
 @Module({
   imports: [
@@ -40,6 +48,15 @@ import { CompaniesService } from './companies/companies.service';
     JwtTokenModule,
     EmailModule,
     HttpModule,
+    ItemRequestsModule,
+    SitesModule,
+    ItemsModule,
+    SuppliersModule,
+    CompaniesModule,
+    DataGenModule,
+    DeliveriesModule,
+    ApprovalsModule,
+    InvoicesModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -51,22 +68,22 @@ import { CompaniesService } from './companies/companies.service';
         extension: 'hbs',
       },
     }),
-    // FileModule.forRootAsync({
-    //   isGlobal: true,
-    //   imports: [ConfigModule],
-    //   inject: [ConfigService],
-    //   useFactory: async (configService: ConfigService) => ({
-    //     authDomain: configService.get(ConfigKey.FIREBASE_AUTH_DOMAIN),
-    //     storageBucket: configService.get(ConfigKey.FIREBASE_BUCKET_NAME),
-    //     projectId: configService.get(ConfigKey.FIREBASE_PROJECT_ID),
-    //     appId: configService.get(ConfigKey.FIREBASE_APP_ID),
-    //     apiKey: configService.get(ConfigKey.FIREBASE_API_KEY),
-    //     measurementId: configService.get(ConfigKey.FIREBASE_MEASUREMENT_ID),
-    //     messagingSenderId: configService.get(
-    //       ConfigKey.FIREBASE_MESSAGING_SENDER_ID,
-    //     ),
-    //   }),
-    // }),
+    FileModule.forRootAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        authDomain: configService.get(ConfigKey.FIREBASE_AUTH_DOMAIN),
+        storageBucket: configService.get(ConfigKey.FIREBASE_BUCKET_NAME),
+        projectId: configService.get(ConfigKey.FIREBASE_PROJECT_ID),
+        appId: configService.get(ConfigKey.FIREBASE_APP_ID),
+        apiKey: configService.get(ConfigKey.FIREBASE_API_KEY),
+        measurementId: configService.get(ConfigKey.FIREBASE_MEASUREMENT_ID),
+        messagingSenderId: configService.get(
+          ConfigKey.FIREBASE_MESSAGING_SENDER_ID,
+        ),
+      }),
+    }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -100,11 +117,6 @@ import { CompaniesService } from './companies/companies.service';
         },
       }),
     }),
-    ItemRequestsModule,
-    SitesModule,
-    ItemsModule,
-    SuppliersModule,
-    CompaniesModule,
   ],
   providers: [
     AuthService,
@@ -117,6 +129,10 @@ import { CompaniesService } from './companies/companies.service';
     ItemsService,
     SuppliersService,
     CompaniesService,
+    DataGenService,
+    SitesService,
+    DeliveriesService,
+    ApprovalsService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,

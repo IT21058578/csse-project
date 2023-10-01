@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { TokenPurpose } from 'src/common/constants/token-purpose';
-import { TokenStatus } from 'src/common/constants/token-status';
+import { TokenPurpose } from 'src/common/enums/token-purpose.enum';
+import { TokenStatus } from 'src/common/enums/token-status.enum';
 
 export type TokenDocument = HydratedDocument<Token>;
 

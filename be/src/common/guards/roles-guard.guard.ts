@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
-import { UserRole } from '../constants/user-roles';
-import ErrorMessage from '../constants/error-message';
+import { UserRole } from '../enums/user-roles.enum';
+import ErrorMessage from '../enums/error-message.enum';
 import { UserFlattened } from 'src/users/user.schema';
 
 @Injectable()

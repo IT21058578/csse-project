@@ -8,7 +8,7 @@ import {
 import { Request } from 'express';
 import { JwtTokenService } from 'src/jwt-token/jwt-token.service';
 import { UsersService } from 'src/users/users.service';
-import ErrorMessage from '../constants/error-message';
+import ErrorMessage from '../enums/error-message.enum';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
