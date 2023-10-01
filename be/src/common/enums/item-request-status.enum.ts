@@ -6,6 +6,7 @@ export const ItemRequestStatus = {
   DELIVERED: 'DELIVERED',
   PENDING_INVOICE: 'PENDING_INVOICE',
   COMPLETED: 'COMPLETED',
+  DISAPPROVED: 'DISAPPROVED'
 } as const;
 
 export type ItemRequestStatus = keyof typeof ItemRequestStatus;

@@ -3,12 +3,15 @@ import { FlattenMaps, HydratedDocument, Model } from 'mongoose';
 import { ApprovalStatus } from 'src/common/enums/approval-status.enum';
 import { Audit } from 'src/common/schema/audit.schema';
 
-export type ApprovalModel = Model<Approval>
-export type ApprovalDocument = HydratedDocument<Approval>
-export type FlatApproval = FlattenMaps<Approval & {_id: string}>
+export type ApprovalModel = Model<Approval>;
+export type ApprovalDocument = HydratedDocument<Approval>;
+export type FlatApproval = FlattenMaps<Approval & { _id: string }>;
 
 @Schema({ collection: 'approvals' })
 export class Approval extends Audit {
+  @Prop()
+  companyId: string;
+
   @Prop()
   procurementId: string;
 

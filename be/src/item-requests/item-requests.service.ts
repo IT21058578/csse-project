@@ -9,14 +9,13 @@ import ErrorMessage from 'src/common/enums/error-message.enum';
 import { CreateProcurementDto } from './dto/create-procurement.dto';
 import { User, UserFlattened, UsersModel } from 'src/users/user.schema';
 import { CompaniesService } from 'src/companies/companies.service';
-import { UserRole } from 'src/common/enums/user-roles.enum';
-import { ArrayUtils } from 'src/common/util/array-utils';
 import { ItemsService } from 'src/items/items.service';
 import { SitesService } from 'src/sites/sites.service';
 import { SuppliersService } from 'src/suppliers/suppliers.service';
 import { Approval, ApprovalModel } from 'src/approvals/approval.schema';
 import { ApprovalStatus } from 'src/common/enums/approval-status.enum';
 import { ItemRequestStatus } from 'src/common/enums/item-request-status.enum';
+import { ApprovalsService } from 'src/approvals/approvals.service';
 
 @Injectable()
 export class ItemRequestsService {
@@ -25,6 +24,7 @@ export class ItemRequestsService {
     private readonly itemsService: ItemsService,
     private readonly suppliersService: SuppliersService,
     private readonly companiesService: CompaniesService,
+    private readonly approvalsService: ApprovalsService,
     @InjectModel(ItemRequest.name)
     private readonly itemRequestModel: ItemRequestModel,
     @InjectModel(User.name)
@@ -89,22 +89,8 @@ export class ItemRequestsService {
     );
     if (!isOverThreshold && !isMustApproveItem) return;
 
-    const allAdmins = await this.userModel.find({
-      companyId,
-      roles: { $in: [UserRole.COMPANY_ADMIN, UserRole.PROCUREMENT_ADMIN] },
-    });
-    const procurementAdmins = allAdmins.filter((user) =>
-      user.roles.includes(UserRole.PROCUREMENT_ADMIN),
-    );
     const selectedAdmin =
-      ArrayUtils.selectRandomOne(procurementAdmins) ??
-      ArrayUtils.selectRandomOne(allAdmins);
-    if (selectedAdmin === undefined) {
-      throw new ConflictException(
-        ErrorMessage.NO_PROCUREMENT_ADMIN_CONFIGURED,
-        `The company with id '${companyId}' does not have any procurement admins configured.`,
-      );
-    }
+      await this.approvalsService.selectRandomProcurementAdmin(companyId);
 
     const newApproval = new this.approvalModel({
       procurementId: savedProcurement.id,
@@ -165,7 +151,7 @@ export class ItemRequestsService {
   async deleteProcurement(id: string) {
     // Only by Site managers
     const existingProcurement = await this.getProcurement(id);
-    
+
     // Only procurements that have not begun approval can be edited.
     if (existingProcurement.status !== ItemRequestStatus.PENDING_APPROVAL) {
       throw new ConflictException(
