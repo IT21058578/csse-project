@@ -1,172 +1,76 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-  Company,
-  CompanyModel,
-  FlattenedItem,
-} from 'src/companies/company.schema';
+import { Company, CompanyModel } from 'src/companies/company.schema';
 import { CreateSiteDto } from './dtos/create-site.dto';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import ErrorMessage from 'src/common/enums/error-message.enum';
 import { UserFlattened } from 'src/users/user.schema';
-import { SortOrder } from 'mongoose';
-import { PageBuilder } from 'src/common/util/page-builder';
+import { CompaniesService } from 'src/companies/companies.service';
+import { Site, SiteModel } from './site.schema';
 
 @Injectable()
 export class SitesService {
   constructor(
+    private readonly companiesService: CompaniesService,
     @InjectModel(Company.name) private readonly companyModel: CompanyModel,
+    @InjectModel(Site.name) private readonly siteModel: SiteModel,
   ) {}
 
   async createSite(user: UserFlattened, createSiteDto: CreateSiteDto) {
     const { address, companyId, mobiles, name, siteManagerIds } = createSiteDto;
-    const company = await this.companyModel.findById(companyId);
-
-    if (company == null) {
-      throw new BadRequestException(ErrorMessage.COMPANY_NOT_FOUND);
+    await this.companiesService.getCompany(companyId); // Verification
+    const hasSiteWithSameName = await this.siteModel
+      .find({ companyId, name })
+      .count();
+    if (hasSiteWithSameName !== 0) {
     }
 
-    const hasSiteWithName = company.sites.some((site) => site.name === name);
-    if (hasSiteWithName) {
-      throw new BadRequestException(
-        ErrorMessage.SITE_ALREADY_EXISTS,
-        `A site with the name '${name}' already exists`,
-      );
-    }
-
-    company.sites.push({
+    const newSite = new this.siteModel({
       name,
       address,
       mobiles,
+      companyId,
       siteManagerIds,
       createdAt: new Date(),
       createdBy: user._id,
     });
-    const savedCompany = await company.save();
-    const savedSite = savedCompany.sites.find((site) => site.name === name);
-
-    if (savedSite === undefined) {
-      throw new InternalServerErrorException();
-    }
+    const savedSite = await newSite.save();
 
     return savedSite;
   }
 
   async editSite(user: UserFlattened, id: string, editSiteDto: CreateSiteDto) {
     const { address, mobiles, name, siteManagerIds } = editSiteDto;
-    const company = await this.companyModel.findBySiteId(id);
-
-    if (company == null) {
-      throw new BadRequestException(
-        ErrorMessage.SITE_NOT_FOUND,
-        `Site with the id '${id}' was not found`,
-      );
+    const existingSite = await this.getSite(id);
+    const hasSiteWithSameName = await this.siteModel
+      .find({ companyId: existingSite.companyId, name })
+      .count();
+    if (hasSiteWithSameName !== 0) {
     }
 
-    // Must definitely be present
-    const siteIdx = company.sites.findIndex((site) => site.id === id);
-    company.sites[siteIdx].name = name;
-    company.sites[siteIdx].address = address;
-    company.sites[siteIdx].mobiles = mobiles;
-    company.sites[siteIdx].siteManagerIds = siteManagerIds;
-    company.sites[siteIdx].updatedAt = new Date();
-    company.sites[siteIdx].updatedBy = user._id;
-    const savedCompany = await company.save();
+    existingSite.name = name;
+    existingSite.address = address;
+    existingSite.mobiles = mobiles;
+    existingSite.siteManagerIds = siteManagerIds;
+    existingSite.updatedAt = new Date();
+    existingSite.updatedBy = user._id;
 
-    const savedSite = savedCompany.sites[siteIdx];
-
-    if (savedSite === undefined) {
-      throw new InternalServerErrorException();
-    }
-
+    const savedSite = await existingSite.save();
     return savedSite;
   }
 
-  async deleteSite(id: string) {
-    // Only company admin
-    const company = await this.companyModel.findBySiteId(id);
-
-    if (company == null) {
-      throw new BadRequestException(
-        ErrorMessage.SITE_NOT_FOUND,
-        `Site with the id '${id}' was not found`,
-      );
-    }
-
-    // Must definetely be present
-    const deletedSite = await company.sites.id(id)?.deleteOne()!;
-    await company.save();
-    return deletedSite;
-  }
-
   async getSite(id: string) {
-    const company = await this.companyModel.findBySiteId(id);
+    const existingSite = await this.siteModel.findById(id);
 
-    if (company == null) {
+    if (existingSite == null) {
       throw new BadRequestException(
         ErrorMessage.SITE_NOT_FOUND,
         `Site with the id '${id}' was not found`,
       );
     }
 
-    return company.sites.id(id)!;
+    return existingSite;
   }
 
-  async getSitesPage(pageRequest: PageRequest) {
-    const { pageNum, pageSize, filter, sort } = pageRequest;
-
-    let query = {};
-    let querySort: [string, SortOrder][] = [];
-
-    if (filter !== undefined) {
-      if (filter['companyId']) {
-        query = { ...query, companyId: filter['companyId'].value };
-      }
-      if (filter['siteManagerId']) {
-        query = {
-          ...query,
-          siteManagerIds: { $in: [filter['siteManagerId'].value] },
-        };
-      }
-      if (filter['name']) {
-        query = {
-          ...query,
-          name: filter['name'].value,
-        };
-      }
-    }
-
-    if (sort !== undefined) {
-      if (sort.field === 'name') querySort.push(['name', sort.direction]);
-    }
-
-    const companies = await this.companyModel.find(query).sort(querySort);
-    const items: FlattenedItem[] = [];
-
-    // Iterate through and select only necessary items
-    const start = (pageNum - 1) * pageSize;
-    const end = pageNum * pageSize;
-    let current = 0;
-    companies.forEach((company) => {
-      company.items.forEach((item) => {
-        if (current >= start && current < end) {
-          items.push(item.toJSON());
-        }
-        current += 1;
-      });
-    });
-
-    const itemsPage = PageBuilder.buildPage(items, {
-      pageNum,
-      pageSize,
-      sort,
-      totalDocuments: current + 1,
-    });
-
-    return itemsPage;
-  }
+  async getSitesPage(pageRequest: PageRequest) {}
 }

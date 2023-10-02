@@ -12,6 +12,7 @@ const ErrorMessage = {
   PROCUREMENT_NOT_FOUND: 'Procurement not found',
   APPROVAL_NOT_FOUND: 'Approval not found',
   DELIVERY_NOT_FOUND: 'Delivery not found',
+  INVOICE_NOT_FOUND: 'Invoice not found',
 
   // Already exists
   PRODUCT_ALREADY_EXISTS: 'Product already exists',
@@ -39,6 +40,8 @@ const ErrorMessage = {
   INVALID_PROCUREMENT_ITEM: 'Invalid procurement item',
   INVALID_SUPPLIER_ITEM: 'Invalid supplier item',
   INVALID_PROCUREMENT_STATUS: 'Invalid procurement status',
+  INVALID_PROCUREMENT_COMPANY: 'Invalid procurement company',
+  INVALID_PROCUREMENT_SUPPLIER: 'Invalid procurement supplier',
 } as const;
 
 export default ErrorMessage;
