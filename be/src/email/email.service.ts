@@ -1,6 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable, Logger } from '@nestjs/common';
-import { EmailPurpose } from 'src/common/constants/email-purpose';
+import { EmailPurpose } from 'src/common/enums/email-purpose.enum';
 
 @Injectable()
 export class EmailService {

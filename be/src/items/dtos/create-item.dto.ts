@@ -1,5 +1,6 @@
 export class CreateItemDto {
-    name: string;
-    companyId: string;
+  id?: string;
+  name: string;
+  companyId: string;
   imageUrls: string[];
 }

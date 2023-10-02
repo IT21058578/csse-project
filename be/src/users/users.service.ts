@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from './user.schema';
-import { FlattenMaps, Model, Types } from 'mongoose';
+import { User, UserDocument, UserFlattened } from './user.schema';
+import { Model } from 'mongoose';
 import { Page, PageBuilder } from 'src/common/util/page-builder';
 import { CreateUserDto } from 'src/common/dtos/create-user.dto';
-import ErrorMessage from 'src/common/constants/error-message';
+import ErrorMessage from 'src/common/enums/error-message.enum';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
-import { UserRole } from 'src/common/constants/user-roles';
+import { UserRole } from 'src/common/enums/user-roles.enum';
 import { hashSync } from 'bcrypt';
 
 @Injectable()
@@ -94,7 +94,7 @@ export class UsersService {
     pageNum = 1,
     pageSize = 10,
     sort,
-  }: PageRequest): Promise<Page<FlattenMaps<User & { _id: Types.ObjectId }>>> {
+  }: PageRequest): Promise<Page<UserFlattened>> {
     const skippedDocuments = (pageNum - 1) * pageSize;
     const [totalDocuments, users] = await Promise.all([
       this.userModel.count({}),
@@ -111,7 +111,7 @@ export class UsersService {
     ]);
 
     const userPage = PageBuilder.buildPage(
-      users.map((user) => user.toJSON()),
+      users.map((user) => user.toJSON() as UserFlattened),
       {
         pageNum,
         pageSize,

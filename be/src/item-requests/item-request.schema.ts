@@ -1,53 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model, Types } from 'mongoose';
+import { HydratedDocument, Model } from 'mongoose';
+import { ItemRequestStatus } from 'src/common/enums/item-request-status.enum';
 import { Audit } from 'src/common/schema/audit.schema';
 
 export type ItemRequestDocument = HydratedDocument<ItemRequest>;
-export type ItemRequestModel = Model<ItemRequestDocument> & {
-  findByInvoiceId: (id: string) => Promise<ItemRequestDocument | null>;
-  findByApprovalId: (id: string) => Promise<ItemRequestDocument | null>;
-  findByDeliveryId: (id: string) => Promise<ItemRequestDocument | null>;
-};
-
-export const ItemRequestStatus = {
-  PENDING_APPROVAL: 'PENDING_APPROVAL',
-  PARTIALLY_APPROVED: 'PARTIALLY_APPROVED',
-  APPROVED: 'APPROVED',
-  PARTIALLY_DELIVERED: 'PARTIALLY_DELIVERED',
-  DELIVERED: 'DELIVERED',
-  PENDING_INVOICE: 'PENDING_INVOICE',
-  COMPLETED: 'COMPLETED',
-} as const;
-
-export type ItemRequestStatus = keyof typeof ItemRequestStatus;
-
-class Approval extends Audit {
-  @Prop()
-  approvedBy: string;
-
-  @Prop()
-  isApproved: boolean;
-
-  @Prop()
-  refferredTo?: string;
-
-  @Prop()
-  description?: string;
-}
-
-class Delivery extends Audit {
-  @Prop()
-  qty: number;
-}
-
-class Invoice extends Audit {
-  @Prop()
-  invoiceUrls: string[];
-}
-
-const ApprovalSchema = SchemaFactory.createForClass(Approval);
-const DeliverySchema = SchemaFactory.createForClass(Delivery);
-const InvoiceSchema = SchemaFactory.createForClass(Invoice);
+export type ItemRequestModel = Model<ItemRequestDocument>;
 
 @Schema({ collection: 'item-requests' })
 export class ItemRequest extends Audit {
@@ -73,39 +30,17 @@ export class ItemRequest extends Audit {
   })
   status: ItemRequestStatus;
 
-  @Prop(InvoiceSchema)
-  invoice: Invoice;
+  @Prop()
+  price: number;
 
-  @Prop({ type: [ApprovalSchema], default: [] })
-  approvals: Types.DocumentArray<Approval>;
+  @Prop()
+  invoiceId: string;
 
-  @Prop({ type: [DeliverySchema], default: [] })
-  deliveries: Types.DocumentArray<Delivery>;
+  @Prop({ type: [String], default: [] })
+  approvalIds: string;
+
+  @Prop({ type: [String], default: [] })
+  deliverieIds: string;
 }
 
-const ItemRequestSchema = SchemaFactory.createForClass(ItemRequest);
-
-ItemRequestSchema.statics = {
-  async findByInvoiceId(id: string) {
-    const itemRequests = (await this.find({
-      'invoice.id': id,
-    })) as ItemRequest[];
-    return itemRequests.at(0) ?? null;
-  },
-
-  async findByApprovalId(id: string) {
-    const itemRequests = (await this.find({
-      approvals: { $elemMatch: { id } },
-    })) as ItemRequest[];
-    return itemRequests.at(0) ?? null;
-  },
-
-  async findByDeliveryId(id: string) {
-    const itemRequests = (await this.find({
-      deliveries: { $elemMatch: { id } },
-    })) as ItemRequest[];
-    return itemRequests.at(0) ?? null;
-  },
-};
-
-export { ItemRequestSchema };
+export const ItemRequestSchema = SchemaFactory.createForClass(ItemRequest);

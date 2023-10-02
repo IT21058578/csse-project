@@ -11,7 +11,7 @@ import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dtos/create-company.dto';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { UserRole } from 'src/common/constants/user-roles';
+import { UserRole } from 'src/common/enums/user-roles.enum';
 import { User } from 'src/common/decorators/user.decorator';
 import { UserDocument } from 'src/users/user.schema';
 
