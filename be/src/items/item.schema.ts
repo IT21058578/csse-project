@@ -18,4 +18,4 @@ export class Item extends Audit {
   imageUrls: string[];
 }
 
-export const itemSchema = SchemaFactory.createForClass(Item);
+export const ItemSchema = SchemaFactory.createForClass(Item);

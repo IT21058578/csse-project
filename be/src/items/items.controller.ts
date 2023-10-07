@@ -34,12 +34,6 @@ export class ItemsController {
     return await this.itemsService.editItem(user, id, editItemDto);
   }
 
-  @Delete(':id')
-  @Roles(UserRole.COMPANY_ADMIN, UserRole.SYSTEM_ADMIN)
-  async deleteItem(@Param('id') id: string) {
-    return await this.itemsService.deleteItem(id);
-  }
-
   @Get(':id')
   async getItem(@Param('id') id: string) {
     return await this.itemsService.getItem(id);

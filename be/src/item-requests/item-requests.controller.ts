@@ -1,53 +1,63 @@
-import { Controller } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
+import { PageRequest } from 'src/common/dtos/page-request.dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { UserRole } from 'src/common/enums/user-roles.enum';
+import { User } from 'src/common/decorators/user.decorator';
+import { UserDocument, UserFlattened } from 'src/users/user.schema';
+import { ItemRequestsService } from './item-requests.service';
+import { CreateProcurementDto } from './dto/create-procurement.dto';
 
-@Controller()
+@Controller('procurements')
 export class ItemRequestsController {
-  async getItemRequest() {
-    // Include names of anything refered to by id
+  constructor(private readonly procurementsService: ItemRequestsService) {}
+
+  @Get('search')
+  async getItemRequestPage(@Body() pageRequest: PageRequest) {
+    return await this.procurementsService.getItemRequestPage(pageRequest);
   }
 
-  async getItemRequestPage() {
-    // Include names of anything refered to by id
+  @Put(':id')
+  @Roles(UserRole.SITE_ADMIN)
+  async editProcurement(
+    @User() user: UserFlattened,
+    @Param('id') id: string,
+    @Body() editProcurementDto: CreateProcurementDto,
+  ) {
+    return await this.procurementsService.editProcurement(
+      user,
+      id,
+      editProcurementDto,
+    );
   }
 
-  async createRequest() {
-    // Only by Site managers
-    // Send approval request to random lowest level staff
+  @Delete(':id')
+  @Roles(UserRole.SITE_ADMIN)
+  async deleteProcurement(@Param('id') id: string) {
+    return await this.procurementsService.deleteProcurement(id);
   }
 
-  async editRequest() {
-    // Only by Site managers
-    // Can only be done if pending approval
+  @Get('')
+  async getProcurement(@Param('id') id: string) {
+    return await this.procurementsService.getProcurement(id);
   }
 
-  async deleteRequest() {
-    // Only by Site managers
-    // Can only be done if pending approval
-  }
-
-  async approveRequest() {
-    // Only by Procurement Staff or others
-    // Can only be done if pending approval or partially approved
-    // Can be approved or disapproved. If approval is finalized, send email to supplier.
-  }
-
-  async createDelivery() {
-    // Only by Site managers
-    // Can only be done if approved or partially delivered
-  }
-
-  async deleteDelivery() {
-    // Only by Site managers
-    // Can only be done if approved or partially delivered
-  }
-
-  async editDelivery() {
-    // Only by Site managers
-    // Can only be done if approved or partially delivered
-  }
-
-  async createInvoice() {
-    // Only by Site managers
-    // Can only be done if pending invoice
+  @Post()
+  @Roles(UserRole.SITE_ADMIN)
+  async createProcurement(
+    @User() user: UserFlattened,
+    @Body() createProcurementDto: CreateProcurementDto,
+  ) {
+    return await this.procurementsService.createProcurement(
+      user,
+      createProcurementDto,
+    );
   }
 }

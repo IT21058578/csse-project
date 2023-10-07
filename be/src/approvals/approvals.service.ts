@@ -1,7 +1,9 @@
 import {
   BadRequestException,
   ConflictException,
+  Inject,
   Injectable,
+  forwardRef,
 } from '@nestjs/common';
 import { User, UserDocument, UsersModel } from 'src/users/user.schema';
 import {
@@ -12,19 +14,21 @@ import {
 } from './approval.schema';
 import { CreateApprovalDto } from './dtos/create-approval.dto';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
-import { Page } from 'src/common/util/page-builder';
+import { Page, PageBuilder } from 'src/common/util/page-builder';
 import { InjectModel } from '@nestjs/mongoose';
 import ErrorMessage from 'src/common/enums/error-message.enum';
 import { ApprovalStatus } from 'src/common/enums/approval-status.enum';
-import { ItemRequestsService } from 'src/item-requests/item-requests.service';
-import { ItemRequestStatus } from 'src/common/enums/item-request-status.enum';
 import { ArrayUtils } from 'src/common/util/array-utils';
 import { UserRole } from 'src/common/enums/user-roles.enum';
+import { SortOrder } from 'mongoose';
+import { ItemRequestsService } from 'src/item-requests/item-requests.service';
+import { ItemRequestStatus } from 'src/common/enums/item-request-status.enum';
 
 @Injectable()
 export class ApprovalsService {
   constructor(
-    private readonly procurementsService: ItemRequestsService,
+    @Inject(forwardRef(() => ItemRequestsService))
+    private readonly itemRequestsService: ItemRequestsService,
     @InjectModel(User.name) private readonly userModel: UsersModel,
     @InjectModel(Approval.name) private readonly approvalModel: ApprovalModel,
   ) {}
@@ -57,7 +61,7 @@ export class ApprovalsService {
     approval.updatedAt = new Date();
     const savedApproval = await approval.save();
 
-    const procurement = await this.procurementsService.getProcurement(
+    const procurement = await this.itemRequestsService.getProcurement(
       approval.procurementId,
     );
 
@@ -91,9 +95,42 @@ export class ApprovalsService {
     return savedApproval;
   }
 
-  async getApprovalsPage(
-    pageRequest: PageRequest,
-  ): Promise<Page<FlatApproval>> {}
+  async getApprovalsPage({
+    pageNum = 1,
+    pageSize = 10,
+    filter,
+    sort,
+  }: PageRequest): Promise<Page<FlatApproval>> {
+    const query = this.approvalModel.find({
+      companyId: filter?.company?.value,
+      procurementId: filter?.procurementId?.value,
+      approvedBy: filter?.approvedBy?.value,
+      status: filter?.status?.value,
+      refferredTo: filter?.status?.value,
+    });
+    const sortArr: [string, SortOrder][] = Object.entries(sort ?? {}).map(
+      ([key, value]) => [key, value as SortOrder],
+    );
+    const [content, totalDocuments] = await Promise.all([
+      query
+        .clone()
+        .sort(sortArr)
+        .skip((pageNum - 1) * pageSize)
+        .limit(pageSize)
+        .exec(),
+      query.clone().count().exec(),
+    ]);
+    const jsonContent = content.map((doc) =>
+      doc.toJSON(),
+    ) satisfies FlatApproval[];
+    const approvalsPage = PageBuilder.buildPage(jsonContent, {
+      pageNum,
+      pageSize,
+      totalDocuments,
+      sort,
+    });
+    return approvalsPage;
+  }
 
   async selectRandomProcurementAdmin(
     companyId: string,

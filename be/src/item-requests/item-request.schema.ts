@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
+import { FlattenMaps, HydratedDocument, Model } from 'mongoose';
 import { ItemRequestStatus } from 'src/common/enums/item-request-status.enum';
 import { Audit } from 'src/common/schema/audit.schema';
 
 export type ItemRequestDocument = HydratedDocument<ItemRequest>;
 export type ItemRequestModel = Model<ItemRequestDocument>;
+export type FlatProcurement = FlattenMaps<ItemRequest & { _id: string }>;
 
 @Schema({ collection: 'item-requests' })
 export class ItemRequest extends Audit {
@@ -32,15 +33,6 @@ export class ItemRequest extends Audit {
 
   @Prop()
   price: number;
-
-  @Prop()
-  invoiceId: string;
-
-  @Prop({ type: [String], default: [] })
-  approvalIds: string;
-
-  @Prop({ type: [String], default: [] })
-  deliverieIds: string;
 }
 
 export const ItemRequestSchema = SchemaFactory.createForClass(ItemRequest);

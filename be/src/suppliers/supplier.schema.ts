@@ -26,4 +26,4 @@ export class Supplier extends Audit {
   items: Types.Map<{ rate: number }>;
 }
 
-export const supplierSchema = SchemaFactory.createForClass(Supplier);
+export const SupplierSchema = SchemaFactory.createForClass(Supplier);

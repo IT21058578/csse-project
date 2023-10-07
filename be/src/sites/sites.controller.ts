@@ -34,12 +34,6 @@ export class SitesController {
     return await this.sitesService.editSite(user, id, editSiteDto);
   }
 
-  @Delete(':id')
-  @Roles(UserRole.COMPANY_ADMIN, UserRole.SITE_ADMIN, UserRole.SYSTEM_ADMIN)
-  async deleteSite(@Param('id') id: string) {
-    return await this.sitesService.deleteSite(id);
-  }
-
   @Get(':id')
   async getSite(@Param('id') id: string) {
     return await this.sitesService.getSite(id);

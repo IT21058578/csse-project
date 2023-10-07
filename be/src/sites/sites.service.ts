@@ -1,18 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Company, CompanyModel } from 'src/companies/company.schema';
 import { CreateSiteDto } from './dtos/create-site.dto';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import ErrorMessage from 'src/common/enums/error-message.enum';
 import { UserFlattened } from 'src/users/user.schema';
 import { CompaniesService } from 'src/companies/companies.service';
-import { Site, SiteModel } from './site.schema';
+import { FlatSite, Site, SiteModel } from './site.schema';
+import { SortOrder } from 'mongoose';
+import { PageBuilder } from 'src/common/util/page-builder';
 
 @Injectable()
 export class SitesService {
   constructor(
     private readonly companiesService: CompaniesService,
-    @InjectModel(Company.name) private readonly companyModel: CompanyModel,
     @InjectModel(Site.name) private readonly siteModel: SiteModel,
   ) {}
 
@@ -72,5 +72,44 @@ export class SitesService {
     return existingSite;
   }
 
-  async getSitesPage(pageRequest: PageRequest) {}
+  async getSitesPage({
+    pageNum = 1,
+    pageSize = 10,
+    filter,
+    sort,
+  }: PageRequest) {
+    const query = this.siteModel.find({
+      companyId: filter?.companyId?.value,
+      mobiles: { $in: [...filter?.mobiles?.value] },
+      siteManagerIds: { $in: [...filter?.siteManagerIds?.value] },
+      name:
+        filter?.companyId?.operator === 'LIKE'
+          ? { $regex: filter?.companyId?.value }
+          : filter?.companyId?.value,
+      address:
+        filter?.address?.operator === 'LIKE'
+          ? { $regex: filter?.address?.value }
+          : filter?.address?.value,
+    });
+    const sortArr: [string, SortOrder][] = Object.entries(sort ?? {}).map(
+      ([key, value]) => [key, value as SortOrder],
+    );
+    const [content, totalDocuments] = await Promise.all([
+      query
+        .clone()
+        .sort(sortArr)
+        .skip((pageNum - 1) * pageSize)
+        .limit(pageSize)
+        .exec(),
+      query.clone().count().exec(),
+    ]);
+    const jsonContent = content.map((doc) => doc.toJSON()) satisfies FlatSite[];
+    const page = PageBuilder.buildPage(jsonContent, {
+      pageNum,
+      pageSize,
+      totalDocuments,
+      sort,
+    });
+    return page;
+  }
 }

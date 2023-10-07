@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Company } from './company.schema';
+import { Model, SortOrder } from 'mongoose';
+import { Company, FlatCompany } from './company.schema';
 import { CreateCompanyDto } from './dtos/create-company.dto';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { UserDocument } from 'src/users/user.schema';
@@ -78,32 +78,39 @@ export class CompaniesService {
     return company;
   }
 
-  async getCompaniesPage({ pageNum = 1, pageSize = 10, sort }: PageRequest) {
-    const skippedDocuments = (pageNum - 1) * pageSize;
-    const [totalDocuments, companies] = await Promise.all([
-      this.companyModel.count({}),
-      this.companyModel
-        .find({})
-        .select({ password: 0 })
-        .limit(pageSize)
-        .skip(skippedDocuments)
-        .sort(
-          sort !== undefined
-            ? { [sort?.field ?? '_id']: sort?.direction ?? 'asc' }
-            : undefined,
-        ),
-    ]);
-
-    const companiesPage = PageBuilder.buildPage(
-      companies.map((company) => company.toJSON()),
-      {
-        pageNum,
-        pageSize,
-        totalDocuments,
-        sort,
-      },
+  async getCompaniesPage({
+    pageNum = 1,
+    pageSize = 10,
+    sort,
+    filter,
+  }: PageRequest) {
+    const query = this.companyModel.find({
+      name: filter?.name?.value,
+      siteIds: { $in: filter?.siteIds?.value },
+      itemsIds: { $in: filter?.itemsIds?.value },
+      supplierIds: { $in: filter?.supplierIds.value },
+    });
+    const sortArr: [string, SortOrder][] = Object.entries(sort ?? {}).map(
+      ([key, value]) => [key, value as SortOrder],
     );
-
-    return companiesPage;
+    const [content, totalDocuments] = await Promise.all([
+      query
+        .clone()
+        .sort(sortArr)
+        .skip((pageNum - 1) * pageSize)
+        .limit(pageSize)
+        .exec(),
+      query.clone().count().exec(),
+    ]);
+    const jsonContent = content.map((doc) =>
+      doc.toJSON(),
+    ) satisfies FlatCompany[];
+    const page = PageBuilder.buildPage(jsonContent, {
+      pageNum,
+      pageSize,
+      totalDocuments,
+      sort,
+    });
+    return page;
   }
 }

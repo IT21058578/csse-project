@@ -4,8 +4,10 @@ import { PageRequest } from 'src/common/dtos/page-request.dto';
 import ErrorMessage from 'src/common/enums/error-message.enum';
 import { UserFlattened } from 'src/users/user.schema';
 import { CreateItemDto } from './dtos/create-item.dto';
-import { Item, ItemModel } from './item.schema';
+import { FlattenedItem, Item, ItemModel } from './item.schema';
 import { CompaniesService } from 'src/companies/companies.service';
+import { SortOrder } from 'mongoose';
+import { PageBuilder } from 'src/common/util/page-builder';
 
 @Injectable()
 export class ItemsService {
@@ -26,6 +28,10 @@ export class ItemsService {
       .find({ companyId, name })
       .count();
     if (hasItemWithSameName !== 0) {
+      throw new BadRequestException(
+        ErrorMessage.ITEM_ALREADY_EXISTS,
+        `Item with name ${name} already exists`,
+      );
     }
 
     const newItem = new this.itemModel({
@@ -40,11 +46,14 @@ export class ItemsService {
     return savedItem;
   }
 
-  async editItem(user: UserFlattened, editItemDto: CreateItemDto) {
-    const { id, name, imageUrls } = editItemDto;
+  async editItem(user: UserFlattened, id: string, editItemDto: CreateItemDto) {
+    const { name, imageUrls } = editItemDto;
 
     if (id === undefined) {
-      throw new BadRequestException();
+      throw new BadRequestException(
+        ErrorMessage.ITEM_NOT_FOUND,
+        `Item with id ${id} not found`,
+      );
     }
 
     const existingItem = await this.getItem(id);
@@ -72,5 +81,40 @@ export class ItemsService {
     return existingItem;
   }
 
-  async getItemsPage(pageRequest: PageRequest) {}
+  async getItemsPage({
+    pageNum = 1,
+    pageSize = 10,
+    filter,
+    sort,
+  }: PageRequest) {
+    const query = this.itemModel.find({
+      companyId: filter?.companyId?.value,
+      name:
+        filter?.companyId?.operator === 'LIKE'
+          ? { $regex: filter?.companyId?.value }
+          : filter?.companyId?.value,
+    });
+    const sortArr: [string, SortOrder][] = Object.entries(sort ?? {}).map(
+      ([key, value]) => [key, value as SortOrder],
+    );
+    const [content, totalDocuments] = await Promise.all([
+      query
+        .clone()
+        .sort(sortArr)
+        .skip((pageNum - 1) * pageSize)
+        .limit(pageSize)
+        .exec(),
+      query.clone().count().exec(),
+    ]);
+    const jsonContent = content.map((doc) =>
+      doc.toJSON(),
+    ) satisfies FlattenedItem[];
+    const page = PageBuilder.buildPage(jsonContent, {
+      pageNum,
+      pageSize,
+      totalDocuments,
+      sort,
+    });
+    return page;
+  }
 }

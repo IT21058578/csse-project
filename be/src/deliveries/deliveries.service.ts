@@ -12,7 +12,7 @@ import {
 import { UserDocument } from 'src/users/user.schema';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { CreateDeliveryDto } from './dtos/create-delivery.dto';
-import { Page } from 'src/common/util/page-builder';
+import { Page, PageBuilder } from 'src/common/util/page-builder';
 import { InjectModel } from '@nestjs/mongoose';
 import ErrorMessage from 'src/common/enums/error-message.enum';
 import { CompaniesService } from 'src/companies/companies.service';
@@ -20,6 +20,7 @@ import { SuppliersService } from 'src/suppliers/suppliers.service';
 import { ItemsService } from 'src/items/items.service';
 import { ItemRequestsService } from 'src/item-requests/item-requests.service';
 import { ItemRequestStatus } from 'src/common/enums/item-request-status.enum';
+import { SortOrder } from 'mongoose';
 
 @Injectable()
 export class DeliveriesService {
@@ -118,7 +119,7 @@ export class DeliveriesService {
     const totalQty = allDeliveries
       .map((delivery) => delivery.qty)
       .reduce((a, b) => a + b);
-    
+
     if (totalQty >= procurement.qty) {
       procurement.status = ItemRequestStatus.PENDING_INVOICE;
       await procurement.save();
@@ -127,7 +128,39 @@ export class DeliveriesService {
     return savedDelivery;
   }
 
-  async getDeliveriesPage(
-    pageRequest: PageRequest,
-  ): Promise<Page<FlatDelivery>> {}
+  async getDeliveriesPage({
+    pageNum = 1,
+    pageSize = 10,
+    filter,
+    sort,
+  }: PageRequest): Promise<Page<FlatDelivery>> {
+    const query = this.deliveryModel.find({
+      companyId: filter?.companyId?.value,
+      itemId: filter?.itemId?.value,
+      supplierId: filter?.supplierId?.value,
+      procurementId: filter?.procurementId?.value,
+    });
+    const sortArr: [string, SortOrder][] = Object.entries(sort ?? {}).map(
+      ([key, value]) => [key, value as SortOrder],
+    );
+    const [content, totalDocuments] = await Promise.all([
+      query
+        .clone()
+        .sort(sortArr)
+        .skip((pageNum - 1) * pageSize)
+        .limit(pageSize)
+        .exec(),
+      query.clone().count().exec(),
+    ]);
+    const jsonContent = content.map((doc) =>
+      doc.toJSON(),
+    ) satisfies FlatDelivery[];
+    const page = PageBuilder.buildPage(jsonContent, {
+      pageNum,
+      pageSize,
+      totalDocuments,
+      sort,
+    });
+    return page;
+  }
 }

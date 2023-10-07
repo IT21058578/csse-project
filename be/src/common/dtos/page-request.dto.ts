@@ -5,6 +5,9 @@ export const CriteriaOperator = {
   GREATER_THAN: 'GREATER_THAN',
   LESS_THAN: 'LESS_THAN',
   NOT_EQUAL: 'NOT_EQUAL',
+  IN: 'IN',
+  NOT_IN: 'NOT_IN',
+  LIKE: 'LIKE',
 } as const;
 
 export type CritieriaOperator = keyof typeof CriteriaOperator;
