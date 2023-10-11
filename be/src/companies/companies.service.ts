@@ -24,12 +24,13 @@ export class CompaniesService {
       );
     }
 
-    const company = new this.companyModel();
-    company.name = name;
-    company.createdBy = user.id;
-    company.createdAt = new Date();
-    company.config = {};
-    return await company.save();
+    const savedCompany = await this.companyModel.create({
+      name,
+      createdBy: user?.id,
+      createdAt: new Date(),
+      config: {},
+    });
+    return savedCompany;
   }
 
   async editCompany(
@@ -46,12 +47,7 @@ export class CompaniesService {
       );
     }
 
-    const company = await this.companyModel.findById(id);
-
-    if (company == null) {
-      throw new BadRequestException(ErrorMessage.COMPANY_NOT_FOUND);
-    }
-
+    const company = await this.getCompany(id);
     company.name = name;
     company.updatedBy = user.id;
     company.updatedAt = new Date();
@@ -60,7 +56,6 @@ export class CompaniesService {
 
   async deleteCompany(id: string) {
     const company = await this.companyModel.findByIdAndDelete(id);
-    const etst = await this.companyModel.find();
     if (company == null) {
       throw new BadRequestException(ErrorMessage.COMPANY_NOT_FOUND);
     }

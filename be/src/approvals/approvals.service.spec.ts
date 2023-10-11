@@ -19,8 +19,6 @@ import { UserRole } from 'src/common/enums/user-roles.enum';
 import { isEmpty, xor } from 'lodash';
 import { MockUtils } from 'src/common/util/mock-util';
 
-
-
 describe('ApprovalsService', () => {
   let service: ApprovalsService;
   let itemRequestsService: ItemRequestsService;
@@ -39,11 +37,11 @@ describe('ApprovalsService', () => {
         },
         {
           provide: getModelToken(User.name),
-          useValue: MockUtils.mockModelValue(userModel),
+          useValue: MockUtils.mockModel(userModel),
         },
         {
           provide: getModelToken(Approval.name),
-          useValue: MockUtils.mockModelValue(approvalModel),
+          useValue: MockUtils.mockModel(approvalModel),
         },
       ],
     }).compile();
