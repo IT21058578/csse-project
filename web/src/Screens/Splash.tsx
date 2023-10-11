@@ -1,21 +1,23 @@
 import { FunctionComponent } from "react";
-import "./splash.css"
-import splash_man from "../assets/images/splash_man.png"
-import splash_building from "../assets/images/splash_building.png"
-import login_profile from "../assets/images/login_profile.png"
-
+import { useNavigate } from "react-router-dom";
+import "./splash.css";
+import splash_man from "../assets/images/splash_man.png";
+import splash_building from "../assets/images/splash_building.png";
+import login_profile from "../assets/images/login_profile.png";
+import RoutePaths from "../config";
 
 const Splash: FunctionComponent = () => {
+  const navigate = useNavigate();
+
+  const handleNavigate = () => {
+    navigate(RoutePaths.signin);
+  };
   return (
     <div className="div">
       <div className="macbook-pro-14-3">
         <div className="macbook-pro-14-1">
           <img className="pngegg-1-icon" alt="" src={splash_building} />
-          <img
-            className="pointing-left-icon"
-            alt=""
-            src={splash_man}
-          />
+          <img className="pointing-left-icon" alt="" src={splash_man} />
           <div className="macbook-pro-14-1-child" />
           <b className="welcome-to-autox-container">
             <p className="welcome-to-autox">
@@ -60,15 +62,11 @@ const Splash: FunctionComponent = () => {
           <div className="macbook-pro-14-1-inner" />
           <a
             className="login"
-            href="https://stackoverflow.com/questions/53521136/how-to-getstandard-value-from-spinner-with-multilanguage-app-on-android"
+            onClick={handleNavigate}
             target="_blank"
           >{`LOGIN `}</a>
           <b className="forget-password">Forget Password?</b>
-          <img
-            className="user-1077114-1-icon"
-            alt=""
-            src= {login_profile}
-          />
+          <img className="user-1077114-1-icon" alt="" src={login_profile} />
         </div>
       </div>
     </div>
