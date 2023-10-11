@@ -35,21 +35,21 @@ export class AuthService {
 
       if (!isPasswordsMatching) {
         this.logger.warn(
-          `User with id '${existingUser.id}' has tried to login but used wrong password`,
+          `User with id '${existingUser._id}' has tried to login but used wrong password`,
         );
         throw Error();
       }
 
       if (!existingUser.isAuthorized) {
         this.logger.warn(
-          `User with id ${existingUser.id} attempted login but has not verified their email`,
+          `User with id ${existingUser._id} attempted login but has not verified their email`,
         );
         throw Error();
       }
 
       const [accessToken, refreshToken] = await Promise.all([
-        this.jwtTokenService.getAccessToken(existingUser.id),
-        this.jwtTokenService.getRefreshToken(existingUser.id),
+        this.jwtTokenService.getAccessToken(existingUser._id as any),
+        this.jwtTokenService.getRefreshToken(existingUser._id as any),
       ]);
 
       const { password: userPassword, ...sanitizedUser } = existingUser;

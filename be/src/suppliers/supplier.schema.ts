@@ -23,7 +23,7 @@ export class Supplier extends Audit {
   @Prop([String])
   accountNumbers: string[];
 
-  @Prop({ type: Map, of: { rate: Number }, default: {} })
+  @Prop({ type: Object, default: {} })
   items: Record<string, { rate: number }>;
 }
 
