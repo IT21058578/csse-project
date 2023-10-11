@@ -51,19 +51,27 @@ export class ApprovalsService {
     const { approvalId, description, refferredTo, isApproved } =
       editApprovalDto;
     const approval = await this.getApproval(approvalId);
+    const procurement = await this.itemRequestsService.getProcurement(
+      approval.procurementId,
+    );
+
+    if (
+      ![
+        ItemRequestStatus.PARTIALLY_APPROVED,
+        ItemRequestStatus.PENDING_APPROVAL,
+      ].includes(procurement.status as any)
+    ) {
+      throw new BadRequestException(ErrorMessage.PROCUREMENT_ALREADY_APPROVED);
+    }
 
     approval.description = description;
     approval.refferredTo = refferredTo;
     approval.status = isApproved
       ? ApprovalStatus.APPROVED
       : ApprovalStatus.DISAPPROVED;
-    approval.updatedBy = user.id;
+    approval.updatedBy = user?.id;
     approval.updatedAt = new Date();
     const savedApproval = await approval.save();
-
-    const procurement = await this.itemRequestsService.getProcurement(
-      approval.procurementId,
-    );
 
     if (approval.status === ApprovalStatus.DISAPPROVED) {
       procurement.status = ItemRequestStatus.DISAPPROVED;
@@ -83,15 +91,15 @@ export class ApprovalsService {
       procurement.companyId,
       [approval.approvedBy],
     );
-    const nextApproval = new this.approvalModel({
+    const nextApprovalPromise = this.approvalModel.create({
       companyId: procurement.companyId,
       approvedBy: selectedAdmin.id,
       status: ApprovalStatus.PENDING,
       procurementId: procurement.id,
       createdAt: new Date(),
-      createdBy: user.id,
+      createdBy: user?.id,
     });
-    await Promise.all([procurement.save(), nextApproval.save()]);
+    await Promise.all([procurement.save(), nextApprovalPromise]);
     return savedApproval;
   }
 
