@@ -60,6 +60,8 @@ export class CompaniesService {
       throw new BadRequestException(ErrorMessage.COMPANY_NOT_FOUND);
     }
 
+    // TODO: Delete all corresponding
+
     return company;
   }
 

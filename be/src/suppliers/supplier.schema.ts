@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { FlattenMaps, Model, Types } from 'mongoose';
+import { FlattenMaps, HydratedDocument, Model } from 'mongoose';
 import { Audit } from 'src/common/schema/audit.schema';
 
 export type FlatSupplier = FlattenMaps<Supplier> & { _id: string };
+export type SupplierDocument = HydratedDocument<Supplier>;
 export type SupplierModel = Model<Supplier>;
 
 @Schema()
@@ -23,7 +24,7 @@ export class Supplier extends Audit {
   accountNumbers: string[];
 
   @Prop({ type: Map, of: { rate: Number }, default: {} })
-  items: Types.Map<{ rate: number }>;
+  items: Record<string, { rate: number }>;
 }
 
 export const SupplierSchema = SchemaFactory.createForClass(Supplier);

@@ -64,7 +64,7 @@ export class SuppliersService {
     supplier.name = name;
     supplier.accountNumbers = accountNumbers;
     supplier.email = email;
-    supplier.items = new Types.Map(Object.entries(items));
+    supplier.items = items;
     supplier.mobiles = mobiles;
     supplier.updatedAt = new Date();
     supplier.updatedBy = user._id;

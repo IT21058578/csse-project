@@ -67,10 +67,10 @@ export class ItemRequestsService {
     if (supplier.companyId !== company.id) {
       throw new BadRequestException(ErrorMessage.SUPPLIER_NOT_FOUND);
     }
-    if (!supplier.items.has(item.id)) {
+    if (!Object.keys(supplier.items).includes(item.id)) {
       throw new BadRequestException(ErrorMessage.ITEM_NOT_FOUND);
     }
-    const supplierItem = supplier.items.get(item.id)!;
+    const supplierItem = supplier.items[item.id];
 
     const price = qty * supplierItem.rate;
     const newProcurement = new this.procurementModel({
@@ -103,8 +103,9 @@ export class ItemRequestsService {
     //   createdAt: new Date(),
     //   createdBy: user._id,
     // });
+
     // await newApproval.save();
-    // return savedProcurement;
+    return savedProcurement;
   }
 
   async editProcurement(
@@ -145,7 +146,7 @@ export class ItemRequestsService {
     if (supplier.companyId !== company.id) {
       throw new BadRequestException(ErrorMessage.SUPPLIER_NOT_FOUND);
     }
-    if (!supplier.items.has(item.id)) {
+    if (!Object.keys(supplier.items).includes(item.id)) {
       throw new BadRequestException(ErrorMessage.ITEM_NOT_FOUND);
     }
 

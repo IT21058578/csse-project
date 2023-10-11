@@ -37,32 +37,11 @@ export class InvoicesService {
     user: UserDocument,
     createInvoiceDto: CreateInvoiceDto,
   ): Promise<InvoiceDocument> {
-    const { companyId, itemId, procurementId, supplierId, invoiceUrls } =
+    const { procurementId, invoiceUrls } =
       createInvoiceDto;
     const procurement = await this.procurementsService.getProcurement(
       procurementId,
     );
-
-    if (procurement.itemId !== itemId) {
-      throw new BadRequestException(
-        ErrorMessage.INVALID_PROCUREMENT_ITEM,
-        `Procurement with the id '${procurementId}' and item with the id '${itemId}' does not match`,
-      );
-    }
-
-    if (procurement.supplierId !== supplierId) {
-      throw new BadRequestException(
-        ErrorMessage.INVALID_PROCUREMENT_ITEM,
-        `Procurement with the id '${procurementId}' and supplier with the id '${supplierId}' does not match`,
-      );
-    }
-
-    if (procurement.companyId !== companyId) {
-      throw new BadRequestException(
-        ErrorMessage.INVALID_PROCUREMENT_ITEM,
-        `Procurement with the id '${procurementId}' and company with the id '${companyId}' does not match`,
-      );
-    }
 
     if (procurement.status !== ItemRequestStatus.PENDING_INVOICE) {
       throw new BadRequestException(
@@ -74,13 +53,13 @@ export class InvoicesService {
     procurement.status = ItemRequestStatus.COMPLETED;
     procurement.updatedAt = new Date();
     procurement.updatedBy = user.id;
-    const newInvoice = new this.invoiceModel({
+    const newInvoicePromise = this.invoiceModel.create({
       invoiceUrls,
       createdAt: new Date(),
       createdBy: user.id,
     });
     const [savedInvoice] = await Promise.all([
-      newInvoice.save(),
+      newInvoicePromise,
       procurement.save(),
     ]);
 
