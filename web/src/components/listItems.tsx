@@ -8,6 +8,7 @@ import Notifications from "@mui/icons-material/Notifications";
 import PlagiarismIcon from "@mui/icons-material/Plagiarism";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AssignmentIcon from "@mui/icons-material/Assignment";
+import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 import { Link } from "react-router-dom";
 
@@ -75,5 +76,13 @@ export const secondaryListItems = (
       </ListItemIcon>
       <ListItemText primary="Year-end sale" />
     </ListItemButton>
+    <br />
+    <ListItemButton component="a" href="/">
+      <ListItemIcon>
+        <LogoutIcon />
+      </ListItemIcon>
+      <ListItemText primary="Log Out" />
+    </ListItemButton>
+    <br />
   </React.Fragment>
 );

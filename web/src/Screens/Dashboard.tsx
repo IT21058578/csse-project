@@ -150,7 +150,11 @@ export default function Dashboard() {
               <ChevronLeftIcon />
             </IconButton>
           </Toolbar>
-          <Divider />
+          <Divider
+            sx={{
+              backgroundColor: "rgba(126, 142, 166, 1)",
+            }}
+          />
           <List
             component="nav"
             sx={{

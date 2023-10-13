@@ -6,7 +6,8 @@ const RoutePaths = {
   notification: "/notification",
   suppliers: "/suppliers",
   profile: "/profile",
-  settings: "./settings",
+  settings: "/settings",
+
   // USERS PATHS
 };
 
