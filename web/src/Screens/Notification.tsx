@@ -174,7 +174,7 @@ export default function Notification() {
           }}
         >
           {" "}
-          <Stack sx={{ width: "100%" }} spacing={2}>
+          <Stack sx={{ width: "100%", marginTop: "60px" }} spacing={2}>
             <Alert severity="error">
               <AlertTitle>Error</AlertTitle>
               This is an error alert — <strong>check it out!</strong>

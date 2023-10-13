@@ -153,7 +153,13 @@ export default function Supplier() {
             {secondaryListItems}
           </List>
         </Drawer>{" "}
-        <div style={{ height: 400, width: "100%" }}>
+        <div
+          style={{
+            height: 400,
+            width: "100%",
+            marginTop: "60px",
+          }}
+        >
           <DataGrid
             checkboxSelection
             onRowSelectionModelChange={(newRowSelectionModel) => {

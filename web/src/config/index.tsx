@@ -7,7 +7,6 @@ const RoutePaths = {
   suppliers: "/suppliers",
   profile: "/profile",
   settings: "/settings",
-
   // USERS PATHS
 };
 
