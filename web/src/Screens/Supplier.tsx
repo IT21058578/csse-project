@@ -158,6 +158,7 @@ export default function Supplier() {
             height: 400,
             width: "100%",
             marginTop: "60px",
+            padding: "30px",
           }}
         >
           <DataGrid
