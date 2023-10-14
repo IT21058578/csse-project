@@ -1,116 +1,122 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Company, CompanyModel } from 'src/companies/company.schema';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
-import ErrorMessage from 'src/common/constants/error-message';
+import ErrorMessage from 'src/common/enums/error-message.enum';
 import { UserFlattened } from 'src/users/user.schema';
 import { CreateItemDto } from './dtos/create-item.dto';
+import { FlattenedItem, Item, ItemModel } from './item.schema';
+import { CompaniesService } from 'src/companies/companies.service';
+import { SortOrder } from 'mongoose';
+import { PageBuilder } from 'src/common/util/page-builder';
 
 @Injectable()
 export class ItemsService {
   constructor(
-    @InjectModel(Company.name) private readonly companyModel: CompanyModel,
+    private readonly companiesService: CompaniesService,
+    @InjectModel(Item.name) private readonly itemModel: ItemModel,
   ) {}
 
   async createItem(user: UserFlattened, createItemDto: CreateItemDto) {
     const { name, imageUrls, companyId } = createItemDto;
-    const company = await this.companyModel.findById(companyId);
+    const company = await this.companiesService.getCompany(companyId);
 
     if (company == null) {
       throw new BadRequestException(ErrorMessage.COMPANY_NOT_FOUND);
     }
 
-    const hasItemWithName = company.items.some(
-      (item) => item.name === name,
-    );
-    if (hasItemWithName) {
+    const hasItemWithSameName = await this.itemModel
+      .find({ companyId, name })
+      .count();
+    if (hasItemWithSameName !== 0) {
       throw new BadRequestException(
         ErrorMessage.ITEM_ALREADY_EXISTS,
-        `A item with the name '${name}' already exists`,
+        `Item with name ${name} already exists`,
       );
     }
 
-    company.items.push({
+    const savedItem = await this.itemModel.create({
       name,
       imageUrls,
+      companyId,
       createdAt: new Date(),
       createdBy: user._id,
     });
-    const savedCompany = await company.save();
-    const savedItem = savedCompany.items.find(
-      (item) => item.name === name,
-    );
-
-    if (savedItem === undefined) {
-      throw new InternalServerErrorException();
-    }
 
     return savedItem;
   }
 
   async editItem(user: UserFlattened, id: string, editItemDto: CreateItemDto) {
     const { name, imageUrls } = editItemDto;
-    const company = await this.companyModel.findByItemId(id);
+    const existingItem = await this.getItem(id);
 
-    if (company == null) {
-      throw new BadRequestException(
-        ErrorMessage.ITEM_NOT_FOUND,
-        `Item with the id '${id}' was not found`,
-      );
+    if (name) {
+      const hasItemWithSameName = await this.itemModel
+        .find({ companyId: existingItem.companyId, name })
+        .count();
+      if (hasItemWithSameName !== 0) {
+        throw new BadRequestException(
+          ErrorMessage.ITEM_ALREADY_EXISTS,
+          `Item with name ${name} already exists`,
+        );
+      }
     }
 
-    // Must definitely be present
-    const itemIdx = company.items.findIndex(
-      (item) => item.id === id,
-    );
-    company.items[itemIdx].name = name;
-    company.items[itemIdx].imageUrls = imageUrls;
-    company.items[itemIdx].updatedAt = new Date();
-    company.items[itemIdx].updatedBy = user._id;
-    const savedCompany = await company.save();
-
-    const savedItem = savedCompany.items[itemIdx];
-
-    if (savedItem === undefined) {
-      throw new InternalServerErrorException();
-    }
+    existingItem.name = name ?? existingItem.name;
+    existingItem.imageUrls = imageUrls ?? existingItem.imageUrls;
+    existingItem.updatedAt = new Date();
+    existingItem.updatedBy = user._id;
+    const savedItem = await existingItem.save();
 
     return savedItem;
   }
 
-  async deleteItem(id: string) {
-    // Only company admin
-    const company = await this.companyModel.findByItemId(id);
-
-    if (company == null) {
-      throw new BadRequestException(
-        ErrorMessage.ITEM_NOT_FOUND,
-        `Item with the id '${id}' was not found`,
-      );
-    }
-
-    // Must definetely be present
-    const deletedItem = await company.items.id(id)?.deleteOne()!;
-    await company.save();
-    return deletedItem;
-  }
-
   async getItem(id: string) {
-    const company = await this.companyModel.findByItemId(id);
+    const existingItem = await this.itemModel.findById(id);
 
-    if (company == null) {
+    if (existingItem == null) {
       throw new BadRequestException(
         ErrorMessage.ITEM_NOT_FOUND,
         `Item with the id '${id}' was not found`,
       );
     }
 
-    return company.items.id(id)!;
+    return existingItem;
   }
 
-  async getItemsPage(pageRequest: PageRequest) {}
+  async getItemsPage({
+    pageNum = 1,
+    pageSize = 10,
+    filter,
+    sort,
+  }: PageRequest) {
+    const query = this.itemModel.find({
+      companyId: filter?.companyId?.value,
+      name:
+        filter?.companyId?.operator === 'LIKE'
+          ? { $regex: filter?.companyId?.value }
+          : filter?.companyId?.value,
+    });
+    const sortArr: [string, SortOrder][] = Object.entries(sort ?? {}).map(
+      ([key, value]) => [key, value as SortOrder],
+    );
+    const [content, totalDocuments] = await Promise.all([
+      query
+        .clone()
+        .sort(sortArr)
+        .skip((pageNum - 1) * pageSize)
+        .limit(pageSize)
+        .exec(),
+      query.clone().count().exec(),
+    ]);
+    const jsonContent = content.map((doc) =>
+      doc.toJSON(),
+    ) satisfies FlattenedItem[];
+    const page = PageBuilder.buildPage(jsonContent, {
+      pageNum,
+      pageSize,
+      totalDocuments,
+      sort,
+    });
+    return page;
+  }
 }

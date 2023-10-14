@@ -1,15 +1,15 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { hash, compare } from 'bcrypt';
-import ErrorMessage from 'src/common/constants/error-message';
+import ErrorMessage from 'src/common/enums/error-message.enum';
 import { LoginDto } from 'src/common/dtos/login.dto';
 import { CreateUserDto } from 'src/common/dtos/create-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/users/user.schema';
 import { Model } from 'mongoose';
-import { UserRole } from 'src/common/constants/user-roles';
+import { UserRole } from 'src/common/enums/user-roles.enum';
 import { TokenService } from 'src/token/token.service';
-import { TokenPurpose } from 'src/common/constants/token-purpose';
+import { TokenPurpose } from 'src/common/enums/token-purpose.enum';
 import { JwtTokenService } from 'src/jwt-token/jwt-token.service';
 import { EmailService } from 'src/email/email.service';
 
@@ -35,21 +35,21 @@ export class AuthService {
 
       if (!isPasswordsMatching) {
         this.logger.warn(
-          `User with id '${existingUser.id}' has tried to login but used wrong password`,
+          `User with id '${existingUser._id}' has tried to login but used wrong password`,
         );
         throw Error();
       }
 
       if (!existingUser.isAuthorized) {
         this.logger.warn(
-          `User with id ${existingUser.id} attempted login but has not verified their email`,
+          `User with id ${existingUser._id} attempted login but has not verified their email`,
         );
         throw Error();
       }
 
       const [accessToken, refreshToken] = await Promise.all([
-        this.jwtTokenService.getAccessToken(existingUser.id),
-        this.jwtTokenService.getRefreshToken(existingUser.id),
+        this.jwtTokenService.getAccessToken(existingUser._id as any),
+        this.jwtTokenService.getRefreshToken(existingUser._id as any),
       ]);
 
       const { password: userPassword, ...sanitizedUser } = existingUser;

@@ -11,9 +11,10 @@ import { SitesService } from './sites.service';
 import { CreateSiteDto } from './dtos/create-site.dto';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { UserRole } from 'src/common/constants/user-roles';
+import { UserRole } from 'src/common/enums/user-roles.enum';
 import { User } from 'src/common/decorators/user.decorator';
 import { UserFlattened } from 'src/users/user.schema';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 
 @Controller('sites')
 export class SitesController {
@@ -28,20 +29,14 @@ export class SitesController {
   @Roles(UserRole.COMPANY_ADMIN, UserRole.SITE_ADMIN, UserRole.SYSTEM_ADMIN)
   async editSite(
     @User() user: UserFlattened,
-    @Param('id') id: string,
+    @Param('id', ValidateObjectIdPipe) id: string,
     @Body() editSiteDto: CreateSiteDto,
   ) {
     return await this.sitesService.editSite(user, id, editSiteDto);
   }
 
-  @Delete(':id')
-  @Roles(UserRole.COMPANY_ADMIN, UserRole.SITE_ADMIN, UserRole.SYSTEM_ADMIN)
-  async deleteSite(@Param('id') id: string) {
-    return await this.sitesService.deleteSite(id);
-  }
-
   @Get(':id')
-  async getSite(@Param('id') id: string) {
+  async getSite(@Param('id', ValidateObjectIdPipe) id: string) {
     return await this.sitesService.getSite(id);
   }
 

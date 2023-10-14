@@ -1,19 +1,23 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from './user.schema';
-import { FlattenMaps, Model, Types } from 'mongoose';
+import { User, UserDocument, UserFlattened } from './user.schema';
+import { Model } from 'mongoose';
 import { Page, PageBuilder } from 'src/common/util/page-builder';
 import { CreateUserDto } from 'src/common/dtos/create-user.dto';
-import ErrorMessage from 'src/common/constants/error-message';
+import ErrorMessage from 'src/common/enums/error-message.enum';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
-import { UserRole } from 'src/common/constants/user-roles';
+import { UserRole } from 'src/common/enums/user-roles.enum';
 import { hashSync } from 'bcrypt';
+import { SitesService } from 'src/sites/sites.service';
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
-  constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {
+  constructor(
+    private readonly sitesService: SitesService,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+  ) {
     const existingSystemAdmin = this.userModel.findOne({
       roles: { $in: [UserRole.SYSTEM_ADMIN] },
     });
@@ -90,11 +94,44 @@ export class UsersService {
     // TODO: Delete orders, reviews.
   }
 
+  async assignToSite(user: UserFlattened, userId: string, siteId: string) {
+    const site = await this.sitesService.getSite(siteId);
+    const relevantUser = await this.getUser(userId);
+
+    if (site.companyId !== user.companyId) {
+      throw new BadRequestException(
+        ErrorMessage.SITE_NOT_FOUND,
+        `User with id ${userId} does not belong to same company as site with id ${siteId}`,
+      );
+    }
+
+    relevantUser.siteIds = [...user.siteIds, siteId];
+    relevantUser.updatedAt = new Date();
+    relevantUser.updatedBy = user._id;
+    return await relevantUser.save();
+  }
+
+  async unassignFromSite(user: UserFlattened, userId: string, siteId: string) {
+    const relevantUser = await this.getUser(userId);
+
+    if (!relevantUser.siteIds.includes(siteId)) {
+      throw new BadRequestException(
+        ErrorMessage.SITE_NOT_FOUND,
+        `User with id ${userId} is not assigned to site with id ${siteId}`,
+      );
+    }
+
+    relevantUser.siteIds = relevantUser.siteIds.filter((id) => id !== siteId);
+    relevantUser.updatedAt = new Date();
+    relevantUser.updatedBy = user._id;
+    return await relevantUser.save();
+  }
+
   async getUserPage({
     pageNum = 1,
     pageSize = 10,
     sort,
-  }: PageRequest): Promise<Page<FlattenMaps<User & { _id: Types.ObjectId }>>> {
+  }: PageRequest): Promise<Page<UserFlattened>> {
     const skippedDocuments = (pageNum - 1) * pageSize;
     const [totalDocuments, users] = await Promise.all([
       this.userModel.count({}),
@@ -111,7 +148,7 @@ export class UsersService {
     ]);
 
     const userPage = PageBuilder.buildPage(
-      users.map((user) => user.toJSON()),
+      users.map((user) => user.toJSON() as UserFlattened),
       {
         pageNum,
         pageSize,
