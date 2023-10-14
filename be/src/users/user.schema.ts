@@ -4,7 +4,7 @@ import { UserRole } from 'src/common/enums/user-roles.enum';
 import { Audit } from 'src/common/schema/audit.schema';
 
 export type UserDocument = HydratedDocument<User>;
-export type UsersModel = Model<User>
+export type UsersModel = Model<User>;
 export type UserFlattened = FlattenMaps<User & { _id: string }>;
 
 @Schema({ collection: 'users' })
@@ -29,6 +29,9 @@ export class User extends Audit {
 
   @Prop()
   companyId: string;
+
+  @Prop([String])
+  siteIds: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

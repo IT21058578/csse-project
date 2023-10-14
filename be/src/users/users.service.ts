@@ -8,12 +8,16 @@ import ErrorMessage from 'src/common/enums/error-message.enum';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { UserRole } from 'src/common/enums/user-roles.enum';
 import { hashSync } from 'bcrypt';
+import { SitesService } from 'src/sites/sites.service';
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
-  constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {
+  constructor(
+    private readonly sitesService: SitesService,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+  ) {
     const existingSystemAdmin = this.userModel.findOne({
       roles: { $in: [UserRole.SYSTEM_ADMIN] },
     });
@@ -88,6 +92,39 @@ export class UsersService {
     }
 
     // TODO: Delete orders, reviews.
+  }
+
+  async assignToSite(user: UserFlattened, userId: string, siteId: string) {
+    const site = await this.sitesService.getSite(siteId);
+    const relevantUser = await this.getUser(userId);
+
+    if (site.companyId !== user.companyId) {
+      throw new BadRequestException(
+        ErrorMessage.SITE_NOT_FOUND,
+        `User with id ${userId} does not belong to same company as site with id ${siteId}`,
+      );
+    }
+
+    relevantUser.siteIds = [...user.siteIds, siteId];
+    relevantUser.updatedAt = new Date();
+    relevantUser.updatedBy = user._id;
+    return await relevantUser.save();
+  }
+
+  async unassignFromSite(user: UserFlattened, userId: string, siteId: string) {
+    const relevantUser = await this.getUser(userId);
+
+    if (!relevantUser.siteIds.includes(siteId)) {
+      throw new BadRequestException(
+        ErrorMessage.SITE_NOT_FOUND,
+        `User with id ${userId} is not assigned to site with id ${siteId}`,
+      );
+    }
+
+    relevantUser.siteIds = relevantUser.siteIds.filter((id) => id !== siteId);
+    relevantUser.updatedAt = new Date();
+    relevantUser.updatedBy = user._id;
+    return await relevantUser.save();
   }
 
   async getUserPage({
