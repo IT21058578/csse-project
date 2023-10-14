@@ -3,7 +3,7 @@ import { InvoicesService } from './invoices.service';
 import { ItemRequestsService } from 'src/item-requests/item-requests.service';
 import { Invoice, InvoiceDocument, InvoiceModel } from './invoice.schema';
 import { getModelToken } from 'nestjs-typegoose';
-import { MockUtils } from 'src/common/util/mock-util';
+import { MockUtils } from 'src/common/util/mock.util';
 import { CreateInvoiceDto } from './dtos/create-invoice.dto';
 import { faker } from '@faker-js/faker';
 import { ItemRequestDocument } from 'src/item-requests/item-request.schema';

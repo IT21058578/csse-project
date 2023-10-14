@@ -5,8 +5,7 @@ import { CreateSupplierDto } from './dtos/create-supplier.dto';
 import { UserFlattened } from 'src/users/user.schema';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { Supplier, SupplierModel } from './supplier.schema';
-import { SortOrder } from 'mongoose';
-import { PageBuilder } from 'src/common/util/page-builder';
+import { PageBuilder } from 'src/common/util/page.util';
 import { FlatSite } from 'src/sites/site.schema';
 import { QueryUtil } from 'src/common/util/query.util';
 
@@ -94,47 +93,22 @@ export class SuppliersService {
     filter,
     sort,
   }: PageRequest) {
-    const itemIdQuery = filter?.item?.value?.reduce(
-      (obj = {}, id = '') => ({ ...obj, [`items.${id}`]: { $exists: true } }),
-      {},
-    );
+    // const itemIdQuery = filter?.item?.value?.reduce(
+    //   (obj = {}, id = '') => ({ ...obj, [`items.${id}`]: { $exists: true } }),
+    //   {},
+    // );
 
-    const query = this.supplierModel.find({
-      ...itemIdQuery,
-      companyId: filter?.companyId?.value,
-      ...QueryUtil.buildInQuery('mobiles', filter?.mobiles?.value),
-      ...QueryUtil.buildInQuery(
-        'siteManagerIds',
-        filter?.siteManagerIds?.value,
-      ),
-      ...QueryUtil.buildInQuery(
-        'accountNumbers',
-        filter?.accountNumbers?.value,
-      ),
-      email:
-        filter?.email?.operator === 'LIKE'
-          ? { $regex: filter?.email?.value }
-          : filter?.email?.value,
-      name:
-        filter?.name?.operator === 'LIKE'
-          ? { $regex: filter?.name?.value }
-          : filter?.name?.value,
-      address:
-        filter?.address?.operator === 'LIKE'
-          ? { $regex: filter?.address?.value }
-          : filter?.address?.value,
-    });
-    const sortArr: [string, SortOrder][] = Object.entries(sort ?? {}).map(
-      ([key, value]) => [key, value as SortOrder],
-    );
     const [content, totalDocuments] = await Promise.all([
-      query
-        .clone()
-        .sort(sortArr)
+      this.supplierModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .sort(QueryUtil.buildSort(sort))
         .skip((pageNum - 1) * pageSize)
         .limit(pageSize)
         .exec(),
-      query.clone().count().exec(),
+      this.supplierModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .count()
+        .exec(),
     ]);
     const jsonContent = content.map((doc) => doc.toJSON()) satisfies FlatSite[];
     const page = PageBuilder.buildPage(jsonContent, {

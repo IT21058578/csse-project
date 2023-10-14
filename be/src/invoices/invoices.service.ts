@@ -8,12 +8,12 @@ import {
 import { UserDocument } from 'src/users/user.schema';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { CreateInvoiceDto } from './dtos/create-invoice.dto';
-import { Page, PageBuilder } from 'src/common/util/page-builder';
+import { Page, PageBuilder } from 'src/common/util/page.util';
 import { InjectModel } from '@nestjs/mongoose';
 import ErrorMessage from 'src/common/enums/error-message.enum';
 import { ItemRequestsService } from 'src/item-requests/item-requests.service';
 import { ItemRequestStatus } from 'src/common/enums/item-request-status.enum';
-import { SortOrder } from 'mongoose';
+import { QueryUtil } from 'src/common/util/query.util';
 
 @Injectable()
 export class InvoicesService {
@@ -37,8 +37,7 @@ export class InvoicesService {
     user: UserDocument,
     createInvoiceDto: CreateInvoiceDto,
   ): Promise<InvoiceDocument> {
-    const { procurementId, invoiceUrls } =
-      createInvoiceDto;
+    const { procurementId, invoiceUrls } = createInvoiceDto;
     const procurement = await this.procurementsService.getProcurement(
       procurementId,
     );
@@ -72,23 +71,17 @@ export class InvoicesService {
     filter,
     sort,
   }: PageRequest): Promise<Page<FlatInvoice>> {
-    const query = this.invoiceModel.find({
-      companyId: filter?.companyId?.value,
-      itemId: filter?.itemId?.value,
-      supplierId: filter?.supplierId?.value,
-      procurementId: filter?.procurementId?.value,
-    });
-    const sortArr: [string, SortOrder][] = Object.entries(sort ?? {}).map(
-      ([key, value]) => [key, value as SortOrder],
-    );
     const [content, totalDocuments] = await Promise.all([
-      query
-        .clone()
-        .sort(sortArr)
+      this.invoiceModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .sort(QueryUtil.buildSort(sort))
         .skip((pageNum - 1) * pageSize)
         .limit(pageSize)
         .exec(),
-      query.clone().count().exec(),
+      this.invoiceModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .count()
+        .exec(),
     ]);
     const jsonContent = content.map((doc) =>
       doc.toJSON(),

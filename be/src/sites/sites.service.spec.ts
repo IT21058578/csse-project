@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import { SitesService } from './sites.service';
 import { Site, SiteModel } from './site.schema';
 import { CompaniesService } from 'src/companies/companies.service';
-import { MockUtils } from 'src/common/util/mock-util';
+import { MockUtils } from 'src/common/util/mock.util';
 import { getModelToken } from '@nestjs/mongoose';
 
 describe('Sites Test suite', () => {

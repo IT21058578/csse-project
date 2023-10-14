@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { CompaniesService } from './companies.service';
 import { getModelToken } from 'nestjs-typegoose';
-import { MockUtils } from 'src/common/util/mock-util';
+import { MockUtils } from 'src/common/util/mock.util';
 import { Company, CompanyModel } from './company.schema';
 import { when } from 'jest-when';
 import { UserDocument } from 'src/users/user.schema';
@@ -170,10 +170,7 @@ describe('Companies Test suite', () => {
 
   it('should get a company', async () => {
     const companyId = faker.database.mongodbObjectId();
-    const companyModel_findById = jest.spyOn(
-      companyModel,
-      'findById',
-    );
+    const companyModel_findById = jest.spyOn(companyModel, 'findById');
     when(companyModel_findById)
       .expectCalledWith(companyId)
       .mockResolvedValue({ id: companyId } as never);
