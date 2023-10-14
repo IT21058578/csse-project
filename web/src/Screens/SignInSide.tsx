@@ -12,6 +12,7 @@ import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import SigninIcon from "../assets/images/signin.png";
 function Copyright(props: any) {
   return (
     <Typography
@@ -51,8 +52,9 @@ export default function SignInSide() {
           md={7}
           sx={{
             backgroundRepeat: "no-repeat",
-            backgroundColor: "rgba(76, 88, 113, 1)",
+            backgroundImage: `url(${SigninIcon})`,
             backgroundPosition: "center",
+            backgroundSize: "cover",
           }}
         />
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
