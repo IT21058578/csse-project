@@ -7,6 +7,7 @@ import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { UserDocument } from 'src/users/user.schema';
 import ErrorMessage from 'src/common/enums/error-message.enum';
 import { PageBuilder } from 'src/common/util/page-builder';
+import { QueryUtil } from 'src/common/util/query.util';
 
 @Injectable()
 export class CompaniesService {
@@ -83,9 +84,6 @@ export class CompaniesService {
   }: PageRequest) {
     const query = this.companyModel.find({
       name: filter?.name?.value,
-      siteIds: { $in: filter?.siteIds?.value },
-      itemsIds: { $in: filter?.itemsIds?.value },
-      supplierIds: { $in: filter?.supplierIds.value },
     });
     const sortArr: [string, SortOrder][] = Object.entries(sort ?? {}).map(
       ([key, value]) => [key, value as SortOrder],

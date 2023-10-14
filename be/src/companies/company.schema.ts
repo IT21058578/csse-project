@@ -19,15 +19,6 @@ export class Company extends Audit {
   @Prop({ unique: true })
   name: string;
 
-  @Prop({ type: [String], default: [] })
-  itemsIds: string[];
-
-  @Prop({ type: [String], default: [] })
-  siteIds: string[];
-
-  @Prop({ type: [String], default: [] })
-  supplierIds: string[];
-
   @Prop({ default: {} })
   config: CompanyConfig;
 }

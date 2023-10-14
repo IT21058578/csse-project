@@ -8,6 +8,7 @@ import { Supplier, SupplierModel } from './supplier.schema';
 import { SortOrder } from 'mongoose';
 import { PageBuilder } from 'src/common/util/page-builder';
 import { FlatSite } from 'src/sites/site.schema';
+import { QueryUtil } from 'src/common/util/query.util';
 
 @Injectable()
 export class SuppliersService {
@@ -101,9 +102,15 @@ export class SuppliersService {
     const query = this.supplierModel.find({
       ...itemIdQuery,
       companyId: filter?.companyId?.value,
-      mobiles: { $in: [...filter?.mobiles?.value] },
-      accountNumbers: { $in: [...filter?.accountNumbers?.value] },
-      siteManagerIds: { $in: [...filter?.siteManagerIds?.value] },
+      ...QueryUtil.buildInQuery('mobiles', filter?.mobiles?.value),
+      ...QueryUtil.buildInQuery(
+        'siteManagerIds',
+        filter?.siteManagerIds?.value,
+      ),
+      ...QueryUtil.buildInQuery(
+        'accountNumbers',
+        filter?.accountNumbers?.value,
+      ),
       email:
         filter?.email?.operator === 'LIKE'
           ? { $regex: filter?.email?.value }

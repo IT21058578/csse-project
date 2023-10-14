@@ -8,6 +8,7 @@ import { CompaniesService } from 'src/companies/companies.service';
 import { FlatSite, Site, SiteModel } from './site.schema';
 import { SortOrder } from 'mongoose';
 import { PageBuilder } from 'src/common/util/page-builder';
+import { QueryUtil } from 'src/common/util/query.util';
 
 @Injectable()
 export class SitesService {
@@ -80,8 +81,11 @@ export class SitesService {
   }: PageRequest) {
     const query = this.siteModel.find({
       companyId: filter?.companyId?.value,
-      mobiles: { $in: [...filter?.mobiles?.value] },
-      siteManagerIds: { $in: [...filter?.siteManagerIds?.value] },
+      ...QueryUtil.buildInQuery('mobiles', filter?.mobiles?.value),
+      ...QueryUtil.buildInQuery(
+        'siteManagerIds',
+        filter?.siteManagerIds?.value,
+      ),
       name:
         filter?.companyId?.operator === 'LIKE'
           ? { $regex: filter?.companyId?.value }
