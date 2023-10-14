@@ -20,7 +20,7 @@ export class ApprovalsController {
   constructor(private readonly approvalsService: ApprovalsService) {}
 
   @Get(':id')
-  @Roles()
+  @Roles(...Object.values(UserRole))
   async getApproval(@Param('id', ValidateObjectIdPipe) id: string) {
     return await this.approvalsService.getApproval(id);
   }
