@@ -46,10 +46,11 @@ export class ApprovalsService {
 
   async passApproval(
     user: UserDocument,
+    approvalId: string,
+    isApproved: boolean,
     editApprovalDto: CreateApprovalDto,
   ): Promise<ApprovalDocument> {
-    const { approvalId, description, refferredTo, isApproved } =
-      editApprovalDto;
+    const { description, refferredTo } = editApprovalDto;
     const approval = await this.getApproval(approvalId);
     const procurement = await this.itemRequestsService.getProcurement(
       approval.procurementId,
@@ -162,5 +163,19 @@ export class ApprovalsService {
       );
     }
     return selectedAdmin;
+  }
+
+  async createInitialApproval(approval: Approval) {
+    const existingApproval = await this.approvalModel.find({
+      procurementId: approval.procurementId,
+    });
+    if (existingApproval.length !== 0) {
+      throw new ConflictException(
+        ErrorMessage.INVALID_PROCUREMENT_APPROVAL,
+        `Attempted to create an initial approval for procurement with id ${approval.procurementId} which already has approvals`,
+      );
+    }
+    const savedApproval = await this.approvalModel.create(approval);
+    return savedApproval;
   }
 }

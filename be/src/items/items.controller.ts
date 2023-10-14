@@ -14,6 +14,7 @@ import { User } from 'src/common/decorators/user.decorator';
 import { UserFlattened } from 'src/users/user.schema';
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dtos/create-item.dto';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 
 @Controller('items')
 export class ItemsController {
@@ -28,14 +29,14 @@ export class ItemsController {
   @Roles(UserRole.COMPANY_ADMIN, UserRole.SYSTEM_ADMIN)
   async editItem(
     @User() user: UserFlattened,
-    @Param('id') id: string,
+    @Param('id', ValidateObjectIdPipe) id: string,
     @Body() editItemDto: CreateItemDto,
   ) {
     return await this.itemsService.editItem(user, id, editItemDto);
   }
 
   @Get(':id')
-  async getItem(@Param('id') id: string) {
+  async getItem(@Param('id', ValidateObjectIdPipe) id: string) {
     return await this.itemsService.getItem(id);
   }
 

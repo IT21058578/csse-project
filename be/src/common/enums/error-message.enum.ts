@@ -42,6 +42,7 @@ const ErrorMessage = {
   INVALID_PROCUREMENT_STATUS: 'Invalid procurement status',
   INVALID_PROCUREMENT_COMPANY: 'Invalid procurement company',
   INVALID_PROCUREMENT_SUPPLIER: 'Invalid procurement supplier',
+  INVALID_PROCUREMENT_APPROVAL: 'Invalid procurement approval',
 } as const;
 
 export default ErrorMessage;

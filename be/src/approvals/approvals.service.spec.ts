@@ -100,10 +100,12 @@ describe('ApprovalsService', () => {
       .calledWith(procurementId)
       .mockResolvedValue(procurement as never);
 
-    const result = await service.passApproval({} as UserDocument, {
+    const result = await service.passApproval(
+      {} as UserDocument,
       approvalId,
-      isApproved: true,
-    });
+      true,
+      {},
+    );
 
     expect(result.status).toBe(ApprovalStatus.APPROVED);
     expect(procurement.status).toBe(ItemRequestStatus.APPROVED);
@@ -138,10 +140,12 @@ describe('ApprovalsService', () => {
       .calledWith(procurementId)
       .mockResolvedValue(procurement as never);
 
-    const result = await service.passApproval({} as UserDocument, {
+    const result = await service.passApproval(
+      {} as UserDocument,
       approvalId,
-      isApproved: false,
-    });
+      false,
+      {},
+    );
 
     expect(result.status).toBe(ApprovalStatus.DISAPPROVED);
     expect(procurement.status).toBe(ItemRequestStatus.DISAPPROVED);
@@ -191,11 +195,12 @@ describe('ApprovalsService', () => {
     });
     when(approvalModel_create).expectCalledWith(isNewApprovalCorrect);
 
-    const result = await service.passApproval({} as UserDocument, {
+    const result = await service.passApproval(
+      {} as UserDocument,
       approvalId,
-      isApproved: true,
-      refferredTo,
-    });
+      true,
+      { refferredTo },
+    );
 
     expect(result.status).toBe(ApprovalStatus.APPROVED);
     expect(result.refferredTo).toBe(refferredTo);
@@ -234,10 +239,7 @@ describe('ApprovalsService', () => {
       .mockResolvedValue(procurement as never);
 
     const fn = async () =>
-      await service.passApproval({} as UserDocument, {
-        approvalId,
-        isApproved: false,
-      });
+      await service.passApproval({} as UserDocument, approvalId, true, {});
 
     await expect(fn).rejects.toThrow(BadRequestException);
     await expect(fn).rejects.toThrow(ErrorMessage.PROCUREMENT_ALREADY_APPROVED);
@@ -300,4 +302,9 @@ describe('ApprovalsService', () => {
     );
     expect(userModel_find).toBeCalledTimes(2); // As the fn executes twice.
   });
+
+  it.todo('should create initial approval');
+  it.todo(
+    'should not create initial approval and throw when approvals already exist',
+  );
 });

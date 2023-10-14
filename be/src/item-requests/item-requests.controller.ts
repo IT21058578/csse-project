@@ -11,9 +11,10 @@ import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/common/enums/user-roles.enum';
 import { User } from 'src/common/decorators/user.decorator';
-import { UserDocument, UserFlattened } from 'src/users/user.schema';
+import { UserFlattened } from 'src/users/user.schema';
 import { ItemRequestsService } from './item-requests.service';
 import { CreateProcurementDto } from './dto/create-procurement.dto';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 
 @Controller('procurements')
 export class ItemRequestsController {
@@ -28,7 +29,7 @@ export class ItemRequestsController {
   @Roles(UserRole.SITE_ADMIN)
   async editProcurement(
     @User() user: UserFlattened,
-    @Param('id') id: string,
+    @Param('id', ValidateObjectIdPipe) id: string,
     @Body() editProcurementDto: CreateProcurementDto,
   ) {
     return await this.procurementsService.editProcurement(
@@ -40,12 +41,12 @@ export class ItemRequestsController {
 
   @Delete(':id')
   @Roles(UserRole.SITE_ADMIN)
-  async deleteProcurement(@Param('id') id: string) {
+  async deleteProcurement(@Param('id', ValidateObjectIdPipe) id: string) {
     return await this.procurementsService.deleteProcurement(id);
   }
 
   @Get('')
-  async getProcurement(@Param('id') id: string) {
+  async getProcurement(@Param('id', ValidateObjectIdPipe) id: string) {
     return await this.procurementsService.getProcurement(id);
   }
 

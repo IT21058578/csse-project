@@ -14,6 +14,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/common/enums/user-roles.enum';
 import { User } from 'src/common/decorators/user.decorator';
 import { UserFlattened } from 'src/users/user.schema';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 
 @Controller('sites')
 export class SitesController {
@@ -28,14 +29,14 @@ export class SitesController {
   @Roles(UserRole.COMPANY_ADMIN, UserRole.SITE_ADMIN, UserRole.SYSTEM_ADMIN)
   async editSite(
     @User() user: UserFlattened,
-    @Param('id') id: string,
+    @Param('id', ValidateObjectIdPipe) id: string,
     @Body() editSiteDto: CreateSiteDto,
   ) {
     return await this.sitesService.editSite(user, id, editSiteDto);
   }
 
   @Get(':id')
-  async getSite(@Param('id') id: string) {
+  async getSite(@Param('id', ValidateObjectIdPipe) id: string) {
     return await this.sitesService.getSite(id);
   }
 

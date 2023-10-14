@@ -34,31 +34,33 @@ export class ItemsService {
       );
     }
 
-    const newItem = new this.itemModel({
+    const savedItem = await this.itemModel.create({
       name,
       imageUrls,
       companyId,
       createdAt: new Date(),
       createdBy: user._id,
     });
-    const savedItem = await newItem.save();
 
     return savedItem;
   }
 
   async editItem(user: UserFlattened, id: string, editItemDto: CreateItemDto) {
     const { name, imageUrls } = editItemDto;
-
-    if (id === undefined) {
-      throw new BadRequestException(
-        ErrorMessage.ITEM_NOT_FOUND,
-        `Item with id ${id} not found`,
-      );
-    }
-
     const existingItem = await this.getItem(id);
 
-    // Must definitely be present
+    if (name) {
+      const hasItemWithSameName = await this.itemModel
+        .find({ companyId: existingItem.companyId, name })
+        .count();
+      if (hasItemWithSameName !== 0) {
+        throw new BadRequestException(
+          ErrorMessage.ITEM_ALREADY_EXISTS,
+          `Item with name ${name} already exists`,
+        );
+      }
+    }
+
     existingItem.name = name ?? existingItem.name;
     existingItem.imageUrls = imageUrls ?? existingItem.imageUrls;
     existingItem.updatedAt = new Date();

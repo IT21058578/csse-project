@@ -4,7 +4,6 @@ import ErrorMessage from 'src/common/enums/error-message.enum';
 import { CreateSupplierDto } from './dtos/create-supplier.dto';
 import { UserFlattened } from 'src/users/user.schema';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
-import { Types } from 'mongoose';
 import { Supplier, SupplierModel } from './supplier.schema';
 import { SortOrder } from 'mongoose';
 import { PageBuilder } from 'src/common/util/page-builder';
@@ -51,14 +50,7 @@ export class SuppliersService {
     editSupplierDto: CreateSupplierDto,
   ) {
     const { accountNumbers, email, items, mobiles, name } = editSupplierDto;
-    const supplier = await this.supplierModel.findById(id);
-
-    if (supplier == null) {
-      throw new BadRequestException(
-        ErrorMessage.SUPPLIER_NOT_FOUND,
-        `Supplier with the id '${id}' was not found`,
-      );
-    }
+    const supplier = await this.getSupplier(id);
 
     // Must definitely be present
     supplier.name = name;
@@ -76,27 +68,22 @@ export class SuppliersService {
   async deleteSupplier(id: string) {
     // Only company admin
     const deletedSupplier = await this.supplierModel.findByIdAndDelete(id);
-
     if (deletedSupplier == null) {
       throw new BadRequestException(
         ErrorMessage.SUPPLIER_NOT_FOUND,
         `Supplier with the id '${id}' was not found`,
       );
     }
-
-    return deletedSupplier.toJSON();
   }
 
   async getSupplier(id: string) {
     const supplier = await this.supplierModel.findById(id);
-
     if (supplier == null) {
       throw new BadRequestException(
         ErrorMessage.SUPPLIER_NOT_FOUND,
         `Supplier with the id '${id}' was not found`,
       );
     }
-
     return supplier;
   }
 

@@ -23,6 +23,7 @@ import { ApprovalsService } from 'src/approvals/approvals.service';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { PageBuilder } from 'src/common/util/page-builder';
 import { SortOrder } from 'mongoose';
+import { ApprovalStatus } from 'src/common/enums/approval-status.enum';
 
 @Injectable()
 export class ItemRequestsService {
@@ -53,58 +54,68 @@ export class ItemRequestsService {
     createProcurementDto: CreateProcurementDto,
   ) {
     // Only by Site managers
-    const { companyId, itemId, qty, siteId, supplierId } = createProcurementDto;
-    const company = await this.companiesService.getCompany(companyId);
+    const { itemId, qty, siteId, supplierId } = createProcurementDto;
     const item = await this.itemsService.getItem(itemId);
-    if (item.companyId !== company.id) {
-      throw new BadRequestException(ErrorMessage.ITEM_NOT_FOUND);
-    }
+    const company = await this.companiesService.getCompany(item.companyId);
     const site = await this.sitesService.getSite(siteId);
     if (site.companyId !== company.id) {
-      throw new BadRequestException(ErrorMessage.SITE_NOT_FOUND);
+      throw new BadRequestException(
+        ErrorMessage.SITE_NOT_FOUND,
+        `Site with id ${site.id} does not belong to company with id ${company.id}`,
+      );
     }
     const supplier = await this.suppliersService.getSupplier(supplierId);
     if (supplier.companyId !== company.id) {
-      throw new BadRequestException(ErrorMessage.SUPPLIER_NOT_FOUND);
+      throw new BadRequestException(
+        ErrorMessage.SUPPLIER_NOT_FOUND,
+        `Supplier with id ${supplierId} does not belong to company with id ${company.id}`,
+      );
     }
     if (!Object.keys(supplier.items).includes(item.id)) {
-      throw new BadRequestException(ErrorMessage.ITEM_NOT_FOUND);
+      throw new BadRequestException(
+        ErrorMessage.ITEM_NOT_FOUND,
+        `Supplier with id ${supplierId} does not provide the item with id ${itemId}`,
+      );
     }
+
+    let status: ItemRequestStatus = ItemRequestStatus.PENDING_APPROVAL;
     const supplierItem = supplier.items[item.id];
-
     const price = qty * supplierItem.rate;
-    const newProcurement = new this.procurementModel({
-      companyId,
-      itemId,
-      qty,
-      siteId,
-      supplierId,
-      price,
-      createdAt: new Date(),
-      createdBy: user._id,
-    });
-    const savedProcurement = await newProcurement.save();
-
-    // Send approval request to random lowest level staff only if it needs approval.
     const isOverThreshold =
       price > (company.config.approvalThreshold || 100000);
     const isMustApproveItem = company.config.mustApproveItemIds?.includes(
       item.id,
     );
-    if (!isOverThreshold && !isMustApproveItem) return;
+    if (!isOverThreshold && !isMustApproveItem) {
+      status = ItemRequestStatus.APPROVED;
+    }
+
+    const savedProcurement = await this.procurementModel.create({
+      companyId: item.companyId,
+      itemId,
+      qty,
+      siteId,
+      supplierId,
+      price,
+      status,
+      createdAt: new Date(),
+      createdBy: user._id,
+    });
+
+    // Send approval request to random lowest level staff only if it needs approval.
+    if (status === ItemRequestStatus.APPROVED) return;
 
     const selectedAdmin =
-      await this.approvalsService.selectRandomProcurementAdmin(companyId);
+      await this.approvalsService.selectRandomProcurementAdmin(item.companyId);
 
-    // const newApproval = new this.approvalModel({
-    //   procurementId: savedProcurement.id,
-    //   status: ApprovalStatus.PENDING,
-    //   approvedBy: selectedAdmin.id,
-    //   createdAt: new Date(),
-    //   createdBy: user._id,
-    // });
-
-    // await newApproval.save();
+    await this.approvalsService.createInitialApproval({
+      companyId: item.companyId,
+      procurementId: savedProcurement.id,
+      status: ApprovalStatus.PENDING,
+      approvedBy: selectedAdmin.id,
+      createdAt: new Date(),
+      createdBy: user._id,
+    });
     return savedProcurement;
   }
 
@@ -141,7 +152,7 @@ export class ItemRequestsService {
       throw new BadRequestException(ErrorMessage.ITEM_NOT_FOUND);
     }
     const supplier = await this.suppliersService.getSupplier(
-      existingProcurement.itemId,
+      existingProcurement.supplierId,
     );
     if (supplier.companyId !== company.id) {
       throw new BadRequestException(ErrorMessage.SUPPLIER_NOT_FOUND);
@@ -156,7 +167,6 @@ export class ItemRequestsService {
   async deleteProcurement(id: string) {
     // Only by Site managers
     const existingProcurement = await this.getProcurement(id);
-
     // Only procurements that have not begun approval can be edited.
     if (existingProcurement.status !== ItemRequestStatus.PENDING_APPROVAL) {
       throw new ConflictException(
@@ -164,9 +174,7 @@ export class ItemRequestsService {
         `The procurement with id '${id}' has already been approved by administrators. It can no longer be deleted`,
       );
     }
-
-    await this.procurementModel.findByIdAndDelete(existingProcurement.id);
-    return existingProcurement;
+    await existingProcurement.deleteOne();
   }
 
   async getItemRequestPage({

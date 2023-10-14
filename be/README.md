@@ -6,7 +6,7 @@
 # Important
 - For some strange reason, we need to import aswell as export MongooseModule from every module that uses it.
 - For some strange reason to resolve the circular dependency you need to forward ref on the module aswell as the service level. Check approvals and itemRequests / procurements modules
-- There were many ways to mock a module given online. But what I did was to stick the relevant services I need to import into my my module in the test module delcaration with the {provide, useValue} syntax.
+- There were many ways to mock a module given online. But what we did was to stick the relevant services we need to import into my my module in the test module delcaration with the {provide, useValue} syntax.
 
 # Helpful for testing
 - https://stackoverflow.com/questions/55143467/testing-mongoose-models-with-nestjs

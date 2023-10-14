@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Body, Post } from '@nestjs/common';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { UsersService } from './users.service';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -12,7 +13,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  async getUser(@Param('id') id: string) {
+  async getUser(@Param('id', ValidateObjectIdPipe) id: string) {
     const { password, ...user } = await this.usersService.getUser(id);
     return user;
   }

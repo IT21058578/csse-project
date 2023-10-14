@@ -1,8 +1,18 @@
-import { ApprovalStatus } from "src/common/enums/approval-status.enum";
+import {
+  IsBoolean,
+  IsMongoId,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateApprovalDto {
-  approvalId: string;
-  isApproved: boolean;
+  @IsString()
+  @IsMongoId()
+  @IsOptional()
   refferredTo?: string;
+
+  @IsString()
+  @IsOptional()
   description?: string;
 }

@@ -6,6 +6,7 @@ import { User } from 'src/common/decorators/user.decorator';
 import { UserDocument } from 'src/users/user.schema';
 import { DeliveriesService } from './deliveries.service';
 import { CreateDeliveryDto } from './dtos/create-delivery.dto';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 
 @Controller('deliveries')
 export class DeliveriesController {
@@ -17,7 +18,7 @@ export class DeliveriesController {
   }
 
   @Get('')
-  async getDelivery(@Param('id') id: string) {
+  async getDelivery(@Param('id', ValidateObjectIdPipe) id: string) {
     return await this.deliveriesService.getDelivery(id);
   }
 
