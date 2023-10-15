@@ -17,7 +17,7 @@ export class DeliveriesController {
     return await this.deliveriesService.getDeliveriesPage(pageRequest);
   }
 
-  @Get('')
+  @Get(':id')
   async getDelivery(@Param('id', ValidateObjectIdPipe) id: string) {
     return await this.deliveriesService.getDelivery(id);
   }

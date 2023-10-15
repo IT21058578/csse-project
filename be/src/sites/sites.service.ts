@@ -6,8 +6,7 @@ import ErrorMessage from 'src/common/enums/error-message.enum';
 import { UserFlattened } from 'src/users/user.schema';
 import { CompaniesService } from 'src/companies/companies.service';
 import { FlatSite, Site, SiteModel } from './site.schema';
-import { SortOrder } from 'mongoose';
-import { PageBuilder } from 'src/common/util/page-builder';
+import { PageBuilder } from 'src/common/util/page.util';
 import { QueryUtil } from 'src/common/util/query.util';
 
 @Injectable()
@@ -79,33 +78,17 @@ export class SitesService {
     filter,
     sort,
   }: PageRequest) {
-    const query = this.siteModel.find({
-      companyId: filter?.companyId?.value,
-      ...QueryUtil.buildInQuery('mobiles', filter?.mobiles?.value),
-      ...QueryUtil.buildInQuery(
-        'siteManagerIds',
-        filter?.siteManagerIds?.value,
-      ),
-      name:
-        filter?.companyId?.operator === 'LIKE'
-          ? { $regex: filter?.companyId?.value }
-          : filter?.companyId?.value,
-      address:
-        filter?.address?.operator === 'LIKE'
-          ? { $regex: filter?.address?.value }
-          : filter?.address?.value,
-    });
-    const sortArr: [string, SortOrder][] = Object.entries(sort ?? {}).map(
-      ([key, value]) => [key, value as SortOrder],
-    );
     const [content, totalDocuments] = await Promise.all([
-      query
-        .clone()
-        .sort(sortArr)
+      this.siteModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .sort(QueryUtil.buildSort(sort))
         .skip((pageNum - 1) * pageSize)
         .limit(pageSize)
         .exec(),
-      query.clone().count().exec(),
+      this.siteModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .count()
+        .exec(),
     ]);
     const jsonContent = content.map((doc) => doc.toJSON()) satisfies FlatSite[];
     const page = PageBuilder.buildPage(jsonContent, {

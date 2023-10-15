@@ -6,8 +6,8 @@ import { UserFlattened } from 'src/users/user.schema';
 import { CreateItemDto } from './dtos/create-item.dto';
 import { FlattenedItem, Item, ItemModel } from './item.schema';
 import { CompaniesService } from 'src/companies/companies.service';
-import { SortOrder } from 'mongoose';
-import { PageBuilder } from 'src/common/util/page-builder';
+import { PageBuilder } from 'src/common/util/page.util';
+import { QueryUtil } from 'src/common/util/query.util';
 
 @Injectable()
 export class ItemsService {
@@ -89,24 +89,17 @@ export class ItemsService {
     filter,
     sort,
   }: PageRequest) {
-    const query = this.itemModel.find({
-      companyId: filter?.companyId?.value,
-      name:
-        filter?.companyId?.operator === 'LIKE'
-          ? { $regex: filter?.companyId?.value }
-          : filter?.companyId?.value,
-    });
-    const sortArr: [string, SortOrder][] = Object.entries(sort ?? {}).map(
-      ([key, value]) => [key, value as SortOrder],
-    );
     const [content, totalDocuments] = await Promise.all([
-      query
-        .clone()
-        .sort(sortArr)
+      this.itemModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .sort(QueryUtil.buildSort(sort))
         .skip((pageNum - 1) * pageSize)
         .limit(pageSize)
         .exec(),
-      query.clone().count().exec(),
+      this.itemModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .count()
+        .exec(),
     ]);
     const jsonContent = content.map((doc) =>
       doc.toJSON(),

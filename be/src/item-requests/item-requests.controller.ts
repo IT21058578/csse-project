@@ -45,7 +45,7 @@ export class ItemRequestsController {
     return await this.procurementsService.deleteProcurement(id);
   }
 
-  @Get('')
+  @Get(':id')
   async getProcurement(@Param('id', ValidateObjectIdPipe) id: string) {
     return await this.procurementsService.getProcurement(id);
   }

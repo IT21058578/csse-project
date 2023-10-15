@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { DeliveriesService } from './deliveries.service';
 import { getModelToken } from 'nestjs-typegoose';
-import { MockUtils } from 'src/common/util/mock-util';
+import { MockUtils } from 'src/common/util/mock.util';
 import { Delivery, DeliveryDocument, DeliveryModel } from './delivery.schema';
 import { CompaniesService } from 'src/companies/companies.service';
 import { SuppliersService } from 'src/suppliers/suppliers.service';

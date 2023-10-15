@@ -13,7 +13,7 @@ import { SuppliersService } from 'src/suppliers/suppliers.service';
 import { CompaniesService } from 'src/companies/companies.service';
 import { ApprovalsService } from 'src/approvals/approvals.service';
 import { getModelToken } from 'nestjs-typegoose';
-import { MockUtils } from 'src/common/util/mock-util';
+import { MockUtils } from 'src/common/util/mock.util';
 import {
   BadRequestException,
   ConflictException,

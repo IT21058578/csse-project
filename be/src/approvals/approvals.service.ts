@@ -14,15 +14,15 @@ import {
 } from './approval.schema';
 import { CreateApprovalDto } from './dtos/create-approval.dto';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
-import { Page, PageBuilder } from 'src/common/util/page-builder';
+import { Page, PageBuilder } from 'src/common/util/page.util';
 import { InjectModel } from '@nestjs/mongoose';
 import ErrorMessage from 'src/common/enums/error-message.enum';
 import { ApprovalStatus } from 'src/common/enums/approval-status.enum';
-import { ArrayUtils } from 'src/common/util/array-utils';
+import { ArrayUtils } from 'src/common/util/array.util';
 import { UserRole } from 'src/common/enums/user-roles.enum';
-import { SortOrder } from 'mongoose';
 import { ItemRequestsService } from 'src/item-requests/item-requests.service';
 import { ItemRequestStatus } from 'src/common/enums/item-request-status.enum';
+import { QueryUtil } from 'src/common/util/query.util';
 
 @Injectable()
 export class ApprovalsService {
@@ -110,24 +110,17 @@ export class ApprovalsService {
     filter,
     sort,
   }: PageRequest): Promise<Page<FlatApproval>> {
-    const query = this.approvalModel.find({
-      companyId: filter?.company?.value,
-      procurementId: filter?.procurementId?.value,
-      approvedBy: filter?.approvedBy?.value,
-      status: filter?.status?.value,
-      refferredTo: filter?.status?.value,
-    });
-    const sortArr: [string, SortOrder][] = Object.entries(sort ?? {}).map(
-      ([key, value]) => [key, value as SortOrder],
-    );
     const [content, totalDocuments] = await Promise.all([
-      query
-        .clone()
-        .sort(sortArr)
+      this.approvalModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .sort(QueryUtil.buildSort(sort))
         .skip((pageNum - 1) * pageSize)
         .limit(pageSize)
         .exec(),
-      query.clone().count().exec(),
+      this.approvalModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .count()
+        .exec(),
     ]);
     const jsonContent = content.map((doc) =>
       doc.toJSON(),

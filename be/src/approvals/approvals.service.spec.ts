@@ -17,7 +17,7 @@ import { ApprovalStatus } from 'src/common/enums/approval-status.enum';
 import ErrorMessage from 'src/common/enums/error-message.enum';
 import { UserRole } from 'src/common/enums/user-roles.enum';
 import { isEmpty, xor } from 'lodash';
-import { MockUtils } from 'src/common/util/mock-util';
+import { MockUtils } from 'src/common/util/mock.util';
 
 describe('ApprovalsService', () => {
   let service: ApprovalsService;
