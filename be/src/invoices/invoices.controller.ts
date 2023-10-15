@@ -17,7 +17,7 @@ export class InvoicesController {
     return await this.invoicesService.getInvoicesPage(pageRequest);
   }
 
-  @Get('')
+  @Get(':id')
   async getInvoice(@Param('id', ValidateObjectIdPipe) id: string) {
     return await this.invoicesService.getInvoice(id);
   }
