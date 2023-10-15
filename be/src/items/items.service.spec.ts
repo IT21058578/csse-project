@@ -3,7 +3,7 @@ import { ItemsService } from './items.service';
 import { CompaniesService } from 'src/companies/companies.service';
 import { Item, ItemDocument, ItemModel } from './item.schema';
 import { getModelToken } from '@nestjs/mongoose';
-import { MockUtils } from 'src/common/util/mock-util';
+import { MockUtils } from 'src/common/util/mock.util';
 import { when } from 'jest-when';
 import { CompanyDocument } from 'src/companies/company.schema';
 import { CreateItemDto } from './dtos/create-item.dto';

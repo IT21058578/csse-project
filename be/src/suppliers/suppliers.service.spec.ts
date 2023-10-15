@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import { SuppliersService } from './suppliers.service';
 import { Supplier, SupplierModel } from './supplier.schema';
 import { getModelToken } from 'nestjs-typegoose';
-import { MockUtils } from 'src/common/util/mock-util';
+import { MockUtils } from 'src/common/util/mock.util';
 
 describe('Suppliers Test suite', () => {
   let service: SuppliersService;

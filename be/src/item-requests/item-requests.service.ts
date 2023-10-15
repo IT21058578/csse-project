@@ -21,9 +21,9 @@ import { SuppliersService } from 'src/suppliers/suppliers.service';
 import { ItemRequestStatus } from 'src/common/enums/item-request-status.enum';
 import { ApprovalsService } from 'src/approvals/approvals.service';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
-import { PageBuilder } from 'src/common/util/page-builder';
-import { SortOrder } from 'mongoose';
+import { PageBuilder } from 'src/common/util/page.util';
 import { ApprovalStatus } from 'src/common/enums/approval-status.enum';
+import { QueryUtil } from 'src/common/util/query.util';
 
 @Injectable()
 export class ItemRequestsService {
@@ -183,25 +183,17 @@ export class ItemRequestsService {
     filter,
     sort,
   }: PageRequest) {
-    const query = this.procurementModel.find({
-      companyId: filter?.companyId?.value,
-      itemId: filter?.itemId?.value,
-      supplierId: filter?.supplierId?.value,
-      siteId: filter?.siteId.value,
-      invoiceId: filter?.invoiceId.value,
-      status: filter?.status?.value,
-    });
-    const sortArr: [string, SortOrder][] = Object.entries(sort ?? {}).map(
-      ([key, value]) => [key, value as SortOrder],
-    );
     const [content, totalDocuments] = await Promise.all([
-      query
-        .clone()
-        .sort(sortArr)
+      this.procurementModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .sort(QueryUtil.buildSort(sort))
         .skip((pageNum - 1) * pageSize)
         .limit(pageSize)
         .exec(),
-      query.clone().count().exec(),
+      this.procurementModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .count()
+        .exec(),
     ]);
     const jsonContent = content.map((doc) =>
       doc.toJSON(),

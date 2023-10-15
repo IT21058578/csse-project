@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, SortOrder } from 'mongoose';
+import { Model } from 'mongoose';
 import { Company, FlatCompany } from './company.schema';
 import { CreateCompanyDto } from './dtos/create-company.dto';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { UserDocument } from 'src/users/user.schema';
 import ErrorMessage from 'src/common/enums/error-message.enum';
-import { PageBuilder } from 'src/common/util/page-builder';
+import { PageBuilder } from 'src/common/util/page.util';
 import { QueryUtil } from 'src/common/util/query.util';
 
 @Injectable()
@@ -82,20 +82,17 @@ export class CompaniesService {
     sort,
     filter,
   }: PageRequest) {
-    const query = this.companyModel.find({
-      name: filter?.name?.value,
-    });
-    const sortArr: [string, SortOrder][] = Object.entries(sort ?? {}).map(
-      ([key, value]) => [key, value as SortOrder],
-    );
     const [content, totalDocuments] = await Promise.all([
-      query
-        .clone()
-        .sort(sortArr)
+      this.companyModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .sort(QueryUtil.buildSort(sort))
         .skip((pageNum - 1) * pageSize)
         .limit(pageSize)
         .exec(),
-      query.clone().count().exec(),
+      this.companyModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .count()
+        .exec(),
     ]);
     const jsonContent = content.map((doc) =>
       doc.toJSON(),
