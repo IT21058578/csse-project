@@ -1,4 +1,4 @@
-const CACHE_NAME = 'friedshop_cache';
+const CACHE_NAME = 'autoxshop_cache';
 const OFFLINE_URL = '/'
 
 
