@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { SyntheticEvent, useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -13,6 +13,14 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import SigninIcon from "../assets/img/signin.png";
+import RoutePaths from "../config";
+import { checkLogin } from "../Utils/Generals";
+import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from 'react-router-dom';
+import { Navigate } from "react-router-dom";
+import { useLoginMutation } from "../store/apiquery/AuthApiSlice";
+import { HandleResult } from "../components/HandleResult";
+
 function Copyright(props: any) {
   return (
     <Typography
@@ -31,14 +39,27 @@ function Copyright(props: any) {
 const defaultTheme = createTheme();
 
 export default function SignInSide() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
-  };
+
+  const handleSubmit = (e : SyntheticEvent) => {
+      e.preventDefault();
+      sendUserInfo(data);
+  }
+
+  if (checkLogin()) {
+    
+      return <Navigate to={RoutePaths.admin} replace />
+  }
+
+
+  const [data, setData] = useState({});
+  const [sendUserInfo, result] = useLoginMutation();
+
+  const handleChange = ( e : SyntheticEvent) => {
+
+      const target = e.target as HTMLInputElement
+
+      setData({...data, [target.name]: target.value });
+  }
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -95,6 +116,7 @@ export default function SignInSide() {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
+                onChange={handleChange}
                 autoFocus
               />
               <TextField
@@ -105,12 +127,14 @@ export default function SignInSide() {
                 label="Password"
                 type="password"
                 id="password"
+                onChange={handleChange}
                 autoComplete="current-password"
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
                 label="Remember me"
               />
+              <HandleResult result={result} />
               <Button
                 type="submit"
                 fullWidth

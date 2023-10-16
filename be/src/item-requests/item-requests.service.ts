@@ -86,9 +86,9 @@ export class ItemRequestsService {
     const isMustApproveItem = company.config.mustApproveItemIds?.includes(
       item.id,
     );
-    if (!isOverThreshold && !isMustApproveItem) {
-      status = ItemRequestStatus.APPROVED;
-    }
+    // if (!isOverThreshold && !isMustApproveItem) {
+    //   status = ItemRequestStatus.APPROVED;
+    // }
 
     const savedProcurement = await this.procurementModel.create({
       companyId: item.companyId,
@@ -103,7 +103,7 @@ export class ItemRequestsService {
     });
 
     // Send approval request to random lowest level staff only if it needs approval.
-    if (status === ItemRequestStatus.APPROVED) return;
+    // if (status === ItemRequestStatus.APPROVED) return;
 
     const selectedAdmin =
       await this.approvalsService.selectRandomProcurementAdmin(item.companyId);

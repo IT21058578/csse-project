@@ -46,4 +46,57 @@ export interface Item extends Audit{
   imageUrls: string[];
 }
 
+export interface CreateUserDto {
+  firstName: string;
+  lastName: string;
+  email: string;
+  region: string;
+  country: string;
+  password: string;
+  roles: UserRole[];
+  companyId: string;
+}
+
+type UserRole = 'SYSTEM_ADMIN' | 'COMPANY_ADMIN' | 'PROCUREMENT_ADMIN' | 'SITE_ADMIN';
+
+export interface Approval {
+  companyId: string;
+  procurementId: string;
+  approvedBy: string;
+  status: keyof typeof ApprovalStatus; 
+  refferredTo?: string;
+  description?: string;
+}
+
+const ApprovalStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  DISAPPROVED: 'DISAPPROVED',
+} as const;
+
+export interface ItemRequest {
+  _id: string;
+  companyId: string;
+  supplierId: string;
+  itemId: string;
+  siteId: string;
+  qty: number;
+  status: keyof typeof ItemRequestStatus; 
+  price: number;
+}
+
+
+const ItemRequestStatus = {
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  PARTIALLY_APPROVED: 'PARTIALLY_APPROVED',
+  APPROVED: 'APPROVED',
+  PARTIALLY_DELIVERED: 'PARTIALLY_DELIVERED',
+  DELIVERED: 'DELIVERED',
+  PENDING_INVOICE: 'PENDING_INVOICE',
+  COMPLETED: 'COMPLETED',
+  DISAPPROVED: 'DISAPPROVED',
+} as const;
+
+
+
 

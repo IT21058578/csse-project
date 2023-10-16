@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Company } from "../../types";
 import Swal from "sweetalert2";
+import { Company } from "../../types";
 import Spinner from "../Spinner";
 import { ToastContainer, toast } from "react-toastify";
 import { useGetAllcompaniesQuery,

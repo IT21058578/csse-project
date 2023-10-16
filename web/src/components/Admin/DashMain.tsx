@@ -1,33 +1,30 @@
 import React from "react";
 // import { useGetStartisticsQuery } from "../../store/apiquery/usersApiSlice";
 import Spinner from "../Spinner";
-import { useGetAllProductsQuery } from "../../store/apiquery/productApiSlice";
-import { useGetAllUsersQuery } from "../../store/apiquery/usersApiSlice";
-import { useGetAllOrderQuery } from "../../store/apiquery/OrderApiSlice";
-import { useGetAllReviewQuery } from "../../store/apiquery/ReviewApiSlice";
+
 
 
 const DashMain = () => {
   // const { data: starts, isLoading } = useGetStartisticsQuery("api/users");
-  const {data: products } = useGetAllProductsQuery("api/products");
-  const {data: reviews  } = useGetAllReviewQuery("api/reviews");
-  const {data: users } = useGetAllUsersQuery("api/users");
-  const {data: orders } = useGetAllOrderQuery("api/orders");
+  // const {data: products } = useGetAllProductsQuery("api/products");
+  // const {data: reviews  } = useGetAllReviewQuery("api/reviews");
+  // const {data: users } = useGetAllUsersQuery("api/users");
+  // const {data: orders } = useGetAllOrderQuery("api/orders");
 
 
   const handleProductsDownload = () => {
-      const reportURL = 'http://localhost:3000/products/reports'; 
-      window.location.href = reportURL;
+      // const reportURL = 'http://localhost:3000/products/reports'; 
+      // window.location.href = reportURL;
   };
 
   const handleOrdersDownload = () => {
-    const reportURL = 'http://localhost:3000/orders/reports'; 
-    window.location.href = reportURL;
+    // const reportURL = 'http://localhost:3000/orders/reports'; 
+    // window.location.href = reportURL;
   };
 
   const handleCustomersDownload = () => {
-    const reportURL = 'http://localhost:3000/users/reports'; 
-    window.location.href = reportURL;
+    // const reportURL = 'http://localhost:3000/users/reports'; 
+    // window.location.href = reportURL;
   };
 
 
@@ -41,19 +38,19 @@ const DashMain = () => {
       <h4 className="text-dark fw-bold">Dashboard</h4>
         <div className="resume d-grid grid-4 gap-3 fw-bold mt-3">
         <div className="r-card d-flex flex-column align-items-center gap-3 border border-1 bg-secondary p-3">
-          <h1>{products?.metadata.totalDocuments}</h1>
+          {/* <h1>{products?.metadata.totalDocuments}</h1> */}
           <h4 className="align-self-center">Total Products</h4>
         </div>
         <div className="r-card d-flex flex-column align-items-center gap-3 border border-1 bg-secondary p-3">
-          <h1>{reviews?.metadata.totalDocuments}</h1>
+          {/* <h1>{reviews?.metadata.totalDocuments}</h1> */}
           <h4 className="align-self-center">Total Reviews</h4>
         </div>
         <div className="r-card d-flex flex-column align-items-center gap-3 border border-1 bg-secondary p-3">
-          <h1>{users?.metadata.totalDocuments}</h1>
+          {/* <h1>{users?.metadata.totalDocuments}</h1> */}
           <h4 className="align-self-center">Total Users</h4>
         </div>
         <div className="r-card d-flex flex-column align-items-center gap-3 border border-1 bg-secondary p-3">
-          <h1>{orders?.metadata.totalDocuments}</h1>
+          {/* <h1>{orders?.metadata.totalDocuments}</h1> */}
           <h4 className="align-self-center">Total Orders</h4>
         </div>
       </div>
