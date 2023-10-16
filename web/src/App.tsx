@@ -11,6 +11,12 @@ import SiteMain from "./components/Admin/SitesMain"
 import PrivateRoute from "./components/PrivateRoute"
 import RedirectIfAuthenticate from "./components/RedirectIfAuthenticate"
 import ItemMain from "./components/Admin/ItemsMain"
+import SupplierMain from "./components/Admin/SuppliersMain"
+import AdminAccount from "./components/Admin/AdminAccount"
+import DeliverieMain from "./components/Admin/DeliveriesMain"
+import InvoiceMain from "./components/Admin/InvoicesMain"
+import OrdersMain from "./components/Admin/OrdersMain"
+import UserMain from "./components/Admin/UsersMain"
 
 function App() {
 
@@ -35,7 +41,9 @@ function App() {
         <Route path={RoutePaths.adminCompanies} element={<AdminPanel  currentComponent={<CompanyMain />} />}></Route>
         <Route path={RoutePaths.adminSites} element={<AdminPanel  currentComponent={<SiteMain />} />}></Route>
         <Route path={RoutePaths.adminItems} element={<AdminPanel  currentComponent={<ItemMain />} />}></Route>
-        {/* <Route path={RoutePaths.adminSuppliers} element={<AdminPanel  currentComponent={<ReviewMain />} />}></Route> */}
+        <Route path={RoutePaths.adminAccount} element={<AdminPanel  currentComponent={<AdminAccount />} />}></Route>
+        <Route path={RoutePaths.adminOrders} element={<AdminPanel  currentComponent={<OrdersMain />} />}></Route>
+        <Route path={RoutePaths.adminSuppliers} element={<AdminPanel  currentComponent={<SupplierMain />} />}></Route>
       </Route>
 
       <Route path="*" element={<PageNotFound />}></Route>

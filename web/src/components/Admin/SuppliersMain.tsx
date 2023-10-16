@@ -492,7 +492,7 @@ const ListOfsuppliers = ({
   );
 };
 
-const supplierMain = () => {
+const SupplierMain = () => {
   const [page, setPage] = useState("list");
   const [currentsupplier, setCurrentsupplier] = useState(null);
 
@@ -539,4 +539,4 @@ const supplierMain = () => {
   );
 };
 
-export default supplierMain;
+export default SupplierMain;

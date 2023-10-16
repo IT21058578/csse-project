@@ -100,14 +100,14 @@ const ItemRequestStatus = {
 
 export interface UserDocument extends Audit {
   _id:string;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  password?: string;
-  roles?: UserRole[];
-  isAuthorized?: boolean;
-  companyId?: string;
-  siteIds?: string[];
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  roles: UserRole[];
+  isAuthorized: boolean;
+  companyId: string;
+  siteIds: string[];
 }
 
 export interface Delivery extends Audit {

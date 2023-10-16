@@ -302,7 +302,7 @@ const ListOfusers = ({
   );
 };
 
-const userMain = () => {
+const UserMain = () => {
   const [page, setPage] = useState("list");
   const [currentuser, setCurrentuser] = useState(null);
 
@@ -349,4 +349,4 @@ const userMain = () => {
   );
 };
 
-export default userMain;
+export default UserMain;

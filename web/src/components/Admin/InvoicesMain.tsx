@@ -113,7 +113,7 @@ const ListOfinvoices = ({
   );
 };
 
-const invoiceMain = () => {
+const InvoiceMain = () => {
   const [page, setPage] = useState("list");
   const [currentinvoice, setCurrentinvoice] = useState(null);
 
@@ -137,4 +137,4 @@ const invoiceMain = () => {
   );
 };
 
-export default invoiceMain;
+export default InvoiceMain;

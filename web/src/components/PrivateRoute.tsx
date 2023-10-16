@@ -4,14 +4,17 @@ import { getItem } from "../Utils/Generals"
 import RoutePaths from "../config";
 import { UserDocument } from "../types";
 import { useAppSelector } from '../hooks/redux-hooks'
+import { useState } from "react";
+
+const isLogged = getItem(RoutePaths.token);
+const user = !isLogged ? null : JSON.parse(getItem("user") || "");
 
 const PrivateRoute = ({type = 0, children} : PropsWithChildren<{type : number}>) => {
     
     const isLogged = getItem(RoutePaths.token);
-    const find : UserDocument = useAppSelector(state => state.user);
-    const user = !isLogged ? null : JSON.parse(getItem('user') || '');
+    const [data, setData] = useState(user);
 
-    const admin = find.isAuthorized;
+    const admin = data.isAuthorized;
 
     if (!isLogged) {
         return <Navigate to={RoutePaths.login} replace />;
