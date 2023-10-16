@@ -10,6 +10,7 @@ import CompanyMain from "./components/Admin/CompaniesMain"
 import SiteMain from "./components/Admin/SitesMain"
 import PrivateRoute from "./components/PrivateRoute"
 import RedirectIfAuthenticate from "./components/RedirectIfAuthenticate"
+import ItemMain from "./components/Admin/ItemsMain"
 
 function App() {
 
@@ -17,7 +18,7 @@ function App() {
     <Routes>
       <Route element={<RedirectIfAuthenticate />} >
         <Route path={RoutePaths.login} element={<Login />}></Route>
-        <Route path={RoutePaths.signup} element={<SignUp />}></Route>
+        {/* <Route path={RoutePaths.signup} element={<SignUp />}></Route> */}
       </Route>
       <Route path={RoutePaths.passwordReset} element={<ForgotPassword />}></Route>
 
@@ -33,10 +34,8 @@ function App() {
         <Route path={RoutePaths.admin} element={<AdminPanel  currentComponent={<DashMain />} />}></Route>
         <Route path={RoutePaths.adminCompanies} element={<AdminPanel  currentComponent={<CompanyMain />} />}></Route>
         <Route path={RoutePaths.adminSites} element={<AdminPanel  currentComponent={<SiteMain />} />}></Route>
-        <Route path={RoutePaths.adminItems} element={<AdminPanel  currentComponent={<CategoryMain />} />}></Route>
-        <Route path={RoutePaths.adminSuppliers} element={<AdminPanel  currentComponent={<ReviewMain />} />}></Route>
-        <Route path={RoutePaths.adminItems} element={<AdminPanel  currentComponent={<CustomersMain />} />}></Route>
-        <Route path={RoutePaths.adminAccount} element={<AdminPanel  currentComponent={<AdminAccount />} />}></Route>
+        <Route path={RoutePaths.adminItems} element={<AdminPanel  currentComponent={<ItemMain />} />}></Route>
+        {/* <Route path={RoutePaths.adminSuppliers} element={<AdminPanel  currentComponent={<ReviewMain />} />}></Route> */}
       </Route>
 
       <Route path="*" element={<PageNotFound />}></Route>

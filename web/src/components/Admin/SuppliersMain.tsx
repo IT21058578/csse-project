@@ -8,13 +8,10 @@ import { useGetAllsuppliersQuery ,
          useDeletesupplierMutation , 
          useUpdatesupplierMutation } from "../../store/apiquery/SuppliersApiSlice";  
 
-let imageIsChanged = false;
-
 const Updatesupplier = ({ supplier }: { supplier: Supplier }) => {
 
   const [updateData, setUpdateData] = useState(supplier);
   const [updatesupplier, udpateResult] = useUpdatesupplierMutation();
-  const imageTag = useRef<HTMLImageElement>(null);
   const supplierId = supplier?._id;
 
   const [formData, setFormData] = useState({
@@ -124,7 +121,7 @@ const Updatesupplier = ({ supplier }: { supplier: Supplier }) => {
           />
         </label>
       </div>
-      <label>
+      {/* <label>
         <span>Items</span>
         <textarea
           name="type"
@@ -135,7 +132,8 @@ const Updatesupplier = ({ supplier }: { supplier: Supplier }) => {
           placeholder="Description"
           onChange={handleUpdateValue}
         ></textarea>
-      </label>
+      </label> */}
+
       <div className="mt-4">
         <ToastContainer />
       </div>
@@ -159,20 +157,18 @@ const Updatesupplier = ({ supplier }: { supplier: Supplier }) => {
   );
 };
 
-const AddOrEditsupplier = ({ supplier }: { supplier: null | supplierType }) => {
+const AddOrEditsupplier = ({ supplier }: { supplier: null | Supplier }) => {
 
 
   const [createsupplier, result] = useCreatesupplierMutation();
 
   const [formData, setFormData] = useState({
-    name: "",
-    images: [],
-    price: 0,
-    color: "",
-    countInStock: 0,
-    brand: "",
-    type: "",
-    tags: [],
+    name: '',
+    companyId: '',
+    email: '',
+    mobiles: [],
+    accountNumbers: [],
+    items: [{ itemId: '', rate: '' }],
   });
 
   const handleValue = (
@@ -182,6 +178,13 @@ const AddOrEditsupplier = ({ supplier }: { supplier: null | supplierType }) => {
   ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleAddItem = () => {
+    setFormData({
+      ...formData,
+      items: [...formData.items, { itemId: '', rate: '' }],
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -194,14 +197,12 @@ const AddOrEditsupplier = ({ supplier }: { supplier: null | supplierType }) => {
         console.log("supplier created successfully");
         toast.success("supplier created successfully");
         setFormData({
-          name: "",
-          images: [],
-          price: 0,
-          color: "",
-          countInStock: 0,
-          brand: "",
-          type: "",
-          tags: [],
+          name: '',
+          companyId: '',
+          email: '',
+          mobiles: [],
+          accountNumbers: [],
+          items: [{ itemId: '', rate: '' }],
         });
       } else if ("error" in result && result.error) {
         console.error("supplier creation failed", result.error);
@@ -221,117 +222,95 @@ const AddOrEditsupplier = ({ supplier }: { supplier: null | supplierType }) => {
         className="checkout-service p-3 .form-supplier"
         onSubmit={handleSubmit}
       >
-        {image && (
-          <div
-            className="w-25 mx-auto p-3 border border-1 rounded-5 fd-hover-border-primary mb-4"
-            style={{ height: "250px" }}
-          >
-            <img
-              src={URL.createObjectURL(image)}
-              alt="supplier Image Preview"
-              className="w-100 h-100"
-            />
-          </div>
-        )}
         <div className="d-flex gap-2">
           <label className="w-50">
-            <span>Name</span>
+            <span>Company Id</span>
             <input
               type="text"
-              name="name"
-              value={formData.name}
+              name="companyId"
+              value={formData.companyId}
               className="form-control w-100 rounded-0 p-2"
               placeholder="supplier Name"
               onChange={handleValue}
             />
           </label>
-          {/* <label className="w-50">
-            <span>Image</span>
-            <input
-              type="file"
-              name="images"
-              value={formData.images}
-              className="form-control w-100 rounded-0 p-2"
-              placeholder="supplier Image"
-              onChange={handleImageChange}
-              accept="image/*"
-            />
-          </label> */}
         </div>
         <div className="d-grid grid-4 gap-2 mt-3">
           <label>
-            <span>Price</span>
+            <span>Name</span>
             <input
-              type="number"
+              type="text"
               step={0.1}
-              name="price"
-              value={formData.price}
+              name="name"
+              value={formData.name}
               className="form-control w-100 rounded-0 p-2"
               placeholder="supplier Price"
               onChange={handleValue}
             />
           </label>
           <label>
-            <span>Color</span>
+            <span>Email</span>
             <input
-              type="string"
+              type="text"
               step={0.1}
-              name="color"
-              value={formData.color}
+              name="email"
+              value={formData.email}
               className="form-control w-100 rounded-0 p-2"
               placeholder="Color"
               onChange={handleValue}
             />
           </label>
           <label>
-            <span>Quantity</span>
+            <span>Mobiles</span>
             <input
-              type="number"
-              name="countInStock"
-              value={formData.countInStock}
+              type="text"
+              name="mobiles"
+              value={formData.mobiles}
               className="form-control w-100 rounded-0 p-2"
               placeholder="Quantity"
               onChange={handleValue}
             />
           </label>
           <label>
-            <span>Brand</span>
+            <span>Account Numbers</span>
             <input
               type="text"
-              name="brand"
-              value={formData.brand}
+              name="accountNumbers"
+              value={formData.accountNumbers}
               className="form-control w-100 rounded-0 p-2"
               placeholder="Brand"
               onChange={handleValue}
             />
           </label>
+
           <label>
-            <span>Description</span>
-            <textarea
-              name="type"
-              cols={100}
-              rows={10}
-              value={formData.type}
-              className="w-100 p-2 border"
-              placeholder="Description"
-              onChange={handleValue}
-            ></textarea>
-          </label>
+            <span>Account Numbers</span>
+            {formData.items.map((item, index) => (
+              <div key={index}>
+                <input
+                  type="text"
+                  name="itemId"
+                  placeholder="Item ID"
+                  value={item.itemId || ''}
+                  onChange={handleValue}
+                />
+                <input
+                  type="number"
+                  step="0.01"
+                  name="rate"
+                  placeholder="Item Rate"
+                  value={item.rate || ''}
+                  onChange={handleValue}
+                />
+              </div>
+            ))};
+           </label>
+
+           <button type="button" onClick={handleAddItem}>+ Add Item</button>
+
+
         </div>
-        <div className="my-4">
-          <label>
-            <span>Tags</span>
-          </label>
-          <textarea
-            name="tags"
-            cols={100}
-            rows={10}
-            value={formData.tags}
-            className="w-100 p-2 border"
-            placeholder="Tags"
-            onChange={handleValue}
-          ></textarea>
-        </div>
+      
         <div className="mt-3">
           <ToastContainer />
         </div>
@@ -348,7 +327,6 @@ const AddOrEditsupplier = ({ supplier }: { supplier: null | supplierType }) => {
           ) : (
             <button
               className="fd-btn w-25 text-center border-0"
-              onClick={handleImageUpload}
             >
               SAVE NOW
             </button>
@@ -376,7 +354,7 @@ const ListOfsuppliers = ({
   } = useGetAllsuppliersQuery("api/suppliers");
   const [deletesupplier, deletedResult] = useDeletesupplierMutation();
 
-  const parsesupplier = (supplier: supplierType) => {
+  const parsesupplier = (supplier: Supplier) => {
     setsupplier(supplier);
     setPage("add");
   };
@@ -403,18 +381,12 @@ const ListOfsuppliers = ({
   let content: React.ReactNode;
 
   // Filter suppliers based on the search input
-    const filteredsuppliers = suppliersList?.content.filter((supplier: supplierType) =>{
+    const filteredsuppliers = suppliersList?.content.filter((supplier: Supplier) =>{
       const suppliername = supplier.name?.toLowerCase();
       const search = searchInput.toLowerCase();
-    
-      // Convert numbers to strings before searching
-      const price = supplier.price?.toString();
-      const totalstock = supplier.countInStock?.toString();
   
       return (
-        suppliername?.includes(search) ||
-        price?.includes(search) ||
-        totalstock?.includes(search)
+        suppliername?.includes(search) 
       );
     });
 
@@ -422,22 +394,23 @@ const ListOfsuppliers = ({
     isLoading || isError
       ? null
       : isSuccess
-      ? filteredsuppliers.map((supplier: supplierType) => {
+      ? filteredsuppliers.map((supplier: Supplier) => {
           // ? sortsuppliers.map((supplier: supplierType) => {
 
           return (
             <tr className="p-3" key={supplier._id}>
-              <td scope="row w-25">
-                <img
-                  src={supplier.images[0]}
-                  alt={supplier.name}
-                  style={{ width: "50px", height: "50px" }}
-                />
-              </td>
-              {/* <td scope="row w-25"><img src={supplier.img} alt={supplier.name} style={{ width: '50px', height: '50px' }} /></td> */}
               <td className="fw-bold">{supplier.name}</td>
-              <td>{supplier.price}</td>
-              <td>{supplier.countInStock}</td>
+              <td>{supplier.companyId}</td>
+              <td>{supplier.email}</td>
+              <td>{supplier.mobiles}</td>
+              <td>{supplier.accountNumbers}</td>
+              <td>
+                  {Object.keys(supplier.items).map((itemId) => (
+                    <div key={itemId}>
+                      Item ID: {itemId}, Rate: {supplier.items[itemId].rate}
+                    </div>
+                  ))}
+              </td>
               <td className="fw-bold d-flex gap-2 justify-content-center">
                 <a
                   href="#"
@@ -488,19 +461,25 @@ const ListOfsuppliers = ({
         <thead>
           <tr className="fd-bg-primary text-white">
             <th scope="col" className="p-3">
-              IMAGE
+              NAME
             </th>
             <th scope="col" className="p-3">
-              supplier NAME
+              COMPANY ID
             </th>
             <th scope="col" className="p-3">
-              PRICE
+              EMAIL
             </th>
             <th scope="col" className="p-3">
-              TOTAL STOCK
+              MOBILES
             </th>
             <th scope="col" className="p-3">
-              ACTION
+              ACCOUNT NUMBERS
+            </th>
+            <th scope="col" className="p-3">
+              ITEMS
+            </th>
+            <th scope="col" className="p-3">
+              ACTIONS
             </th>
           </tr>
         </thead>

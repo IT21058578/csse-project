@@ -75,7 +75,7 @@ export const HandleResult = ({ result }: { result: any }) => {
         navigate(
           responseData.user.roles.includes("ADMIN")
             ? RoutePaths.admin
-            : RoutePaths.userAccount
+            : RoutePaths.admin
         );
       } else {
         // Handle invalid response data

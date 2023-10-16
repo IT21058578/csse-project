@@ -355,7 +355,7 @@ const ListOfitems = ({
   );
 };
 
-const itemMain = () => {
+const ItemMain = () => {
   const [page, setPage] = useState("list");
   const [currentitem, setCurrentitem] = useState(null);
 
@@ -402,4 +402,4 @@ const itemMain = () => {
   );
 };
 
-export default itemMain;
+export default ItemMain;

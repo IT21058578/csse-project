@@ -1,17 +1,37 @@
-import {useEffect} from 'react'
-import {Navigate, useNavigate} from "react-router-dom"
+import React from "react";
 import { LoginForm } from '../components/Form';
-import RoutePaths from '../config';
-import { checkLogin } from '../Utils/Generals';
-import SignInSide from './LoginScreen';
+import back from "../assets/img/home.png";
 
-const Login = () => {
-
+const LoginPage = () => {
   return (
-    <>
-      <SignInSide/>
-    </>
-  )
-}
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center", 
+        height: "100vh",
+      }}
+    >
+      <div
+        style={{
+          flex: 0.6,
+          backgroundImage: back, 
+          height:"100%"
+        }}
+      >
+        <img
+          src={back}
+          alt="Background"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+        />
+      </div>
+        <LoginForm />
+    </div>
+  );
+};
 
-export default Login;
+export default LoginPage;

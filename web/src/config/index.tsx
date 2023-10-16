@@ -1,7 +1,7 @@
 
 const RoutePaths = {
 
-    home : '/',
+    home : '/admin',
     login : '/login',
     signup : '/signup',
     passwordReset : '/reset-password',

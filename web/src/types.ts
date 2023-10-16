@@ -98,5 +98,35 @@ const ItemRequestStatus = {
 } as const;
 
 
+export interface UserDocument extends Audit {
+  _id:string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
+  roles?: UserRole[];
+  isAuthorized?: boolean;
+  companyId?: string;
+  siteIds?: string[];
+}
+
+export interface Delivery extends Audit {
+  _id:string;
+  supplierId: string;
+  procurementId: string;
+  companyId: string;
+  itemId: string;
+  qty: number;
+}
+
+export interface Invoice extends Audit {
+  _id:string;
+  companyId: string;
+  procurementId: string;
+  supplierId: string;
+  itemId: string;
+  invoiceUrls: string[];
+}
+
 
 

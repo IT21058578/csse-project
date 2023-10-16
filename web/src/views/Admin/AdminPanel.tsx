@@ -52,9 +52,9 @@ const AdminPanel = ({ currentComponent }: { currentComponent: React.ReactNode })
             <div><Link to={RoutePaths.admin} className={toggleLinkClass(RoutePaths.admin)}>Dashboard<i className="bi bi-house float-end"></i></Link></div>
             <div><Link to={RoutePaths.adminCompanies} className={toggleLinkClass(RoutePaths.adminCompanies)}>Companies<i className="bi bi-newspaper float-end"></i></Link></div>
             <div><Link to={RoutePaths.adminSites} className={toggleLinkClass(RoutePaths.adminSites)}>Sites<i className="bi bi-bookmark float-end"></i></Link></div>
-            <div><Link to={RoutePaths.adminSuppliers} className={toggleLinkClass(RoutePaths.adminSuppliers)}>Suppliers<i className="bi bi-bookmark float-end"></i></Link></div>
+            {/* <div><Link to={RoutePaths.adminSuppliers} className={toggleLinkClass(RoutePaths.adminSuppliers)}>Suppliers<i className="bi bi-bookmark float-end"></i></Link></div> */}
             <div><Link to={RoutePaths.adminItems} className={toggleLinkClass(RoutePaths.adminItems)}>Items<i className="bi bi-people float-end"></i></Link></div>
-            <div><Link to={RoutePaths.adminAccount} className={toggleLinkClass(RoutePaths.adminAccount)}>Users<i className="bi bi-person float-end"></i></Link></div>
+            {/* <div><Link to={RoutePaths.adminAccount} className={toggleLinkClass(RoutePaths.adminAccount)}>Users<i className="bi bi-person float-end"></i></Link></div> */}
             <div><a href='#' className="d-block p-3 text-black" onClick={logoutUser}>Logout<i className="bi bi-person-slash float-end"></i></a></div>
           </aside>
           <div className="w-75 overflow-auto scroller">

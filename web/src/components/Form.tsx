@@ -67,7 +67,7 @@ const LoginForm = () => {
                     </div>
                     <div className="bt text-center">
                         <div><Link to="/reset-password" className="text-black opacity-75">Forget Password</Link></div>
-                        <div className="signup mt-2"><span>Don't have account ?</span><Link to="/signup" className="fd-color-primary">Sign Up</Link></div>
+                        {/* <div className="signup mt-2"><span>Don't have account ?</span><Link to="/signup" className="fd-color-primary">Sign Up</Link></div> */}
                     </div>
                 </div>
             </form>

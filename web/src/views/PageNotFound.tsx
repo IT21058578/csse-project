@@ -1,15 +1,15 @@
 import React from 'react'
-import Header from './includes/Header';
-import Footer from './includes/Footer';
+// import Header from './includes/Header';
+// import Footer from './includes/Footer';
 import NotFound from '../components/404';
 
 const PageNotFound = () => {
 
   return (
     <>
-        <Header />
+        {/* <Header /> */}
         <NotFound />
-        <Footer />
+        {/* <Footer /> */}
     </>
 )
 
