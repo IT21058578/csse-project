@@ -1,12 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Company } from './company.schema';
+import { Company, FlatCompany } from './company.schema';
 import { CreateCompanyDto } from './dtos/create-company.dto';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { UserDocument } from 'src/users/user.schema';
 import ErrorMessage from 'src/common/enums/error-message.enum';
-import { PageBuilder } from 'src/common/util/page-builder';
+import { PageBuilder } from 'src/common/util/page.util';
+import { QueryUtil } from 'src/common/util/query.util';
 
 @Injectable()
 export class CompaniesService {
@@ -24,12 +25,13 @@ export class CompaniesService {
       );
     }
 
-    const company = new this.companyModel();
-    company.name = name;
-    company.createdBy = user.id;
-    company.createdAt = new Date();
-    company.config = {};
-    return await company.save();
+    const savedCompany = await this.companyModel.create({
+      name,
+      createdBy: user?.id,
+      createdAt: new Date(),
+      config: {},
+    });
+    return savedCompany;
   }
 
   async editCompany(
@@ -46,12 +48,7 @@ export class CompaniesService {
       );
     }
 
-    const company = await this.companyModel.findById(id);
-
-    if (company == null) {
-      throw new BadRequestException(ErrorMessage.COMPANY_NOT_FOUND);
-    }
-
+    const company = await this.getCompany(id);
     company.name = name;
     company.updatedBy = user.id;
     company.updatedAt = new Date();
@@ -60,10 +57,11 @@ export class CompaniesService {
 
   async deleteCompany(id: string) {
     const company = await this.companyModel.findByIdAndDelete(id);
-    const etst = await this.companyModel.find();
     if (company == null) {
       throw new BadRequestException(ErrorMessage.COMPANY_NOT_FOUND);
     }
+
+    // TODO: Delete all corresponding
 
     return company;
   }
@@ -78,32 +76,33 @@ export class CompaniesService {
     return company;
   }
 
-  async getCompaniesPage({ pageNum = 1, pageSize = 10, sort }: PageRequest) {
-    const skippedDocuments = (pageNum - 1) * pageSize;
-    const [totalDocuments, companies] = await Promise.all([
-      this.companyModel.count({}),
+  async getCompaniesPage({
+    pageNum = 1,
+    pageSize = 10,
+    sort,
+    filter,
+  }: PageRequest) {
+    const [content, totalDocuments] = await Promise.all([
       this.companyModel
-        .find({})
-        .select({ password: 0 })
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .sort(QueryUtil.buildSort(sort))
+        .skip((pageNum - 1) * pageSize)
         .limit(pageSize)
-        .skip(skippedDocuments)
-        .sort(
-          sort !== undefined
-            ? { [sort?.field ?? '_id']: sort?.direction ?? 'asc' }
-            : undefined,
-        ),
+        .exec(),
+      this.companyModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .count()
+        .exec(),
     ]);
-
-    const companiesPage = PageBuilder.buildPage(
-      companies.map((company) => company.toJSON()),
-      {
-        pageNum,
-        pageSize,
-        totalDocuments,
-        sort,
-      },
-    );
-
-    return companiesPage;
+    const jsonContent = content.map((doc) =>
+      doc.toJSON(),
+    ) satisfies FlatCompany[];
+    const page = PageBuilder.buildPage(jsonContent, {
+      pageNum,
+      pageSize,
+      totalDocuments,
+      sort,
+    });
+    return page;
   }
 }

@@ -24,4 +24,4 @@ export class Site extends Audit {
   siteManagerIds: string[];
 }
 
-export const siteSchema = SchemaFactory.createForClass(Site);
+export const SiteSchema = SchemaFactory.createForClass(Site);

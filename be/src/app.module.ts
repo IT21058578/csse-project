@@ -35,9 +35,9 @@ import { FileModule } from './file/file.module';
 import { DataGenModule } from './data-gen/data-gen.module';
 import { DataGenService } from './data-gen/data-gen.service';
 import { DeliveriesModule } from './deliveries/deliveries.module';
-import { ApprovalsModule } from './approvals/approvals.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { DeliveriesService } from './deliveries/deliveries.service';
+import { ApprovalsModule } from './approvals/approvals.module';
 import { ApprovalsService } from './approvals/approvals.service';
 
 @Module({

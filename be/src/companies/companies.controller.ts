@@ -14,6 +14,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/common/enums/user-roles.enum';
 import { User } from 'src/common/decorators/user.decorator';
 import { UserDocument } from 'src/users/user.schema';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 
 @Controller('companies')
 export class CompaniesController {
@@ -28,7 +29,7 @@ export class CompaniesController {
   @Roles(UserRole.SYSTEM_ADMIN, UserRole.COMPANY_ADMIN)
   async editCompany(
     @User() user: UserDocument,
-    @Param('id') id: string,
+    @Param('id', ValidateObjectIdPipe) id: string,
     @Body() editCompanyDto: CreateCompanyDto,
   ) {
     return await this.companiesService.editCompany(user, id, editCompanyDto);
@@ -36,12 +37,12 @@ export class CompaniesController {
 
   @Delete(':id')
   @Roles(UserRole.SYSTEM_ADMIN)
-  async deleteCompany(@Param('id') id: string) {
+  async deleteCompany(@Param('id', ValidateObjectIdPipe) id: string) {
     return await this.companiesService.deleteCompany(id);
   }
 
   @Get('')
-  async getCompany(@Param('id') id: string) {
+  async getCompany(@Param('id', ValidateObjectIdPipe) id: string) {
     return await this.companiesService.getCompany(id);
   }
 

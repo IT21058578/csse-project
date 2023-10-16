@@ -1,21 +1,29 @@
 import {
   BadRequestException,
   ConflictException,
+  Inject,
   Injectable,
+  forwardRef,
 } from '@nestjs/common';
-import { ItemRequest, ItemRequestModel } from './item-request.schema';
+import {
+  FlatProcurement,
+  ItemRequest,
+  ItemRequestModel,
+} from './item-request.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import ErrorMessage from 'src/common/enums/error-message.enum';
 import { CreateProcurementDto } from './dto/create-procurement.dto';
-import { User, UserFlattened, UsersModel } from 'src/users/user.schema';
+import { UserFlattened } from 'src/users/user.schema';
 import { CompaniesService } from 'src/companies/companies.service';
 import { ItemsService } from 'src/items/items.service';
 import { SitesService } from 'src/sites/sites.service';
 import { SuppliersService } from 'src/suppliers/suppliers.service';
-import { Approval, ApprovalModel } from 'src/approvals/approval.schema';
-import { ApprovalStatus } from 'src/common/enums/approval-status.enum';
 import { ItemRequestStatus } from 'src/common/enums/item-request-status.enum';
 import { ApprovalsService } from 'src/approvals/approvals.service';
+import { PageRequest } from 'src/common/dtos/page-request.dto';
+import { PageBuilder } from 'src/common/util/page.util';
+import { ApprovalStatus } from 'src/common/enums/approval-status.enum';
+import { QueryUtil } from 'src/common/util/query.util';
 
 @Injectable()
 export class ItemRequestsService {
@@ -24,17 +32,14 @@ export class ItemRequestsService {
     private readonly itemsService: ItemsService,
     private readonly suppliersService: SuppliersService,
     private readonly companiesService: CompaniesService,
+    @Inject(forwardRef(() => ApprovalsService))
     private readonly approvalsService: ApprovalsService,
     @InjectModel(ItemRequest.name)
-    private readonly itemRequestModel: ItemRequestModel,
-    @InjectModel(User.name)
-    private readonly userModel: UsersModel,
-    @InjectModel(Approval.name)
-    private readonly approvalModel: ApprovalModel,
+    private readonly procurementModel: ItemRequestModel,
   ) {}
 
   async getProcurement(id: string) {
-    const existingProcurement = await this.itemRequestModel.findById(id);
+    const existingProcurement = await this.procurementModel.findById(id);
     if (existingProcurement === null) {
       throw new BadRequestException(
         ErrorMessage.PROCUREMENT_NOT_FOUND,
@@ -49,57 +54,68 @@ export class ItemRequestsService {
     createProcurementDto: CreateProcurementDto,
   ) {
     // Only by Site managers
-    const { companyId, itemId, qty, siteId, supplierId } = createProcurementDto;
-    const company = await this.companiesService.getCompany(companyId);
+    const { itemId, qty, siteId, supplierId } = createProcurementDto;
     const item = await this.itemsService.getItem(itemId);
-    if (item.companyId !== company.id) {
-      throw new BadRequestException(ErrorMessage.ITEM_NOT_FOUND);
-    }
+    const company = await this.companiesService.getCompany(item.companyId);
     const site = await this.sitesService.getSite(siteId);
     if (site.companyId !== company.id) {
-      throw new BadRequestException(ErrorMessage.SITE_NOT_FOUND);
+      throw new BadRequestException(
+        ErrorMessage.SITE_NOT_FOUND,
+        `Site with id ${site.id} does not belong to company with id ${company.id}`,
+      );
     }
     const supplier = await this.suppliersService.getSupplier(supplierId);
     if (supplier.companyId !== company.id) {
-      throw new BadRequestException(ErrorMessage.SUPPLIER_NOT_FOUND);
+      throw new BadRequestException(
+        ErrorMessage.SUPPLIER_NOT_FOUND,
+        `Supplier with id ${supplierId} does not belong to company with id ${company.id}`,
+      );
     }
-    if (!supplier.items.has(item.id)) {
-      throw new BadRequestException(ErrorMessage.ITEM_NOT_FOUND);
+    if (!Object.keys(supplier.items).includes(item.id)) {
+      throw new BadRequestException(
+        ErrorMessage.ITEM_NOT_FOUND,
+        `Supplier with id ${supplierId} does not provide the item with id ${itemId}`,
+      );
     }
-    const supplierItem = supplier.items.get(item.id)!;
 
+    let status: ItemRequestStatus = ItemRequestStatus.PENDING_APPROVAL;
+    const supplierItem = supplier.items[item.id];
     const price = qty * supplierItem.rate;
-    const newProcurement = new this.itemRequestModel({
-      companyId,
-      itemId,
-      qty,
-      siteId,
-      supplierId,
-      price,
-      createdAt: new Date(),
-      createdBy: user._id,
-    });
-    const savedProcurement = await newProcurement.save();
-
-    // Send approval request to random lowest level staff only if it needs approval.
     const isOverThreshold =
       price > (company.config.approvalThreshold || 100000);
     const isMustApproveItem = company.config.mustApproveItemIds?.includes(
       item.id,
     );
-    if (!isOverThreshold && !isMustApproveItem) return;
+    if (!isOverThreshold && !isMustApproveItem) {
+      status = ItemRequestStatus.APPROVED;
+    }
+
+    const savedProcurement = await this.procurementModel.create({
+      companyId: item.companyId,
+      itemId,
+      qty,
+      siteId,
+      supplierId,
+      price,
+      status,
+      createdAt: new Date(),
+      createdBy: user._id,
+    });
+
+    // Send approval request to random lowest level staff only if it needs approval.
+    if (status === ItemRequestStatus.APPROVED) return;
 
     const selectedAdmin =
-      await this.approvalsService.selectRandomProcurementAdmin(companyId);
+      await this.approvalsService.selectRandomProcurementAdmin(item.companyId);
 
-    const newApproval = new this.approvalModel({
+    await this.approvalsService.createInitialApproval({
+      companyId: item.companyId,
       procurementId: savedProcurement.id,
       status: ApprovalStatus.PENDING,
       approvedBy: selectedAdmin.id,
       createdAt: new Date(),
       createdBy: user._id,
     });
-    await newApproval.save();
     return savedProcurement;
   }
 
@@ -136,12 +152,12 @@ export class ItemRequestsService {
       throw new BadRequestException(ErrorMessage.ITEM_NOT_FOUND);
     }
     const supplier = await this.suppliersService.getSupplier(
-      existingProcurement.itemId,
+      existingProcurement.supplierId,
     );
     if (supplier.companyId !== company.id) {
       throw new BadRequestException(ErrorMessage.SUPPLIER_NOT_FOUND);
     }
-    if (!supplier.items.has(item.id)) {
+    if (!Object.keys(supplier.items).includes(item.id)) {
       throw new BadRequestException(ErrorMessage.ITEM_NOT_FOUND);
     }
 
@@ -151,7 +167,6 @@ export class ItemRequestsService {
   async deleteProcurement(id: string) {
     // Only by Site managers
     const existingProcurement = await this.getProcurement(id);
-
     // Only procurements that have not begun approval can be edited.
     if (existingProcurement.status !== ItemRequestStatus.PENDING_APPROVAL) {
       throw new ConflictException(
@@ -159,12 +174,36 @@ export class ItemRequestsService {
         `The procurement with id '${id}' has already been approved by administrators. It can no longer be deleted`,
       );
     }
-
-    await this.itemRequestModel.findByIdAndDelete(existingProcurement.id);
-    return existingProcurement;
+    await existingProcurement.deleteOne();
   }
 
-  async getItemRequestPage() {
-    // Include names of anything refered to by id
+  async getItemRequestPage({
+    pageNum = 1,
+    pageSize = 10,
+    filter,
+    sort,
+  }: PageRequest) {
+    const [content, totalDocuments] = await Promise.all([
+      this.procurementModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .sort(QueryUtil.buildSort(sort))
+        .skip((pageNum - 1) * pageSize)
+        .limit(pageSize)
+        .exec(),
+      this.procurementModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .count()
+        .exec(),
+    ]);
+    const jsonContent = content.map((doc) =>
+      doc.toJSON(),
+    ) satisfies FlatProcurement[];
+    const page = PageBuilder.buildPage(jsonContent, {
+      pageNum,
+      pageSize,
+      totalDocuments,
+      sort,
+    });
+    return page;
   }
 }

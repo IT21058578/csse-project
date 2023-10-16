@@ -12,7 +12,7 @@ import {
 import { UserDocument } from 'src/users/user.schema';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { CreateDeliveryDto } from './dtos/create-delivery.dto';
-import { Page } from 'src/common/util/page-builder';
+import { Page, PageBuilder } from 'src/common/util/page.util';
 import { InjectModel } from '@nestjs/mongoose';
 import ErrorMessage from 'src/common/enums/error-message.enum';
 import { CompaniesService } from 'src/companies/companies.service';
@@ -20,6 +20,7 @@ import { SuppliersService } from 'src/suppliers/suppliers.service';
 import { ItemsService } from 'src/items/items.service';
 import { ItemRequestsService } from 'src/item-requests/item-requests.service';
 import { ItemRequestStatus } from 'src/common/enums/item-request-status.enum';
+import { QueryUtil } from 'src/common/util/query.util';
 
 @Injectable()
 export class DeliveriesService {
@@ -46,33 +47,19 @@ export class DeliveriesService {
     user: UserDocument,
     createDeliveryDto: CreateDeliveryDto,
   ): Promise<DeliveryDocument> {
-    const { itemId, qty, supplierId, companyId, procurementId } =
-      createDeliveryDto;
-    const [item, company, supplier, procurement] = await Promise.all([
+    const { itemId, qty, supplierId, procurementId } = createDeliveryDto;
+    const [item, procurement] = await Promise.all([
       this.itemsService.getItem(itemId),
-      this.companiesService.getCompany(companyId),
-      this.suppliersService.getSupplier(supplierId),
       this.procurementsService.getProcurement(procurementId),
     ]);
+    const supplier = await this.suppliersService.getSupplier(
+      procurement.supplierId,
+    );
 
-    if (item.companyId !== company.id) {
-      throw new BadRequestException(
-        ErrorMessage.ITEM_NOT_FOUND,
-        `Item with id '${itemId}' was not found`,
-      );
-    }
-
-    if (supplier.companyId !== company.id) {
-      throw new BadRequestException(
-        ErrorMessage.SITE_NOT_FOUND,
-        `Supplier with id '${supplierId}' was not found`,
-      );
-    }
-
-    if (procurement.companyId !== company.id) {
+    if (procurement.companyId !== item.companyId) {
       throw new BadRequestException(
         ErrorMessage.PROCUREMENT_NOT_FOUND,
-        `Procurement with id '${procurementId}' was not found`,
+        `Procurement with id '${procurementId}' does not belong to this company`,
       );
     }
 
@@ -91,43 +78,68 @@ export class DeliveriesService {
     ) {
       throw new ConflictException(
         ErrorMessage.INVALID_PROCUREMENT_STATUS,
-        `This procurement is currently in '${procurement.status}' status which means it is no longer applicable for deliveries`,
+        `This procurement is in '${procurement.status}' status which means it is not applicable for deliveries`,
       );
     }
 
-    if (Object.keys(supplier.items).includes(item.id)) {
+    if (!Object.keys(supplier.items).includes(item.id)) {
       throw new ConflictException(
         ErrorMessage.INVALID_SUPPLIER_ITEM,
-        `Item with id '${itemId}' does not belong to supplier with id '${supplierId}' was not found`,
+        `Item with id '${itemId}' does not belong to supplier with id '${supplierId}'`,
       );
     }
 
-    const newDelivery = new this.deliveryModel({
-      companyId,
+    const newDelivery = await this.deliveryModel.create({
+      companyId: item.companyId,
       itemId,
       procurementId,
       qty,
       supplierId,
       createdAt: new Date(),
-      createdBy: user.id,
+      createdBy: user?.id,
     });
-    const savedDelivery = await newDelivery.save();
 
     // If procurement qty is fulfilled, change its status.
     const allDeliveries = await this.deliveryModel.find({ procurementId });
     const totalQty = allDeliveries
       .map((delivery) => delivery.qty)
       .reduce((a, b) => a + b);
-    
+
     if (totalQty >= procurement.qty) {
       procurement.status = ItemRequestStatus.PENDING_INVOICE;
       await procurement.save();
     }
 
-    return savedDelivery;
+    return newDelivery;
   }
 
-  async getDeliveriesPage(
-    pageRequest: PageRequest,
-  ): Promise<Page<FlatDelivery>> {}
+  async getDeliveriesPage({
+    pageNum = 1,
+    pageSize = 10,
+    filter,
+    sort,
+  }: PageRequest): Promise<Page<FlatDelivery>> {
+    const [content, totalDocuments] = await Promise.all([
+      this.deliveryModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .sort(QueryUtil.buildSort(sort))
+        .skip((pageNum - 1) * pageSize)
+        .limit(pageSize)
+        .exec(),
+      this.deliveryModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .count()
+        .exec(),
+    ]);
+    const jsonContent = content.map((doc) =>
+      doc.toJSON(),
+    ) satisfies FlatDelivery[];
+    const page = PageBuilder.buildPage(jsonContent, {
+      pageNum,
+      pageSize,
+      totalDocuments,
+      sort,
+    });
+    return page;
+  }
 }

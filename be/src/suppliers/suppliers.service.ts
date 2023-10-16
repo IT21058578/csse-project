@@ -1,14 +1,13 @@
-import {
-  BadRequestException,
-  Injectable
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import ErrorMessage from 'src/common/enums/error-message.enum';
 import { CreateSupplierDto } from './dtos/create-supplier.dto';
 import { UserFlattened } from 'src/users/user.schema';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
-import { Types } from 'mongoose';
 import { Supplier, SupplierModel } from './supplier.schema';
+import { PageBuilder } from 'src/common/util/page.util';
+import { FlatSite } from 'src/sites/site.schema';
+import { QueryUtil } from 'src/common/util/query.util';
 
 @Injectable()
 export class SuppliersService {
@@ -51,24 +50,17 @@ export class SuppliersService {
     editSupplierDto: CreateSupplierDto,
   ) {
     const { accountNumbers, email, items, mobiles, name } = editSupplierDto;
-    const supplier = await this.supplierModel.findById(id);
-
-    if (supplier == null) {
-      throw new BadRequestException(
-        ErrorMessage.SUPPLIER_NOT_FOUND,
-        `Supplier with the id '${id}' was not found`,
-      );
-    }
+    const supplier = await this.getSupplier(id);
 
     // Must definitely be present
     supplier.name = name;
     supplier.accountNumbers = accountNumbers;
     supplier.email = email;
-    supplier.items = new Types.Map(Object.entries(items));
+    supplier.items = items;
     supplier.mobiles = mobiles;
     supplier.updatedAt = new Date();
     supplier.updatedBy = user._id;
-  
+
     const savedSupplier = await supplier.save();
     return savedSupplier.toJSON();
   }
@@ -76,29 +68,55 @@ export class SuppliersService {
   async deleteSupplier(id: string) {
     // Only company admin
     const deletedSupplier = await this.supplierModel.findByIdAndDelete(id);
-
     if (deletedSupplier == null) {
       throw new BadRequestException(
         ErrorMessage.SUPPLIER_NOT_FOUND,
         `Supplier with the id '${id}' was not found`,
       );
     }
-
-    return deletedSupplier.toJSON();
   }
 
   async getSupplier(id: string) {
     const supplier = await this.supplierModel.findById(id);
-
     if (supplier == null) {
       throw new BadRequestException(
         ErrorMessage.SUPPLIER_NOT_FOUND,
         `Supplier with the id '${id}' was not found`,
       );
     }
-
     return supplier;
   }
 
-  async getSuppliersPage(pageRequest: PageRequest) {}
+  async getSuppliersPage({
+    pageNum = 1,
+    pageSize = 10,
+    filter,
+    sort,
+  }: PageRequest) {
+    // const itemIdQuery = filter?.item?.value?.reduce(
+    //   (obj = {}, id = '') => ({ ...obj, [`items.${id}`]: { $exists: true } }),
+    //   {},
+    // );
+
+    const [content, totalDocuments] = await Promise.all([
+      this.supplierModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .sort(QueryUtil.buildSort(sort))
+        .skip((pageNum - 1) * pageSize)
+        .limit(pageSize)
+        .exec(),
+      this.supplierModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .count()
+        .exec(),
+    ]);
+    const jsonContent = content.map((doc) => doc.toJSON()) satisfies FlatSite[];
+    const page = PageBuilder.buildPage(jsonContent, {
+      pageNum,
+      pageSize,
+      totalDocuments,
+      sort,
+    });
+    return page;
+  }
 }

@@ -1,18 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Company, CompanyModel } from 'src/companies/company.schema';
 import { CreateSiteDto } from './dtos/create-site.dto';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import ErrorMessage from 'src/common/enums/error-message.enum';
 import { UserFlattened } from 'src/users/user.schema';
 import { CompaniesService } from 'src/companies/companies.service';
-import { Site, SiteModel } from './site.schema';
+import { FlatSite, Site, SiteModel } from './site.schema';
+import { PageBuilder } from 'src/common/util/page.util';
+import { QueryUtil } from 'src/common/util/query.util';
 
 @Injectable()
 export class SitesService {
   constructor(
     private readonly companiesService: CompaniesService,
-    @InjectModel(Company.name) private readonly companyModel: CompanyModel,
     @InjectModel(Site.name) private readonly siteModel: SiteModel,
   ) {}
 
@@ -72,5 +72,31 @@ export class SitesService {
     return existingSite;
   }
 
-  async getSitesPage(pageRequest: PageRequest) {}
+  async getSitesPage({
+    pageNum = 1,
+    pageSize = 10,
+    filter,
+    sort,
+  }: PageRequest) {
+    const [content, totalDocuments] = await Promise.all([
+      this.siteModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .sort(QueryUtil.buildSort(sort))
+        .skip((pageNum - 1) * pageSize)
+        .limit(pageSize)
+        .exec(),
+      this.siteModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .count()
+        .exec(),
+    ]);
+    const jsonContent = content.map((doc) => doc.toJSON()) satisfies FlatSite[];
+    const page = PageBuilder.buildPage(jsonContent, {
+      pageNum,
+      pageSize,
+      totalDocuments,
+      sort,
+    });
+    return page;
+  }
 }

@@ -4,8 +4,10 @@ import { PageRequest } from 'src/common/dtos/page-request.dto';
 import ErrorMessage from 'src/common/enums/error-message.enum';
 import { UserFlattened } from 'src/users/user.schema';
 import { CreateItemDto } from './dtos/create-item.dto';
-import { Item, ItemModel } from './item.schema';
+import { FlattenedItem, Item, ItemModel } from './item.schema';
 import { CompaniesService } from 'src/companies/companies.service';
+import { PageBuilder } from 'src/common/util/page.util';
+import { QueryUtil } from 'src/common/util/query.util';
 
 @Injectable()
 export class ItemsService {
@@ -26,30 +28,39 @@ export class ItemsService {
       .find({ companyId, name })
       .count();
     if (hasItemWithSameName !== 0) {
+      throw new BadRequestException(
+        ErrorMessage.ITEM_ALREADY_EXISTS,
+        `Item with name ${name} already exists`,
+      );
     }
 
-    const newItem = new this.itemModel({
+    const savedItem = await this.itemModel.create({
       name,
       imageUrls,
       companyId,
       createdAt: new Date(),
       createdBy: user._id,
     });
-    const savedItem = await newItem.save();
 
     return savedItem;
   }
 
-  async editItem(user: UserFlattened, editItemDto: CreateItemDto) {
-    const { id, name, imageUrls } = editItemDto;
-
-    if (id === undefined) {
-      throw new BadRequestException();
-    }
-
+  async editItem(user: UserFlattened, id: string, editItemDto: CreateItemDto) {
+    const { name, imageUrls } = editItemDto;
     const existingItem = await this.getItem(id);
 
-    // Must definitely be present
+    if (name) {
+      const hasItemWithSameName = await this.itemModel
+        .find({ companyId: existingItem.companyId, name })
+        .count();
+      if (hasItemWithSameName !== 0) {
+        throw new BadRequestException(
+          ErrorMessage.ITEM_ALREADY_EXISTS,
+          `Item with name ${name} already exists`,
+        );
+      }
+    }
+
     existingItem.name = name ?? existingItem.name;
     existingItem.imageUrls = imageUrls ?? existingItem.imageUrls;
     existingItem.updatedAt = new Date();
@@ -72,5 +83,33 @@ export class ItemsService {
     return existingItem;
   }
 
-  async getItemsPage(pageRequest: PageRequest) {}
+  async getItemsPage({
+    pageNum = 1,
+    pageSize = 10,
+    filter,
+    sort,
+  }: PageRequest) {
+    const [content, totalDocuments] = await Promise.all([
+      this.itemModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .sort(QueryUtil.buildSort(sort))
+        .skip((pageNum - 1) * pageSize)
+        .limit(pageSize)
+        .exec(),
+      this.itemModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .count()
+        .exec(),
+    ]);
+    const jsonContent = content.map((doc) =>
+      doc.toJSON(),
+    ) satisfies FlattenedItem[];
+    const page = PageBuilder.buildPage(jsonContent, {
+      pageNum,
+      pageSize,
+      totalDocuments,
+      sort,
+    });
+    return page;
+  }
 }

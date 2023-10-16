@@ -1,7 +1,9 @@
 import {
   BadRequestException,
   ConflictException,
+  Inject,
   Injectable,
+  forwardRef,
 } from '@nestjs/common';
 import { User, UserDocument, UsersModel } from 'src/users/user.schema';
 import {
@@ -12,19 +14,21 @@ import {
 } from './approval.schema';
 import { CreateApprovalDto } from './dtos/create-approval.dto';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
-import { Page } from 'src/common/util/page-builder';
+import { Page, PageBuilder } from 'src/common/util/page.util';
 import { InjectModel } from '@nestjs/mongoose';
 import ErrorMessage from 'src/common/enums/error-message.enum';
 import { ApprovalStatus } from 'src/common/enums/approval-status.enum';
+import { ArrayUtils } from 'src/common/util/array.util';
+import { UserRole } from 'src/common/enums/user-roles.enum';
 import { ItemRequestsService } from 'src/item-requests/item-requests.service';
 import { ItemRequestStatus } from 'src/common/enums/item-request-status.enum';
-import { ArrayUtils } from 'src/common/util/array-utils';
-import { UserRole } from 'src/common/enums/user-roles.enum';
+import { QueryUtil } from 'src/common/util/query.util';
 
 @Injectable()
 export class ApprovalsService {
   constructor(
-    private readonly procurementsService: ItemRequestsService,
+    @Inject(forwardRef(() => ItemRequestsService))
+    private readonly itemRequestsService: ItemRequestsService,
     @InjectModel(User.name) private readonly userModel: UsersModel,
     @InjectModel(Approval.name) private readonly approvalModel: ApprovalModel,
   ) {}
@@ -42,24 +46,33 @@ export class ApprovalsService {
 
   async passApproval(
     user: UserDocument,
+    approvalId: string,
+    isApproved: boolean,
     editApprovalDto: CreateApprovalDto,
   ): Promise<ApprovalDocument> {
-    const { approvalId, description, refferredTo, isApproved } =
-      editApprovalDto;
+    const { description, refferredTo } = editApprovalDto;
     const approval = await this.getApproval(approvalId);
+    const procurement = await this.itemRequestsService.getProcurement(
+      approval.procurementId,
+    );
+
+    if (
+      ![
+        ItemRequestStatus.PARTIALLY_APPROVED,
+        ItemRequestStatus.PENDING_APPROVAL,
+      ].includes(procurement.status as any)
+    ) {
+      throw new BadRequestException(ErrorMessage.PROCUREMENT_ALREADY_APPROVED);
+    }
 
     approval.description = description;
     approval.refferredTo = refferredTo;
     approval.status = isApproved
       ? ApprovalStatus.APPROVED
       : ApprovalStatus.DISAPPROVED;
-    approval.updatedBy = user.id;
+    approval.updatedBy = user?.id;
     approval.updatedAt = new Date();
     const savedApproval = await approval.save();
-
-    const procurement = await this.procurementsService.getProcurement(
-      approval.procurementId,
-    );
 
     if (approval.status === ApprovalStatus.DISAPPROVED) {
       procurement.status = ItemRequestStatus.DISAPPROVED;
@@ -79,21 +92,47 @@ export class ApprovalsService {
       procurement.companyId,
       [approval.approvedBy],
     );
-    const nextApproval = new this.approvalModel({
+    const nextApprovalPromise = this.approvalModel.create({
       companyId: procurement.companyId,
       approvedBy: selectedAdmin.id,
       status: ApprovalStatus.PENDING,
       procurementId: procurement.id,
       createdAt: new Date(),
-      createdBy: user.id,
+      createdBy: user?.id,
     });
-    await Promise.all([procurement.save(), nextApproval.save()]);
+    await Promise.all([procurement.save(), nextApprovalPromise]);
     return savedApproval;
   }
 
-  async getApprovalsPage(
-    pageRequest: PageRequest,
-  ): Promise<Page<FlatApproval>> {}
+  async getApprovalsPage({
+    pageNum = 1,
+    pageSize = 10,
+    filter,
+    sort,
+  }: PageRequest): Promise<Page<FlatApproval>> {
+    const [content, totalDocuments] = await Promise.all([
+      this.approvalModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .sort(QueryUtil.buildSort(sort))
+        .skip((pageNum - 1) * pageSize)
+        .limit(pageSize)
+        .exec(),
+      this.approvalModel
+        .find(QueryUtil.buildQueryFromFilter(filter))
+        .count()
+        .exec(),
+    ]);
+    const jsonContent = content.map((doc) =>
+      doc.toJSON(),
+    ) satisfies FlatApproval[];
+    const approvalsPage = PageBuilder.buildPage(jsonContent, {
+      pageNum,
+      pageSize,
+      totalDocuments,
+      sort,
+    });
+    return approvalsPage;
+  }
 
   async selectRandomProcurementAdmin(
     companyId: string,
@@ -117,5 +156,19 @@ export class ApprovalsService {
       );
     }
     return selectedAdmin;
+  }
+
+  async createInitialApproval(approval: Approval) {
+    const existingApproval = await this.approvalModel.find({
+      procurementId: approval.procurementId,
+    });
+    if (existingApproval.length !== 0) {
+      throw new ConflictException(
+        ErrorMessage.INVALID_PROCUREMENT_APPROVAL,
+        `Attempted to create an initial approval for procurement with id ${approval.procurementId} which already has approvals`,
+      );
+    }
+    const savedApproval = await this.approvalModel.create(approval);
+    return savedApproval;
   }
 }

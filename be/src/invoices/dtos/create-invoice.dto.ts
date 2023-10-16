@@ -1,7 +1,14 @@
+import { IsArray, IsMongoId, IsNotEmpty, IsString, IsUrl } from 'class-validator';
+
 export class CreateInvoiceDto {
-  companyId: string;
+  @IsString()
+  @IsNotEmpty()
+  @IsMongoId()
   procurementId: string;
-  supplierId: string;
-  itemId: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  @IsUrl({}, {each: true})
   invoiceUrls: string[];
 }

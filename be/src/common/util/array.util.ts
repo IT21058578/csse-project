@@ -6,7 +6,7 @@ export class ArrayUtils {
    */
   public static selectRandomOne = <T>(arr: T[]): T | undefined => {
     if (arr.length === 0) return undefined;
-    const randomIdx = Math.round(Math.random() * arr.length);
+    const randomIdx = Math.round(Math.random() * (arr.length - 1));
     return arr[randomIdx];
   };
 }
