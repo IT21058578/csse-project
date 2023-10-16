@@ -10,20 +10,20 @@ const HomeScheduleBox = (props : scheduleTypes) => {
         <View style={[styles.frameContainer, styles.frameLayout]}>
          
         <View style={[styles.frame4, styles.frameFlexBox]}>
-          <View style={styles.frameChild} />
+          {/* <View style={styles.frameChild} />                                                                                                                                                                                                                                                                                                                                                                                                                              QQQQQ */}
           <View style={styles.projectProgressMeetingParent}>
             <Text style={styles.projectProgressMeeting}>
               {props.title}
             </Text>
-            <Text style={styles.text4}>{props.startTime} - {props.endTime}</Text>
+            {/* <Text style={styles.text4}>{props.startTime} - {props.endTime}</Text> */}
           </View>
         </View>
 
-        <View style={[styles.altriumRoom01Wrapper, styles.wrapperLayout]}>
+        {/* <View style={[styles.altriumRoom01Wrapper, styles.wrapperLayout]}>
           <Text style={[styles.altriumRoom01, styles.altriumRoom01Typo]}>
             {props.room}
           </Text>
-        </View>
+        </View> */}
 
       </View>
 

@@ -1,7 +1,7 @@
 export const schedulesApi = [
     {
      id: 1,
-     title:'Project Progress Metting',
+     title:'Pending Requisition 1',
      startTime:'07.00',
      endTime:'07.15',
      date:'2023.09.12',
@@ -9,7 +9,7 @@ export const schedulesApi = [
     },
     {
      id: 2,
-     title:'Project Progress Metting',
+     title:'Pending Requisition 2',
      startTime:'07.00',
      endTime:'07.15',
      date:'2023.09.12',
@@ -17,7 +17,7 @@ export const schedulesApi = [
     },
     {
      id: 3,
-     title:'Project Progress Metting',
+     title:'Pending Requisition 3',
      startTime:'07.00',
      endTime:'07.15',
      date:'2023.09.12',

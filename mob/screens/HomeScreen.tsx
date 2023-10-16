@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   },
   frameParent: {
     width: 327,
-    height: 432,
+    height: 132,
   },
   seProjectGroup: {
     color: "#8f99eb",
