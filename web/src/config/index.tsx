@@ -14,11 +14,11 @@ const RoutePaths = {
     adminAccount: '/admin/account',
     adminCompanies : '/admin/companies',
     adminSites : '/admin/sites',
-    adminSuppliers: 'admin/suppliers',
-    adminItems: 'admin/items',
-    adminOrders: 'admin/orders',
-    adminUsers: 'admin/users',
-    adminInvoices: 'admin/invoices',
+    adminSuppliers: '/admin/suppliers',
+    adminItems: '/admin/items',
+    adminOrders: '/admin/orders',
+    adminUsers: '/admin/users',
+    adminInvoices: '/admin/invoices',
 
     token: 'token'
 

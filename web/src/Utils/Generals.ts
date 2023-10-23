@@ -1,7 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useAppSelector } from "../hooks/redux-hooks";
 import RoutePaths from "../config";
-import { UserType } from "../types";
+
 
 export const toggleLinkClass = (
   path: string,
