@@ -1,7 +1,7 @@
 import {Animated, TextStyle, TouchableOpacity, View, StyleSheet} from "react-native";
 
 import {DotSize, TabButtonLayout, TabElementDisplayOptions} from "../../types";
-import {isIphoneX} from "../../utils/isIphoneX";
+import {isIphoneX} from "../../Utils/isIphoneX";
 import React from "react";
 
 

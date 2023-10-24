@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { getItem, removeItem } from "../Utils/Generals";
-import RoutePaths from "../config";
+// import { getItem, removeItem } from "../Utils/Generals";
+// import RoutePaths from "../config";
 
 
 export const userSlice = createSlice({

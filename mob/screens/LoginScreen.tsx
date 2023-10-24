@@ -64,7 +64,7 @@ const LoginScreen: React.FC<Props> = ({ navigation: { navigate } }) => {
         </View>
 
         <TouchableOpacity
-          onPress={() => navigate("Home")}
+          onPress={() => navigate("NewRequisition")}
           style={{
             padding: Spacing * 2,
             backgroundColor: Colors.primary,

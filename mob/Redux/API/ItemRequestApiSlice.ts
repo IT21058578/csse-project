@@ -1,58 +1,59 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { BASE_URL } from "../../Utils/Generals";
-import { getItem } from "../../Utils/Generals";
-import RoutePaths from "../../config";
+import { getItem, BASE_URL } from "../../Utils/Genarals";
+import RoutePaths from "../../Utils/RoutePaths";
 
-const token = getItem(RoutePaths.token);
+
+
 
 export const itemrequestApiSlice = createApi({
-  reducerPath: "api/itemrequests",
+  reducerPath: "api/procurements",
   baseQuery: fetchBaseQuery({
     baseUrl: BASE_URL,
-    prepareHeaders(headers) {
+    async prepareHeaders(headers) {
+      const token = await getItem(RoutePaths.token);
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }
       return headers;
     },
   }),
-  tagTypes: ["itemrequests"],
+  tagTypes: ["procurements"],
 
   endpoints: (builder) => ({
     getAllitemrequests: builder.query({
-      query: () => "/itemrequests/search",
-      providesTags: ["itemrequests"],
+      query: () => "/procurements/search",
+      providesTags: ["procurements"],
     }),
 
     getitemrequest: builder.query({
-      query: (id: string) => `/itemrequests/${id}`,
-      providesTags: ["itemrequests"],
+      query: (id: string) => "/procurements/${id}",
+      providesTags: ["procurements"],
     }),
 
     createitemrequest: builder.mutation({
       query: ({ formData }) => ({
-        url: "/itemrequests",
+        url: "/procurements",
         method: "POST",
         body: formData,
       }),
-      invalidatesTags: ["itemrequests"],
+      invalidatesTags: ["procurements"],
     }),
 
     updateitemrequest: builder.mutation({
       query: ({ itemrequestId, formData }) => ({
-        url: `/itemrequests/${itemrequestId}`,
+        url: `/procurements/${itemrequestId}`,
         method: "PUT",
         body: formData,
       }),
-      invalidatesTags: ["itemrequests"],
+      invalidatesTags: ["procurements"],
     }),
 
     deleteitemrequest: builder.mutation({
       query: (id: String) => ({
-        url: `/itemrequests/${id}`,
+        url: `/procurements/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["itemrequests"],
+      invalidatesTags: ["procurements"],
     }),
       
   }),

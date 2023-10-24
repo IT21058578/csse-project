@@ -1,10 +1,11 @@
 import React from 'react'
 import BerlinTabBarNavigator from '../components/navBottom/Tabs';
 import {Ionicons as Icon} from '@expo/vector-icons'
-import Home from '../screens/HomeScreen';
+// import Home from '../screens/HomeScreen';
 import PersonalRoomSchedule from "../screens/PersonalRoomSchedule";
 import CreatedTasks from '../screens/CreatedTasks';
 import Profile from '../screens/Profile';
+import Register from '../screens/RegisterScreen';
 
 const Tabs = BerlinTabBarNavigator()
 
@@ -38,7 +39,7 @@ export default () => (
                         tabBarBackground: "#ffffff",
                     }}
     >
-        <Tabs.Screen
+        {/* <Tabs.Screen
             name="TabOne"
             component={Home}
             options={{
@@ -51,7 +52,7 @@ export default () => (
                 ),
 
             }}
-        />
+        /> */}
 
         <Tabs.Screen
             name="TabTwo"
@@ -68,7 +69,8 @@ export default () => (
         />
         <Tabs.Screen
             name="TabThree"
-            component={CreatedTasks}
+            // component={CreatedTasks}
+            component={Register}
             options={{
                 tabBarIcon: ({focused, color}: any) => (
                     <TabBarIcon

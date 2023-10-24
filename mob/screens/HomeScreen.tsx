@@ -8,6 +8,7 @@ import { scheduleTypes } from "../types";
 import HomeScheduleBox from "../components/schedule/homeScheduleBox";
 import { schedulesApi } from "../data/virtualData";
 import { useGetAllPersonalDaySchedulesQuery } from "../Redux/API/schedules.api.slice";
+import BottomTab from "../navigation/BottomTab";
 
 const Home = () => {
 
@@ -85,7 +86,7 @@ const Home = () => {
         )}
 
       </ScrollView>
-
+      <BottomTab />
     </View>
   );
 };

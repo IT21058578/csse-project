@@ -10,6 +10,7 @@ import BottomTab from "./BottomTab";
 import PersonalRoomSchedule from "../screens/PersonalRoomSchedule";
 
 import { RootStackParamList } from "../types";
+import AddTask from "../screens/AddReq";
 
 const theme = {
   ...DefaultTheme,
@@ -41,7 +42,8 @@ function RootNavigator() {
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="BottomTab" component={BottomTab} />
-      <Stack.Screen name="PersonalRoomSchedule" component={PersonalRoomSchedule} />
+      {/* <Stack.Screen name="PersonalRoomSchedule" component={PersonalRoomSchedule} /> */}
+      <Stack.Screen name="NewRequisition" component={AddTask} />
     </Stack.Navigator>
   );
 }

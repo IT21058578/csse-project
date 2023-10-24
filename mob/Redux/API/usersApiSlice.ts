@@ -1,7 +1,7 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
-import { BASE_URL } from '../../Utils/Generals';
-import { getItem } from '../../Utils/Generals';
-import RoutePaths from '../../config';
+import { getItem, BASE_URL } from '../../Utils/Genarals';
+import RoutePaths from '../../Utils/RoutePaths';
+
 
 const token = getItem(RoutePaths.token);
 

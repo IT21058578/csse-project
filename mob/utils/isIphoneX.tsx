@@ -1,8 +1,5 @@
 import { Dimensions, Platform } from 'react-native';
 
-// Function extracted from:
-// https://github.com/ptelad/react-native-iphone-x-helper
-
 export function isIphoneX() {
     const dimen = Dimensions.get('window');
     return (
