@@ -7,7 +7,7 @@ import RegisterScreen from "../screens/RegisterScreen";
 import Welcome from "../screens/WelcomeScreen";
 import Home from "../screens/HomeScreen";
 import BottomTab from "./BottomTab";
-import PersonalRoomSchedule from "../screens/PersonalRoomSchedule";
+// import PersonalRoomSchedule from "../screens/PersonalRoomSchedule";
 
 import { RootStackParamList } from "../types";
 import AddTask from "../screens/AddReq";
