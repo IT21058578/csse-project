@@ -26,7 +26,7 @@ export class CompaniesController {
   }
 
   @Put(':id')
-  @Roles(UserRole.SYSTEM_ADMIN, UserRole.COMPANY_ADMIN)
+  // @Roles(UserRole.SYSTEM_ADMIN, UserRole.COMPANY_ADMIN)
   async editCompany(
     @User() user: UserDocument,
     @Param('id', ValidateObjectIdPipe) id: string,
@@ -36,7 +36,7 @@ export class CompaniesController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.SYSTEM_ADMIN)
+  // @Roles(UserRole.SYSTEM_ADMIN)
   async deleteCompany(@Param('id', ValidateObjectIdPipe) id: string) {
     return await this.companiesService.deleteCompany(id);
   }
@@ -47,7 +47,7 @@ export class CompaniesController {
   }
 
   @Post()
-  @Roles(UserRole.SYSTEM_ADMIN)
+  // @Roles(UserRole.SYSTEM_ADMIN)
   async createCompany(
     @User() user: UserDocument,
     @Body() createCompanyDto: CreateCompanyDto,

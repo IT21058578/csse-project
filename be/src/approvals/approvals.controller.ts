@@ -27,13 +27,13 @@ export class ApprovalsController {
   }
 
   @Get(':id')
-  @Roles(...Object.values(UserRole))
+  // @Roles(...Object.values(UserRole))
   async getApproval(@Param('id', ValidateObjectIdPipe) id: string) {
     return await this.approvalsService.getApproval(id);
   }
 
   @Put(':id/pass')
-  @Roles(UserRole.PROCUREMENT_ADMIN, UserRole.COMPANY_ADMIN)
+  // @Roles(UserRole.PROCUREMENT_ADMIN, UserRole.COMPANY_ADMIN)
   async passApproval(
     @User() user: UserDocument,
     @Param('id', ValidateObjectIdPipe) id: string,

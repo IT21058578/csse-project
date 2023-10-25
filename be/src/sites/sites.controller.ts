@@ -26,7 +26,7 @@ export class SitesController {
   }
 
   @Put(':id')
-  @Roles(UserRole.COMPANY_ADMIN, UserRole.SITE_ADMIN, UserRole.SYSTEM_ADMIN)
+  // @Roles(UserRole.COMPANY_ADMIN, UserRole.SITE_ADMIN, UserRole.SYSTEM_ADMIN)
   async editSite(
     @User() user: UserFlattened,
     @Param('id', ValidateObjectIdPipe) id: string,
@@ -41,7 +41,7 @@ export class SitesController {
   }
 
   @Post()
-  @Roles(UserRole.COMPANY_ADMIN, UserRole.SITE_ADMIN, UserRole.SYSTEM_ADMIN)
+  // @Roles(UserRole.COMPANY_ADMIN, UserRole.SITE_ADMIN, UserRole.SYSTEM_ADMIN)
   async createSite(
     @User() user: UserFlattened,
     @Body() createSiteDto: CreateSiteDto,

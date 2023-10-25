@@ -2,14 +2,19 @@ import React, { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
 import Spinner from "../Spinner";
 import { ToastContainer, toast } from "react-toastify";
-import { Site } from "../../types";
-import { useGetAllsitesQuery, 
-         useCreatesiteMutation,
-         useUpdatesiteMutation } from "../../store/apiquery/SitesApiSlice";
-
+import { Site, User } from "../../types";
+import {
+  useGetAllsitesQuery,
+  useCreatesiteMutation,
+  useUpdatesiteMutation,
+} from "../../store/apiquery/SitesApiSlice";
+import { getItem } from "../../Utils/Generals";
+import RoutePaths from "../../config";
+import { useGetAllUsersQuery } from "../../store/apiquery/usersApiSlice";
+const isLogged = getItem(RoutePaths.token);
+const users = !isLogged ? null : JSON.parse(getItem("user") || "");
 
 const Updatesite = ({ site }: { site: Site }) => {
-
   const [updateData, setUpdateData] = useState(site);
   const [updatesite, udpateResult] = useUpdatesiteMutation();
   const imageTag = useRef<HTMLImageElement>(null);
@@ -42,11 +47,11 @@ const Updatesite = ({ site }: { site: Site }) => {
         console.log("site Updated successfully");
         toast.success("site Updated successfully");
         setFormData({
-            name: '',
-            companyId: '',
-            address: '',
-            mobiles: [],
-            siteManagerIds: [],
+          name: "",
+          companyId: "",
+          address: "",
+          mobiles: [],
+          siteManagerIds: [],
         });
       } else if ("error" in result && result.error) {
         console.error("site creation failed", result.error);
@@ -65,8 +70,8 @@ const Updatesite = ({ site }: { site: Site }) => {
       className="checkout-service p-3"
       onSubmit={handleSubmit}
     >
-    <input type="hidden" name="id" value={updateData._id} />
-    <div className="d-flex gap-2">
+      <input type="hidden" name="id" value={updateData._id} />
+      <div className="d-flex gap-2">
         <label className="w-50">
           <span>Name</span>
           <input
@@ -118,7 +123,7 @@ const Updatesite = ({ site }: { site: Site }) => {
           rows={10}
           value={formData.mobiles}
           className="w-100 p-2 border"
-          placeholder="Description"
+          placeholder="mobiles"
           onChange={handleUpdateValue}
         ></textarea>
       </label>
@@ -146,18 +151,46 @@ const Updatesite = ({ site }: { site: Site }) => {
 };
 
 const AddOrEditsite = ({ site }: { site: null | Site }) => {
-
   const [createsite, result] = useCreatesiteMutation();
+  const [dataUser, setData] = useState(users);
 
+  const {
+    isLoading,
+    data: SiteMangerList,
+    isError,
+  } = useGetAllUsersQuery("users/search");
 
+  const siteAdmins = SiteMangerList?.content.filter((user: any) => {
+    return (
+      user.roles.includes("SITE_ADMIN") && user.companyId === dataUser.companyId
+    );
+  });
 
   const [formData, setFormData] = useState({
-    name: '',
-    companyId: '',
-    address: '',
-    mobiles: [],
-    siteManagerIds: [],
+    name: "",
+    companyId: dataUser.companyId,
+    address: "",
+    mobiles: [""],
+    siteManagerIds: [] as string[],
   });
+
+  const handleUserSelection = (userId: string) => {
+    setFormData((prevFormData: any) => {
+      if (prevFormData.siteManagerIds.includes(userId)) {
+        return {
+          ...prevFormData,
+          siteManagerIds: prevFormData.siteManagerIds.filter(
+            (id: string) => id !== userId
+          ),
+        };
+      } else {
+        return {
+          ...prevFormData,
+          siteManagerIds: [...prevFormData.siteManagerIds, userId],
+        };
+      }
+    });
+  };
 
   const handleValue = (
     e: React.ChangeEvent<
@@ -165,7 +198,13 @@ const AddOrEditsite = ({ site }: { site: null | Site }) => {
     >
   ) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+    if (name === "mobiles") {
+      const mobilesArray = value.split(",").map((mobile) => mobile.trim());
+      setFormData({ ...formData, [name]: mobilesArray });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -178,11 +217,11 @@ const AddOrEditsite = ({ site }: { site: null | Site }) => {
         console.log("site created successfully");
         toast.success("site created successfully");
         setFormData({
-            name: '',
-            companyId: '',
-            address: '',
-            mobiles: [],
-            siteManagerIds: [],
+          name: "",
+          companyId: "",
+          address: "",
+          mobiles: [""],
+          siteManagerIds: [""],
         });
       } else if ("error" in result && result.error) {
         console.error("site creation failed", result.error);
@@ -224,7 +263,7 @@ const AddOrEditsite = ({ site }: { site: null | Site }) => {
               name="price"
               value={formData.companyId}
               className="form-control w-100 rounded-0 p-2"
-              placeholder="site Price"
+              placeholder="Company ID"
               onChange={handleValue}
             />
           </label>
@@ -236,20 +275,42 @@ const AddOrEditsite = ({ site }: { site: null | Site }) => {
               name="address"
               value={formData.address}
               className="form-control w-100 rounded-0 p-2"
-              placeholder="Color"
+              placeholder="Address"
               onChange={handleValue}
             />
           </label>
-          <label>
+          {/* <label>
             <span>Site Managers</span>
             <input
               type="text"
               name="siteManagerIds"
               value={formData.siteManagerIds}
               className="form-control w-100 rounded-0 p-2"
-              placeholder="Quantity"
+              placeholder="Site Managers"
               onChange={handleValue}
             />
+          </label> */}
+          <label>
+            <span>Site Managers</span>
+            <div className="form-control w-100 rounded-0 p-2">
+              {isLoading ? (
+                <p>Loading users...</p>
+              ) : isError ? (
+                <p>Error loading users</p>
+              ) : (
+                siteAdmins?.map((user: User) => (
+                  <label key={user._id}>
+                    <input
+                      type="checkbox"
+                      value={user._id}
+                      checked={formData.siteManagerIds.includes(user._id)}
+                      onChange={() => handleUserSelection(user._id)}
+                    />
+                    {user.firstName}
+                  </label>
+                ))
+              )}
+            </div>
           </label>
         </div>
         <div className="my-4">
@@ -260,9 +321,9 @@ const AddOrEditsite = ({ site }: { site: null | Site }) => {
             name="mobiles"
             cols={100}
             rows={10}
-            value={formData.mobiles}
+            value={formData.mobiles.join(",")}
             className="w-100 p-2 border"
-            placeholder="Tags"
+            placeholder="mobiles"
             onChange={handleValue}
           ></textarea>
         </div>
@@ -280,9 +341,7 @@ const AddOrEditsite = ({ site }: { site: null | Site }) => {
               Loading...
             </button>
           ) : (
-            <button
-              className="fd-btn w-25 text-center border-0"
-            >
+            <button className="fd-btn w-25 text-center border-0">
               SAVE NOW
             </button>
           )}
@@ -313,20 +372,18 @@ const ListOfsites = ({
     setPage("add");
   };
 
-  // search bar coding 
-  const [searchInput, setSearchInput] = useState<string>('');
+  // search bar coding
+  const [searchInput, setSearchInput] = useState<string>("");
 
   let content: React.ReactNode;
 
   // Filter sites based on the search input
-    const filteredsites = sitesList?.content.filter((site: Site) =>{
-      const sitename = site.name?.toLowerCase();
-      const search = searchInput.toLowerCase();
-  
-      return (
-        sitename?.includes(search)
-      );
-    });
+  const filteredsites = sitesList?.content.filter((site: Site) => {
+    const sitename = site.name?.toLowerCase();
+    const search = searchInput.toLowerCase();
+
+    return sitename?.includes(search);
+  });
 
   content =
     isLoading || isError
@@ -369,40 +426,40 @@ const ListOfsites = ({
     <div>
       {/* Add a search input field */}
       <div className="mb-3">
-      <input
-        type="text"
-        placeholder="Search sites"
-        value={searchInput}
-        onChange={(e) => setSearchInput(e.target.value)}
-      />
-    </div>
-    <div className="table-responsive">
-      <table className="table table-default text-center table-bordered">
-        <thead>
-          <tr className="fd-bg-primary text-white">
-            <th scope="col" className="p-3">
-              SITE NAME
-            </th>
-            <th scope="col" className="p-3">
-              COMPANY ID
-            </th>
-            <th scope="col" className="p-3">
-              ADDRESS
-            </th>
-            <th scope="col" className="p-3">
-              MOBILES
-            </th>
-            <th scope="col" className="p-3">
-              SITE MANAGERS ID'S
-            </th>
-            <th scope="col" className="p-3">
-              ACTIONS
-            </th>
-          </tr>
-        </thead>
-        <tbody>{content}</tbody>
-      </table>
-    </div>
+        <input
+          type="text"
+          placeholder="Search sites"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+        />
+      </div>
+      <div className="table-responsive">
+        <table className="table table-default text-center table-bordered">
+          <thead>
+            <tr className="fd-bg-primary text-white">
+              <th scope="col" className="p-3">
+                SITE NAME
+              </th>
+              <th scope="col" className="p-3">
+                COMPANY ID
+              </th>
+              <th scope="col" className="p-3">
+                ADDRESS
+              </th>
+              <th scope="col" className="p-3">
+                MOBILES
+              </th>
+              <th scope="col" className="p-3">
+                SITE MANAGERS ID'S
+              </th>
+              <th scope="col" className="p-3">
+                ACTIONS
+              </th>
+            </tr>
+          </thead>
+          <tbody>{content}</tbody>
+        </table>
+      </div>
     </div>
   ) : (
     <Spinner />

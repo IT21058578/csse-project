@@ -1,27 +1,29 @@
-
 const RoutePaths = {
+  home: "/",
+  login: "/",
+  signup: "/signup",
+  passwordReset: "/reset-password",
 
-    home : '/',
-    login : '/login',
-    signup : '/signup',
-    passwordReset : '/reset-password',
+  // USERS PATHS
 
-    // USERS PATHS
-    
-    // AMIN PATHS
+  // AMIN PATHS
 
-    admin : '/admin',
-    adminAccount: '/admin/account',
-    adminCompanies : '/admin/companies',
-    adminSites : '/admin/sites',
-    adminSuppliers: '/admin/suppliers',
-    adminItems: '/admin/items',
-    adminOrders: '/admin/orders',
-    adminUsers: '/admin/users',
-    adminInvoices: '/admin/invoices',
+  sadmin: "/admin",
+  sadminAccount: "/admin/account",
+  sadminCompanies: "/admin/companies",
+  sadminUsers: "/admin/users",
 
-    token: 'token'
+  companyAdmin: "/companyAdmin",
+  adminSites: "/companyAdmin/sites",
+  adminSuppliers: "/companyAdmin/suppliers",
+  adminItems: "/companyAdmin/items",
+  adminAccount: "/companyAdmin/account",
+  adminOrders: "/companyAdmin/orders",
+  adminUsers: "/companyAdmin/users",
+  adminInvoices: "/companyAdmin/invoices",
+  adminDeliveries: "/companyAdmin/deliveries",
 
-}
+  token: "token",
+};
 
-export default RoutePaths
+export default RoutePaths;

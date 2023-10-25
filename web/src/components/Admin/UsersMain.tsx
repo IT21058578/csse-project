@@ -1,27 +1,47 @@
 import React, { useState, useEffect, useRef } from "react";
 import { CreateUserDto } from "../../types";
-import { useRegisterMutation  } from "../../store/apiquery/AuthApiSlice";
+import { useRegisterMutation } from "../../store/apiquery/AuthApiSlice";
 import { useGetAllUsersQuery } from "../../store/apiquery/usersApiSlice";
 import Swal from "sweetalert2";
 import Spinner from "../Spinner";
 import { ToastContainer, toast } from "react-toastify";
+import { useGetAllcompaniesQuery } from "../../store/apiquery/CompaniesApiSlice";
+import RoutePaths from "../../config";
+import { getItem } from "../../Utils/Generals";
+import { useGetAllsitesQuery } from "../../store/apiquery/SitesApiSlice";
 
+const isLogged = getItem(RoutePaths.token);
+const users = !isLogged ? null : JSON.parse(getItem("user") || "");
 
 const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
-
   const [createuser, result] = useRegisterMutation();
 
+  const [dataUser, setData] = useState(users);
+
+  const {
+    isLoading,
+    data: companysList,
+    isSuccess,
+    isError,
+  } = useGetAllcompaniesQuery("api/companies");
 
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    region: '',
-    country: '',
-    password: '',
-    roles: '',
-    companyId: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    region: "",
+    country: "",
+    password: "",
+    companyId: "",
+    roles: "",
+    siteID: "",
   });
+
+  // const { data: sitesList } = useGetAllsitesQuery("api/sites");
+
+  // const filteredSitesList = sitesList?.content?.filter(
+  //   (site: any) => site.companyId === formData.companyId
+  // );
 
   const handleValue = (
     e: React.ChangeEvent<
@@ -29,6 +49,7 @@ const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
     >
   ) => {
     const { name, value } = e.target;
+
     setFormData({ ...formData, [name]: value });
   };
 
@@ -42,14 +63,15 @@ const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
         console.log("user created successfully");
         toast.success("user created successfully");
         setFormData({
-            firstName: '',
-            lastName: '',
-            email: '',
-            region: '',
-            country: '',
-            password: '',
-            roles: '',
-            companyId: '',
+          firstName: "",
+          lastName: "",
+          email: "",
+          region: "",
+          country: "",
+          password: "",
+          companyId: "",
+          roles: "",
+          siteID: "",
         });
       } else if ("error" in result && result.error) {
         console.error("user creation failed", result.error);
@@ -77,7 +99,7 @@ const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
               name="firstName"
               value={formData.firstName}
               className="form-control w-100 rounded-0 p-2"
-              placeholder="user Name"
+              placeholder="First Name"
               onChange={handleValue}
             />
           </label>
@@ -91,7 +113,7 @@ const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
               name="lastName"
               value={formData.lastName}
               className="form-control w-100 rounded-0 p-2"
-              placeholder="user Price"
+              placeholder="Last Name"
               onChange={handleValue}
             />
           </label>
@@ -103,7 +125,7 @@ const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
               name="email"
               value={formData.email}
               className="form-control w-100 rounded-0 p-2"
-              placeholder="Color"
+              placeholder="Email"
               onChange={handleValue}
             />
           </label>
@@ -114,7 +136,7 @@ const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
               name="region"
               value={formData.region}
               className="form-control w-100 rounded-0 p-2"
-              placeholder="Quantity"
+              placeholder="Region"
               onChange={handleValue}
             />
           </label>
@@ -125,7 +147,7 @@ const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
               name="country"
               value={formData.country}
               className="form-control w-100 rounded-0 p-2"
-              placeholder="Brand"
+              placeholder="Country"
               onChange={handleValue}
             />
           </label>
@@ -136,22 +158,22 @@ const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
               name="brand"
               value={formData.password}
               className="form-control w-100 rounded-0 p-2"
-              placeholder="Brand"
+              placeholder="Password"
               onChange={handleValue}
             />
           </label>
-          <label>
+          {/* <label>
             <span>Roles</span>
             <input
               type="text"
               name="roles"
               value={formData.roles}
               className="form-control w-100 rounded-0 p-2"
-              placeholder="Brand"
+              placeholder="Roles"
               onChange={handleValue}
             />
-          </label>
-          <label>
+          </label> */}
+          {/* <label>
             <span>Company Id</span>
             <input
               type="text"
@@ -161,6 +183,57 @@ const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
               placeholder="Brand"
               onChange={handleValue}
             />
+          </label> */}
+          <label>
+            <span>Company Id</span>
+            <select
+              name="companyId"
+              value={formData.companyId}
+              className="form-control w-100 rounded-0 p-2"
+              onChange={handleValue}
+            >
+              <option value="">Select a Company</option>
+              {isLoading ? (
+                <option value="" disabled>
+                  Loading...
+                </option>
+              ) : isError ? (
+                <option value="" disabled>
+                  Error loading companies
+                </option>
+              ) : isSuccess ? (
+                companysList?.content.map((company: any) => (
+                  <option key={company._id} value={company._id}>
+                    {company.name} - {company._id}
+                  </option>
+                ))
+              ) : null}
+            </select>
+          </label>
+          <label>
+            <span>Roles</span>
+            <select
+              name="roles"
+              value={formData.roles}
+              className="form-control w-100 rounded-0 p-2"
+              onChange={handleValue}
+            >
+              <option value="">Select a Role</option>
+              {dataUser?.roles ? (
+                dataUser.roles.includes("SYSTEM_ADMIN") ? (
+                  <option value="COMPANY_ADMIN">COMPANY_ADMIN</option>
+                ) : (
+                  <>
+                    <option value="SYSTEM_ADMIN">SYSTEM_ADMIN</option>
+                    <option value="PROCUREMENT_ADMIN">PROCUREMENT_ADMIN</option>
+                    <option value="COMPANY_ADMIN">COMPANY_ADMIN</option>
+                    <option value="SITE_ADMIN">SITE_ADMIN</option>
+                  </>
+                )
+              ) : (
+                <option value="DEFAULT_ROLE">DEFAULT_ROLE</option>
+              )}
+            </select>
           </label>
         </div>
         <div className="mt-3">
@@ -177,9 +250,7 @@ const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
               Loading...
             </button>
           ) : (
-            <button
-              className="fd-btn w-25 text-center border-0"
-            >
+            <button className="fd-btn w-25 text-center border-0">
               SAVE NOW
             </button>
           )}
@@ -209,24 +280,21 @@ const ListOfusers = ({
     setPage("add");
   };
 
-
-  // search bar coding 
-  const [searchInput, setSearchInput] = useState<string>('');
+  // search bar coding
+  const [searchInput, setSearchInput] = useState<string>("");
 
   let content: React.ReactNode;
 
   // Filter users based on the search input
-    const filteredusers = usersList?.content.filter((user: CreateUserDto) =>{
-      const username = user.firstName?.toLowerCase();
-      const lastname = user.lastName?.toLowerCase();
-      const search = searchInput.toLowerCase();
-    
-  
-      return (
-        username?.includes(search) ||
-        lastname?.includes(search)
-      );
-    });
+  const filteredusers = usersList?.content.filter((user: CreateUserDto) => {
+    const username = user.firstName?.toLowerCase();
+    const lastname = user.lastName?.toLowerCase();
+    const search = searchInput.toLowerCase();
+
+    return username?.includes(search) || lastname?.includes(search);
+  });
+
+  console.log("user main page", usersList);
 
   content =
     isLoading || isError
@@ -240,8 +308,6 @@ const ListOfusers = ({
               <td className="fw-bold">{user.firstName}</td>
               <td>{user.lastName}</td>
               <td>{user.email}</td>
-              <td className="fw-bold">{user.region}</td>
-              <td>{user.country}</td>
               <td>{user.roles}</td>
               <td className="fw-bold d-flex gap-2 justify-content-center">
                 <a
@@ -262,40 +328,37 @@ const ListOfusers = ({
     <div>
       {/* Add a search input field */}
       <div className="mb-3">
-      <input
-        type="text"
-        placeholder="Search users"
-        value={searchInput}
-        onChange={(e) => setSearchInput(e.target.value)}
-      />
-    </div>
-    <div className="table-responsive">
-      <table className="table table-default text-center table-bordered">
-        <thead>
-          <tr className="fd-bg-primary text-white">
-            <th scope="col" className="p-3">
-              FIRST NAME
-            </th>
-            <th scope="col" className="p-3">
-              LAST NAME
-            </th>
-            <th scope="col" className="p-3">
-              EMAIL
-            </th>
-            <th scope="col" className="p-3">
-              REGION
-            </th>
-            <th scope="col" className="p-3">
-              COUNTRY
-            </th>
-            <th scope="col" className="p-3">
-              ROLES
-            </th>
-          </tr>
-        </thead>
-        <tbody>{content}</tbody>
-      </table>
-    </div>
+        <input
+          type="text"
+          placeholder="Search users"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+        />
+      </div>
+      <div className="table-responsive">
+        <table className="table table-default text-center table-bordered">
+          <thead>
+            <tr className="fd-bg-primary text-white">
+              <th scope="col" className="p-3">
+                FIRST NAME
+              </th>
+              <th scope="col" className="p-3">
+                LAST NAME
+              </th>
+              <th scope="col" className="p-3">
+                EMAIL
+              </th>
+              <th scope="col" className="p-3">
+                ROLES
+              </th>
+              <th scope="col" className="p-3">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>{content}</tbody>
+        </table>
+      </div>
     </div>
   ) : (
     <Spinner />

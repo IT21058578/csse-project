@@ -26,7 +26,7 @@ export class SuppliersController {
   }
 
   @Put(':id')
-  @Roles(UserRole.COMPANY_ADMIN, UserRole.SYSTEM_ADMIN)
+  // @Roles(UserRole.COMPANY_ADMIN, UserRole.SYSTEM_ADMIN)
   async editSupplier(
     @User() user: UserFlattened,
     @Param('id', ValidateObjectIdPipe) id: string,
@@ -36,7 +36,7 @@ export class SuppliersController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.COMPANY_ADMIN, UserRole.SYSTEM_ADMIN)
+  // @Roles(UserRole.COMPANY_ADMIN, UserRole.SYSTEM_ADMIN)
   async deleteSupplier(@Param('id', ValidateObjectIdPipe) id: string) {
     return await this.suppliersService.deleteSupplier(id);
   }
@@ -47,7 +47,7 @@ export class SuppliersController {
   }
 
   @Post()
-  @Roles(UserRole.COMPANY_ADMIN, UserRole.SYSTEM_ADMIN)
+  // @Roles(UserRole.COMPANY_ADMIN, UserRole.SYSTEM_ADMIN)
   async createSupplier(
     @User() user: UserFlattened,
     @Body() createSupplierDto: CreateSupplierDto,

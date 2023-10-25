@@ -34,11 +34,11 @@ class Sort {
 
 export class PageRequest {
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   pageNum: number;
 
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   pageSize: number;
 
   @IsOptional()

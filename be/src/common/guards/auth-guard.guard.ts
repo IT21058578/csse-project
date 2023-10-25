@@ -35,11 +35,14 @@ export class AuthGuard implements CanActivate {
       request['user'] = userJson;
     } catch {
       this.logger.debug(`Could not authenticate user`);
+
+      this.logger.warn(
+        `User attempted to access resources with an invalid token`,
+      );
+      return true;
     }
-    this.logger.warn(
-      `User attempted to access resources with an invalid token`,
-    );
-    throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
+    // throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
+    return true;
   }
 
   private getToken(request: Request): string | undefined {

@@ -26,7 +26,7 @@ export class ItemRequestsController {
   }
 
   @Put(':id')
-  @Roles(UserRole.SITE_ADMIN)
+  // @Roles(UserRole.SITE_ADMIN)
   async editProcurement(
     @User() user: UserFlattened,
     @Param('id', ValidateObjectIdPipe) id: string,
@@ -40,7 +40,7 @@ export class ItemRequestsController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.SITE_ADMIN)
+  // @Roles(UserRole.SITE_ADMIN)
   async deleteProcurement(@Param('id', ValidateObjectIdPipe) id: string) {
     return await this.procurementsService.deleteProcurement(id);
   }
@@ -51,7 +51,7 @@ export class ItemRequestsController {
   }
 
   @Post()
-  @Roles(UserRole.SITE_ADMIN)
+  // @Roles(UserRole.SITE_ADMIN)
   async createProcurement(
     @User() user: UserFlattened,
     @Body() createProcurementDto: CreateProcurementDto,

@@ -3,14 +3,14 @@ import Swal from "sweetalert2";
 import { Company } from "../../types";
 import Spinner from "../Spinner";
 import { ToastContainer, toast } from "react-toastify";
-import { useGetAllcompaniesQuery,
-         useCreatecompanieMutation,
-         useDeletecompanieMutation,
-         useUpdatecompanieMutation } from "../../store/apiquery/CompaniesApiSlice";
-
+import {
+  useGetAllcompaniesQuery,
+  useCreatecompanieMutation,
+  useDeletecompanieMutation,
+  useUpdatecompanieMutation,
+} from "../../store/apiquery/CompaniesApiSlice";
 
 const Updatecompany = ({ company }: { company: Company }) => {
-
   const [updateData, setUpdateData] = useState(company);
   const [updatecompany, udpateResult] = useUpdatecompanieMutation();
   const imageTag = useRef<HTMLImageElement>(null);
@@ -59,7 +59,7 @@ const Updatecompany = ({ company }: { company: Company }) => {
       onSubmit={handleSubmit}
     >
       <input type="hidden" name="id" value={updateData._id} />
-      
+
       <div className="d-flex gap-2">
         <label className="w-50">
           <span>Name</span>
@@ -71,7 +71,7 @@ const Updatecompany = ({ company }: { company: Company }) => {
             onChange={handleUpdateValue}
           />
         </label>
-      </div> 
+      </div>
       <div className="mt-4">
         <ToastContainer />
       </div>
@@ -96,7 +96,6 @@ const Updatecompany = ({ company }: { company: Company }) => {
 };
 
 const AddOrEditcompany = ({ company }: { company: null | Company }) => {
-
   const [createcompany, result] = useCreatecompanieMutation();
 
   const [formData, setFormData] = useState({
@@ -169,9 +168,7 @@ const AddOrEditcompany = ({ company }: { company: null | Company }) => {
               Loading...
             </button>
           ) : (
-            <button
-              className="fd-btn w-25 text-center border-0"
-            >
+            <button className="fd-btn w-25 text-center border-0">
               SAVE NOW
             </button>
           )}
@@ -196,6 +193,7 @@ const ListOfcompanys = ({
     isSuccess,
     isError,
   } = useGetAllcompaniesQuery("api/companies");
+
   const [deletecompany, deletedResult] = useDeletecompanieMutation();
 
   let count = 0;
@@ -221,28 +219,24 @@ const ListOfcompanys = ({
     });
   };
 
-  // search bar coding 
-  const [searchInput, setSearchInput] = useState<string>('');
+  // search bar coding
+  const [searchInput, setSearchInput] = useState<string>("");
 
   let content: React.ReactNode;
 
   // Filter companies based on the search input
-    const filteredcompanys = companysList?.content.filter((company: Company) =>{
-      const companyname = company.name?.toLowerCase();
-      const search = searchInput.toLowerCase();
-    
-  
-      return (
-        companyname?.includes(search)
-      );
-    });
+  const filteredcompanys = companysList?.content.filter((company: Company) => {
+    const companyname = company.name?.toLowerCase();
+    const search = searchInput.toLowerCase();
+
+    return companyname?.includes(search);
+  });
 
   content =
     isLoading || isError
       ? null
       : isSuccess
       ? filteredcompanys.map((company: Company) => {
-
           return (
             <tr className="p-3" key={company._id}>
               <td scope="row w-25">{++count}</td>
@@ -285,31 +279,31 @@ const ListOfcompanys = ({
     <div>
       {/* Add a search input field */}
       <div className="mb-3">
-      <input
-        type="text"
-        placeholder="Search companys"
-        value={searchInput}
-        onChange={(e) => setSearchInput(e.target.value)}
-      />
-    </div>
-    <div className="table-responsive">
-      <table className="table table-default text-center table-bordered">
-        <thead>
-          <tr className="fd-bg-primary text-white">
-            <th scope="col" className='p-3'>
+        <input
+          type="text"
+          placeholder="Search companys"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+        />
+      </div>
+      <div className="table-responsive">
+        <table className="table table-default text-center table-bordered">
+          <thead>
+            <tr className="fd-bg-primary text-white">
+              <th scope="col" className="p-3">
                 No
-            </th>
-            <th scope="col" className="p-3">
-              company NAME
-            </th>
-            <th scope="col" className="p-3">
-              ACTION
-            </th>
-          </tr>
-        </thead>
-        <tbody>{content}</tbody>
-      </table>
-    </div>
+              </th>
+              <th scope="col" className="p-3">
+                company NAME
+              </th>
+              <th scope="col" className="p-3">
+                ACTION
+              </th>
+            </tr>
+          </thead>
+          <tbody>{content}</tbody>
+        </table>
+      </div>
     </div>
   ) : (
     <Spinner />

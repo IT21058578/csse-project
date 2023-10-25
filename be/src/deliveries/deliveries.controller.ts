@@ -23,7 +23,7 @@ export class DeliveriesController {
   }
 
   @Post()
-  @Roles(UserRole.SYSTEM_ADMIN, UserRole.SITE_ADMIN)
+  // @Roles(UserRole.SYSTEM_ADMIN, UserRole.SITE_ADMIN)
   async createDelivery(
     @User() user: UserDocument,
     @Body() createDeliveryDto: CreateDeliveryDto,

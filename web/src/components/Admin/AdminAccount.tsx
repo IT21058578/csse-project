@@ -2,17 +2,13 @@ import { useState } from "react";
 import RoutePaths from "../../config";
 import { getItem } from "../../Utils/Generals";
 
-
 const isLogged = getItem(RoutePaths.token);
 const user = !isLogged ? null : JSON.parse(getItem("user") || "");
 
-
 const AdminAccount = () => {
-
   const [data, setData] = useState(user);
 
   return (
-
     <div className="container">
       <div className="card border-0 shadow-lg">
         <h3 className="card-header bg-primary text-white">Account Details</h3>
@@ -42,21 +38,6 @@ const AdminAccount = () => {
               <div className="mb-3">
                 <label className="form-label text-primary">Role</label>
                 <div className="form-control-plaintext">{data.roles}</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="row">
-            <div className="col-6">
-              <div className="mb-3">
-                <label className="form-label text-primary">Country</label>
-                <div className="form-control-plaintext">{data.country}</div>
-              </div>
-            </div>
-            <div className="col-6">
-              <div className="mb-3">
-                <label className="form-label text-primary">Region</label>
-                <div className="form-control-plaintext">{user.region}</div>
               </div>
             </div>
           </div>

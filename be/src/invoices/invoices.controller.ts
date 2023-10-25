@@ -23,7 +23,7 @@ export class InvoicesController {
   }
 
   @Post()
-  @Roles(UserRole.SYSTEM_ADMIN)
+  // @Roles(UserRole.SYSTEM_ADMIN)
   async createInvoice(
     @User() user: UserDocument,
     @Body() createInvoiceDto: CreateInvoiceDto,

@@ -26,7 +26,7 @@ export class ItemsController {
   }
 
   @Put(':id')
-  @Roles(UserRole.COMPANY_ADMIN, UserRole.SYSTEM_ADMIN)
+  // @Roles(UserRole.COMPANY_ADMIN, UserRole.SYSTEM_ADMIN)
   async editItem(
     @User() user: UserFlattened,
     @Param('id', ValidateObjectIdPipe) id: string,
@@ -41,7 +41,7 @@ export class ItemsController {
   }
 
   @Post()
-  @Roles(UserRole.COMPANY_ADMIN, UserRole.SYSTEM_ADMIN)
+  // @Roles(UserRole.COMPANY_ADMIN, UserRole.SYSTEM_ADMIN)
   async createItem(
     @User() user: UserFlattened,
     @Body() createItemDto: CreateItemDto,

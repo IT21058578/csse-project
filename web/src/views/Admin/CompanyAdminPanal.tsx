@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 import { useAppDispatch } from "../../hooks/redux-hooks";
 import { logoutCurrentUser } from "../../store/userSlice";
 
-const AdminPanel = ({
+const CompanyAdminPanel = ({
   currentComponent,
 }: {
   currentComponent: React.ReactNode;
@@ -56,32 +56,48 @@ const AdminPanel = ({
           <aside className="user-page w-25 fw-bold border border-1">
             <div>
               <Link
-                to={RoutePaths.sadmin}
-                className={toggleLinkClass(RoutePaths.sadmin)}
+                to={RoutePaths.companyAdmin}
+                className={toggleLinkClass(RoutePaths.companyAdmin)}
               >
                 Dashboard<i className="bi bi-house float-end"></i>
               </Link>
             </div>
             <div>
               <Link
-                to={RoutePaths.sadminCompanies}
-                className={toggleLinkClass(RoutePaths.sadminCompanies)}
+                to={RoutePaths.adminSites}
+                className={toggleLinkClass(RoutePaths.adminSites)}
               >
-                Companies<i className="bi bi-newspaper float-end"></i>
+                Sites<i className="bi bi-newspaper float-end"></i>
               </Link>
             </div>
             <div>
               <Link
-                to={RoutePaths.sadminUsers}
-                className={toggleLinkClass(RoutePaths.sadminUsers)}
+                to={RoutePaths.adminSuppliers}
+                className={toggleLinkClass(RoutePaths.adminSuppliers)}
+              >
+                Supliers<i className="bi bi-newspaper float-end"></i>
+              </Link>
+            </div>
+            <div>
+              <Link
+                to={RoutePaths.adminItems}
+                className={toggleLinkClass(RoutePaths.adminItems)}
+              >
+                Items<i className="bi bi-people float-end"></i>
+              </Link>
+            </div>
+            <div>
+              <Link
+                to={RoutePaths.adminUsers}
+                className={toggleLinkClass(RoutePaths.adminUsers)}
               >
                 Users<i className="bi bi-person float-end"></i>
               </Link>
             </div>
             <div>
               <Link
-                to={RoutePaths.sadminAccount}
-                className={toggleLinkClass(RoutePaths.sadminAccount)}
+                to={RoutePaths.adminAccount}
+                className={toggleLinkClass(RoutePaths.adminAccount)}
               >
                 Account<i className="bi bi-person float-end"></i>
               </Link>
@@ -104,4 +120,4 @@ const AdminPanel = ({
   );
 };
 
-export default AdminPanel;
+export default CompanyAdminPanel;

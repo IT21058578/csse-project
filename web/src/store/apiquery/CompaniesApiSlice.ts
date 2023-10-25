@@ -54,7 +54,6 @@ export const companieApiSlice = createApi({
       }),
       invalidatesTags: ["companies"],
     }),
-      
   }),
 });
 
