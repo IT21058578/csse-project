@@ -211,7 +211,7 @@ const AddOrEditsite = ({ site }: { site: null | Site }) => {
     e.preventDefault();
 
     try {
-      const result = await createsite({ formData });
+      const result = await createsite(formData);
 
       if ("data" in result && result.data) {
         console.log("site created successfully");

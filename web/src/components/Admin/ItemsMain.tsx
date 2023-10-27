@@ -3,13 +3,17 @@ import Swal from "sweetalert2";
 import Spinner from "../Spinner";
 import { ToastContainer, toast } from "react-toastify";
 import { Item } from "../../types";
-import { useGetAllitemsQuery , 
-         useCreateitemMutation ,
-         useUpdateitemMutation } from "../../store/apiquery/ItemApiSlice";
-
+import {
+  useGetAllitemsQuery,
+  useCreateitemMutation,
+  useUpdateitemMutation,
+} from "../../store/apiquery/ItemApiSlice";
+import { getItem } from "../../Utils/Generals";
+import RoutePaths from "../../config";
+const isLogged = getItem(RoutePaths.token);
+const users = !isLogged ? null : JSON.parse(getItem("user") || "");
 
 const Updateitem = ({ item }: { item: Item }) => {
-
   const [updateData, setUpdateData] = useState(item);
   const [updateitem, udpateResult] = useUpdateitemMutation();
   const imageTag = useRef<HTMLImageElement>(null);
@@ -40,9 +44,9 @@ const Updateitem = ({ item }: { item: Item }) => {
         console.log("item Updated successfully");
         toast.success("item Updated successfully");
         setFormData({
-            name: '',
-            companyId: '',
-            imageUrls: [],
+          name: "",
+          companyId: "",
+          imageUrls: [],
         });
       } else if ("error" in result && result.error) {
         console.error("item creation failed", result.error);
@@ -61,13 +65,13 @@ const Updateitem = ({ item }: { item: Item }) => {
       className="checkout-service p-3"
       onSubmit={handleSubmit}
     >
-    <input type="hidden" name="id" value={updateData._id} />
-    <div className="d-flex gap-2">
+      <input type="hidden" name="id" value={updateData._id} />
+      <div className="d-flex gap-2">
         <label className="w-50">
           <span>Item Name</span>
           <input
             type="text"
-            name="name"
+            name="Item Name"
             className="form-control w-100 rounded-0 p-2"
             value={formData.name}
             onChange={handleUpdateValue}
@@ -94,7 +98,7 @@ const Updateitem = ({ item }: { item: Item }) => {
           rows={10}
           value={formData.imageUrls}
           className="w-100 p-2 border"
-          placeholder="Description"
+          placeholder="Image Urls"
           onChange={handleUpdateValue}
         ></textarea>
       </label>
@@ -122,15 +126,13 @@ const Updateitem = ({ item }: { item: Item }) => {
 };
 
 const AddOrEdititem = ({ item }: { item: null | Item }) => {
-
   const [createitem, result] = useCreateitemMutation();
-
-
+  const [dataUser, setData] = useState(users);
 
   const [formData, setFormData] = useState({
-    name: '',
-    companyId: '',
-    imageUrls: [],
+    name: "",
+    companyId: dataUser.companyId,
+    imageUrls: [] as string[],
   });
 
   const handleValue = (
@@ -139,22 +141,28 @@ const AddOrEdititem = ({ item }: { item: null | Item }) => {
     >
   ) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+    if (name === "imageUrls") {
+      const imagesArray = value.split(",").map((urls) => urls.trim());
+      setFormData({ ...formData, [name]: imagesArray });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const result = await createitem({ formData });
+      const result = await createitem(formData);
 
       if ("data" in result && result.data) {
         console.log("item created successfully");
         toast.success("item created successfully");
         setFormData({
-            name: '',
-            companyId: '',
-            imageUrls: [],
+          name: "",
+          companyId: "",
+          imageUrls: [],
         });
       } else if ("error" in result && result.error) {
         console.error("item creation failed", result.error);
@@ -196,7 +204,7 @@ const AddOrEdititem = ({ item }: { item: null | Item }) => {
               name="price"
               value={formData.companyId}
               className="form-control w-100 rounded-0 p-2"
-              placeholder="item Price"
+              placeholder="Company ID"
               onChange={handleValue}
             />
           </label>
@@ -209,9 +217,9 @@ const AddOrEdititem = ({ item }: { item: null | Item }) => {
             name="imageUrls"
             cols={100}
             rows={10}
-            value={formData.imageUrls}
+            value={formData.imageUrls.join(",")}
             className="w-100 p-2 border"
-            placeholder="Tags"
+            placeholder="Image Urls"
             onChange={handleValue}
           ></textarea>
         </div>
@@ -229,9 +237,7 @@ const AddOrEdititem = ({ item }: { item: null | Item }) => {
               Loading...
             </button>
           ) : (
-            <button
-              className="fd-btn w-25 text-center border-0"
-            >
+            <button className="fd-btn w-25 text-center border-0">
               SAVE NOW
             </button>
           )}
@@ -262,27 +268,24 @@ const ListOfitems = ({
     setPage("add");
   };
 
-  // search bar coding 
-  const [searchInput, setSearchInput] = useState<string>('');
+  // search bar coding
+  const [searchInput, setSearchInput] = useState<string>("");
 
   let content: React.ReactNode;
 
   // Filter items based on the search input
-    const filtereditems = itemsList?.content.filter((item: Item) =>{
-      const itemname = item.name?.toLowerCase();
-      const search = searchInput.toLowerCase();
-  
-      return (
-        itemname?.includes(search)
-      );
-    });
+  const filtereditems = itemsList?.content.filter((item: Item) => {
+    const itemname = item.name?.toLowerCase();
+    const search = searchInput.toLowerCase();
+
+    return itemname?.includes(search);
+  });
 
   content =
     isLoading || isError
       ? null
       : isSuccess
       ? filtereditems.map((item: Item) => {
-
           return (
             <tr className="p-3" key={item._id}>
               <td scope="row w-25">
@@ -321,34 +324,34 @@ const ListOfitems = ({
     <div>
       {/* Add a search input field */}
       <div className="mb-3">
-      <input
-        type="text"
-        placeholder="Search items"
-        value={searchInput}
-        onChange={(e) => setSearchInput(e.target.value)}
-      />
-    </div>
-    <div className="table-responsive">
-      <table className="table table-default text-center table-bordered">
-        <thead>
-          <tr className="fd-bg-primary text-white">
-            <th scope="col" className="p-3">
-              ITEM IMAGE
-            </th>
-            <th scope="col" className="p-3">
-              ITEM NAME
-            </th>
-            <th scope="col" className="p-3">
-              COMPANY ID
-            </th>
-            <th scope="col" className="p-3">
-              ACTIONS
-            </th>
-          </tr>
-        </thead>
-        <tbody>{content}</tbody>
-      </table>
-    </div>
+        <input
+          type="text"
+          placeholder="Search items"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+        />
+      </div>
+      <div className="table-responsive">
+        <table className="table table-default text-center table-bordered">
+          <thead>
+            <tr className="fd-bg-primary text-white">
+              <th scope="col" className="p-3">
+                ITEM IMAGE
+              </th>
+              <th scope="col" className="p-3">
+                ITEM NAME
+              </th>
+              <th scope="col" className="p-3">
+                COMPANY ID
+              </th>
+              <th scope="col" className="p-3">
+                ACTIONS
+              </th>
+            </tr>
+          </thead>
+          <tbody>{content}</tbody>
+        </table>
+      </div>
     </div>
   ) : (
     <Spinner />

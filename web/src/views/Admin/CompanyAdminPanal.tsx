@@ -88,6 +88,30 @@ const CompanyAdminPanel = ({
             </div>
             <div>
               <Link
+                to={RoutePaths.adminOrders}
+                className={toggleLinkClass(RoutePaths.adminOrders)}
+              >
+                Orders<i className="bi bi-people float-end"></i>
+              </Link>
+            </div>
+            <div>
+              <Link
+                to={RoutePaths.adminInvoices}
+                className={toggleLinkClass(RoutePaths.adminInvoices)}
+              >
+                Invoices<i className="bi bi-people float-end"></i>
+              </Link>
+            </div>
+            <div>
+              <Link
+                to={RoutePaths.adminDeliveries}
+                className={toggleLinkClass(RoutePaths.adminDeliveries)}
+              >
+                Deliveries<i className="bi bi-people float-end"></i>
+              </Link>
+            </div>
+            <div>
+              <Link
                 to={RoutePaths.adminUsers}
                 className={toggleLinkClass(RoutePaths.adminUsers)}
               >

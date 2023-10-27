@@ -30,7 +30,7 @@ export const siteApiSlice = createApi({
     }),
 
     createsite: builder.mutation({
-      query: ({ formData }) => ({
+      query: (formData) => ({
         url: "/sites",
         method: "POST",
         body: formData,
@@ -46,7 +46,6 @@ export const siteApiSlice = createApi({
       }),
       invalidatesTags: ["sites"],
     }),
-
   }),
 });
 
