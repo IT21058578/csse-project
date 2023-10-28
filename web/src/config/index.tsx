@@ -19,6 +19,8 @@ const RoutePaths = {
   adminItems: "/companyAdmin/items",
   adminAccount: "/companyAdmin/account",
   adminOrders: "/companyAdmin/orders",
+  adminApprovedOrders: "/companyAdmin/approvedorders",
+  adminPApprovedOrders: "/companyAdmin/papprovedorders",
   adminUsers: "/companyAdmin/users",
   adminInvoices: "/companyAdmin/invoices",
   adminDeliveries: "/companyAdmin/deliveries",

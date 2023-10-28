@@ -181,11 +181,11 @@ const ListOfOrders = ({
   let count = 0;
 
   const filteredOrdersByStatus = OrdersList?.content.filter(
-    (order: ItemRequest) => order.status === "PENDING_APPROVAL"
+    (order: ItemRequest) => order.status === "PARTIALLY_APPROVED"
   );
 
   // Filter products based on the search input
-  const filteredOrders = filteredOrdersByStatus.filter(
+  const filteredOrders = filteredOrdersByStatus?.filter(
     (order: ItemRequest) =>
       order.siteId.toLowerCase().includes(searchInput.toLowerCase()) ||
       order.status.toLowerCase().includes(searchInput.toLowerCase())
@@ -277,7 +277,7 @@ const ListOfOrders = ({
   );
 };
 
-const OrdersMain = () => {
+const PartialyApprovedOrdersMain = () => {
   const [page, setPage] = useState("list");
   const [currentOrder, setCurrentOrder] = useState(null);
 
@@ -287,7 +287,7 @@ const OrdersMain = () => {
 
   return (
     <div className="text-black">
-      <h4 className="fw-bold">Orders</h4>
+      <h4 className="fw-bold">Partially Approved Orders</h4>
       <div className="add-product my-3 d-flex justify-content-end">
         {
           <a
@@ -310,4 +310,4 @@ const OrdersMain = () => {
   );
 };
 
-export default OrdersMain;
+export default PartialyApprovedOrdersMain;

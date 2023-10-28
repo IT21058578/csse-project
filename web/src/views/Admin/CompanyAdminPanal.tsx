@@ -96,6 +96,23 @@ const CompanyAdminPanel = ({
             </div>
             <div>
               <Link
+                to={RoutePaths.adminApprovedOrders}
+                className={toggleLinkClass(RoutePaths.adminApprovedOrders)}
+              >
+                Approved Orders<i className="bi bi-people float-end"></i>
+              </Link>
+            </div>
+            <div>
+              <Link
+                to={RoutePaths.adminPApprovedOrders}
+                className={toggleLinkClass(RoutePaths.adminPApprovedOrders)}
+              >
+                Partially Approved Orders
+                <i className="bi bi-people float-end"></i>
+              </Link>
+            </div>
+            <div>
+              <Link
                 to={RoutePaths.adminInvoices}
                 className={toggleLinkClass(RoutePaths.adminInvoices)}
               >
@@ -138,7 +155,7 @@ const CompanyAdminPanel = ({
           </aside>
           <div className="w-75 overflow-auto scroller">{currentComponent}</div>
         </div>
-        <AdminFooter />
+        {/* <AdminFooter /> */}
       </div>
     </>
   );
