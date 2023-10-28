@@ -19,25 +19,21 @@ export const approvalApiSlice = createApi({
   tagTypes: ["approvals"],
 
   endpoints: (builder) => ({
-
     getapproval: builder.query({
       query: (id: string) => `/approvals/${id}`,
       providesTags: ["approvals"],
     }),
 
     passApproval: builder.mutation({
-        query: ({ id, isApproved, approvalDto }) => ({
-          url: `/approvals/${id}/pass`,
-          method: 'PUT',
-          params: { 'is-approved': isApproved },
-          body: approvalDto,
-        }),
+      query: ({ id, isApproved, formData }) => ({
+        url: `/approvals/${id}/pass`,
+        method: "PUT",
+        params: { "is-approved": isApproved },
+        body: formData,
+      }),
     }),
-      
   }),
 });
 
-export const {
-  useGetapprovalQuery,
-  usePassApprovalMutation,
-} = approvalApiSlice;
+export const { useGetapprovalQuery, usePassApprovalMutation } =
+  approvalApiSlice;

@@ -554,7 +554,9 @@ const AddOrEditsupplier = ({ supplier }: { supplier: null | Supplier }) => {
                       className="form-control w-100 rounded-0 p-2"
                       onChange={() => handleAddItem(item._id)}
                     >
-                      <option value={item._id}>Item ID: {item._id}</option>
+                      <option value={item._id}>
+                        {item.name}: {item._id}
+                      </option>
                     </select>
                   </label>
                   <input

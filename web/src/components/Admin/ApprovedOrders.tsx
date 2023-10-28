@@ -10,6 +10,10 @@ import {
 import { usePassApprovalMutation } from "../../store/apiquery/ApprovalsApiSlice";
 import { ItemRequest } from "../../types";
 import { Approval } from "../../types";
+import { getItem } from "../../Utils/Generals";
+import RoutePaths from "../../config";
+const isLogged = getItem(RoutePaths.token);
+const user = !isLogged ? null : JSON.parse(getItem("user") || "");
 
 const ListOfOrders = ({
   setOrders,
@@ -32,11 +36,17 @@ const ListOfOrders = ({
   // search bar coding
   const [searchInput, setSearchInput] = useState<string>("");
 
+  const [data, setData] = useState(user);
+
   let content: React.ReactNode;
   let count = 0;
 
-  const filteredOrdersByStatus = OrdersList?.content.filter(
-    (order: ItemRequest) => order.status === "APPROVED"
+  const filteredOrdersByCompany = OrdersList?.content?.filter(
+    (order: ItemRequest) => order?.companyId === data.companyId
+  );
+
+  const filteredOrdersByStatus = filteredOrdersByCompany?.filter(
+    (order: ItemRequest) => order?.status === "APPROVED"
   );
 
   // Filter products based on the search input
@@ -50,7 +60,7 @@ const ListOfOrders = ({
     isLoading || isError
       ? null
       : isSuccess
-      ? filteredOrders.map((Orders: ItemRequest) => {
+      ? filteredOrders?.map((Orders: ItemRequest) => {
           return (
             <tr className="p-3" key={Orders._id}>
               <td scope="row w-25">{++count}</td>

@@ -39,8 +39,8 @@ export const companieApiSlice = createApi({
     }),
 
     updatecompanie: builder.mutation({
-      query: ({ companieId, formData }) => ({
-        url: `/companies/${companieId}`,
+      query: ({ companyId, formData }) => ({
+        url: `/companies/${companyId}`,
         method: "PUT",
         body: formData,
       }),

@@ -11,15 +11,15 @@ import { checkLogin, getItem } from "../Utils/Generals";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-const isLogged = getItem(RoutePaths.token);
-const user = !isLogged ? null : JSON.parse(getItem("user") || "");
-
 const LoginForm = () => {
+  const isLogged = getItem(RoutePaths.token);
+  const user = !isLogged ? null : JSON.parse(getItem("user") || "");
+
   const [userdata, setuserData] = useState(user);
 
-  if (checkLogin() && userdata.roles[0] === "SYSTEM_ADMIN") {
+  if (checkLogin() && userdata?.roles?.[0] === "SYSTEM_ADMIN") {
     return <Navigate to={RoutePaths.sadmin} replace />;
-  } else if (checkLogin() && userdata.roles[0] !== "SYSTEM_ADMIN") {
+  } else if (checkLogin() && userdata?.roles?.[0] !== "SYSTEM_ADMIN") {
     return <Navigate to={RoutePaths.companyAdmin} replace />;
   }
 
@@ -101,6 +101,8 @@ const LoginForm = () => {
 };
 
 const SignUpForm = () => {
+  const isLogged = getItem(RoutePaths.token);
+  const user = !isLogged ? null : JSON.parse(getItem("user") || "");
   const navigate = useNavigate();
 
   const [userdata, setuserData] = useState(user);
@@ -312,6 +314,8 @@ const SignUpForm = () => {
 };
 
 const ResetPassword = () => {
+  const isLogged = getItem(RoutePaths.token);
+  const user = !isLogged ? null : JSON.parse(getItem("user") || "");
   const [userdata, setuserData] = useState(user);
 
   if (checkLogin() && userdata.role === "SYSTEM_ADMIN") {

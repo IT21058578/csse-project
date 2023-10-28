@@ -10,13 +10,16 @@ import {
 import { usePassApprovalMutation } from "../../store/apiquery/ApprovalsApiSlice";
 import { ItemRequest } from "../../types";
 import { Approval } from "../../types";
+import { getItem } from "../../Utils/Generals";
+import RoutePaths from "../../config";
+const isLogged = getItem(RoutePaths.token);
+const user = !isLogged ? null : JSON.parse(getItem("user") || "");
 
 const UpdateOrders = ({ itemRequest }: { itemRequest: ItemRequest }) => {
   const [updateData, setUpdateData] = useState(itemRequest);
   const [updateOrders, udpateResult] = usePassApprovalMutation();
 
   const [formData, setFormData] = useState({
-    isApproved: false,
     refferredTo: "",
     description: "",
   });
@@ -38,8 +41,7 @@ const UpdateOrders = ({ itemRequest }: { itemRequest: ItemRequest }) => {
       const result = await passApproval({
         id: itemRequest._id,
         isApproved: true,
-        refferredTo: "",
-        description: formData.description,
+        formData,
       });
 
       if ("data" in result && result.data) {
@@ -58,8 +60,6 @@ const UpdateOrders = ({ itemRequest }: { itemRequest: ItemRequest }) => {
       const result = await passApproval({
         id: itemRequest._id,
         isApproved: false,
-        refferredTo: "",
-        description: formData.description,
       });
 
       if ("data" in result && result.data) {
@@ -88,17 +88,6 @@ const UpdateOrders = ({ itemRequest }: { itemRequest: ItemRequest }) => {
       <form action="" method="patch" className="checkout-service p-3">
         <input type="hidden" name="id" value={updateData._id} />
         <h3>Approval</h3>
-        <div>
-          <label className="w-100">
-            <input
-              type="checkbox"
-              name="isApproved"
-              checked={formData.isApproved}
-              onChange={handleUpdateValue}
-            />{" "}
-            Approve
-          </label>
-        </div>
         <label className="w-100">
           <span>Refered To</span>
           <input
@@ -106,7 +95,7 @@ const UpdateOrders = ({ itemRequest }: { itemRequest: ItemRequest }) => {
             name="refferredTo"
             value={formData.refferredTo}
             className="form-control w-100 rounded-0 p-2"
-            placeholder="Orders Status"
+            placeholder="User Id"
             onChange={handleUpdateValue}
           />
         </label>
@@ -117,7 +106,7 @@ const UpdateOrders = ({ itemRequest }: { itemRequest: ItemRequest }) => {
             name="description"
             value={formData.description}
             className="form-control w-100 rounded-0 p-2"
-            placeholder="Orders Status"
+            placeholder="Description"
             onChange={handleUpdateValue}
           />
         </label>
@@ -142,6 +131,7 @@ const UpdateOrders = ({ itemRequest }: { itemRequest: ItemRequest }) => {
               >
                 Approve
               </button>
+              <br></br>
               <button
                 className="fd-btn w-25 text-center border-0"
                 onClick={handleDisapprove}
@@ -174,18 +164,24 @@ const ListOfOrders = ({
     isError,
   } = useGetAllitemrequestsQuery("api/procurements");
 
+  const [data, setData] = useState(user);
+
   // search bar coding
   const [searchInput, setSearchInput] = useState<string>("");
 
   let content: React.ReactNode;
   let count = 0;
 
-  const filteredOrdersByStatus = OrdersList?.content.filter(
-    (order: ItemRequest) => order.status === "PENDING_APPROVAL"
+  const filteredOrdersByCompany = OrdersList?.content?.filter(
+    (order: ItemRequest) => order?.companyId === data.companyId
+  );
+
+  const filteredOrdersByStatus = filteredOrdersByCompany?.filter(
+    (order: ItemRequest) => order?.status === "PENDING_APPROVAL"
   );
 
   // Filter products based on the search input
-  const filteredOrders = filteredOrdersByStatus.filter(
+  const filteredOrders = filteredOrdersByStatus?.filter(
     (order: ItemRequest) =>
       order.siteId.toLowerCase().includes(searchInput.toLowerCase()) ||
       order.status.toLowerCase().includes(searchInput.toLowerCase())

@@ -33,7 +33,7 @@ const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
     country: "",
     password: "",
     companyId: "",
-    roles: "",
+    roles: [""],
     siteID: "",
   });
 
@@ -45,19 +45,29 @@ const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
 
   const handleValue = (
     e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
 
-    setFormData({ ...formData, [name]: value });
+    if (type === "select-multiple" && e.target instanceof HTMLSelectElement) {
+      // Cast the event target to HTMLSelectElement and get selected options
+      const selectedOptions = Array.from(
+        e.target.selectedOptions,
+        (option) => option.value
+      );
+      setFormData({ ...formData, [name]: selectedOptions });
+    } else {
+      // Handle other input types as usual
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const result = await createuser({ formData });
+      const result = await createuser(formData);
 
       if ("data" in result && result.data) {
         console.log("user created successfully");
@@ -70,7 +80,7 @@ const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
           country: "",
           password: "",
           companyId: "",
-          roles: "",
+          roles: [""],
           siteID: "",
         });
       } else if ("error" in result && result.error) {
@@ -132,7 +142,7 @@ const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
           <label>
             <span>Region</span>
             <input
-              type="number"
+              type="text"
               name="region"
               value={formData.region}
               className="form-control w-100 rounded-0 p-2"
@@ -155,7 +165,7 @@ const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
             <span>Password</span>
             <input
               type="text"
-              name="brand"
+              name="password"
               value={formData.password}
               className="form-control w-100 rounded-0 p-2"
               placeholder="Password"
@@ -217,6 +227,7 @@ const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
               value={formData.roles}
               className="form-control w-100 rounded-0 p-2"
               onChange={handleValue}
+              multiple
             >
               <option value="">Select a Role</option>
               {dataUser?.roles ? (
@@ -309,7 +320,7 @@ const ListOfusers = ({
               <td>{user.lastName}</td>
               <td>{user.email}</td>
               <td>{user.roles}</td>
-              <td className="fw-bold d-flex gap-2 justify-content-center">
+              {/* <td className="fw-bold d-flex gap-2 justify-content-center">
                 <a
                   href="#"
                   className="p-2 rounded-2 fd-bg-primary"
@@ -318,7 +329,7 @@ const ListOfusers = ({
                 >
                   <i className="bi bi-eye"></i>
                 </a>
-              </td>
+              </td> */}
             </tr>
           );
         })
@@ -351,9 +362,9 @@ const ListOfusers = ({
               <th scope="col" className="p-3">
                 ROLES
               </th>
-              <th scope="col" className="p-3">
+              {/* <th scope="col" className="p-3">
                 Actions
-              </th>
+              </th> */}
             </tr>
           </thead>
           <tbody>{content}</tbody>

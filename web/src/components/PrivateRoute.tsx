@@ -22,10 +22,10 @@ const PrivateRoute = ({
     }
   }, [isLogged, user]);
 
-  console.log("role", data.roles[0]);
+  console.log("role", data.roles?.[0]);
 
   if (type === 1) {
-    if (data.isAuthorized && data.roles[0] === "SYSTEM_ADMIN") {
+    if (data.isAuthorized && data.roles?.[0] === "SYSTEM_ADMIN") {
       return <Navigate to={RoutePaths.sadmin} replace />;
     } else if (data.isAuthorized) {
       return <Navigate to={RoutePaths.companyAdmin} replace />;

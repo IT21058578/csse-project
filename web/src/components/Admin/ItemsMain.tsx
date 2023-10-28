@@ -31,7 +31,12 @@ const Updateitem = ({ item }: { item: Item }) => {
     >
   ) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    if (name === "imageUrls") {
+      const imagesArray = value.split(",").map((urls) => urls.trim());
+      setFormData({ ...formData, [name]: imagesArray });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,7 +76,7 @@ const Updateitem = ({ item }: { item: Item }) => {
           <span>Item Name</span>
           <input
             type="text"
-            name="Item Name"
+            name="name"
             className="form-control w-100 rounded-0 p-2"
             value={formData.name}
             onChange={handleUpdateValue}
@@ -96,7 +101,7 @@ const Updateitem = ({ item }: { item: Item }) => {
           name="imageUrls"
           cols={100}
           rows={10}
-          value={formData.imageUrls}
+          value={formData.imageUrls.join(",")}
           className="w-100 p-2 border"
           placeholder="Image Urls"
           onChange={handleUpdateValue}

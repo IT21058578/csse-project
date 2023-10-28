@@ -14,7 +14,7 @@ const Updatecompany = ({ company }: { company: Company }) => {
   const [updateData, setUpdateData] = useState(company);
   const [updatecompany, udpateResult] = useUpdatecompanieMutation();
   const imageTag = useRef<HTMLImageElement>(null);
-  const companyId = company?._id;
+  const companyId = company._id;
 
   const [formData, setFormData] = useState({
     name: updateData.name,
@@ -42,11 +42,11 @@ const Updatecompany = ({ company }: { company: Company }) => {
           name: "",
         });
       } else if ("error" in result && result.error) {
-        console.error("company creation failed", result.error);
-        toast.error("company creation failed");
+        console.error("company Update failed", result.error);
+        toast.error("company Update failed");
       }
     } catch (error) {
-      console.error("company creation failed`", error);
+      console.error("company creUpdatedation failed`", error);
       toast.error("company creation failed");
     }
   };

@@ -20,6 +20,20 @@ const Updatesite = ({ site }: { site: Site }) => {
   const imageTag = useRef<HTMLImageElement>(null);
   const siteId = site?._id;
 
+  const {
+    isLoading,
+    data: SiteMangerList,
+    isError,
+  } = useGetAllUsersQuery("users/search");
+
+  const [dataUser, setData] = useState(users);
+
+  const siteAdmins = SiteMangerList?.content.filter((user: any) => {
+    return (
+      user.roles.includes("SITE_ADMIN") && user.companyId === dataUser.companyId
+    );
+  });
+
   const [formData, setFormData] = useState({
     name: updateData.name,
     companyId: updateData.companyId,
@@ -27,6 +41,24 @@ const Updatesite = ({ site }: { site: Site }) => {
     mobiles: updateData.mobiles,
     siteManagerIds: updateData.siteManagerIds,
   });
+
+  const handleUserSelection = (userId: string) => {
+    setFormData((prevFormData: any) => {
+      if (prevFormData.siteManagerIds.includes(userId)) {
+        return {
+          ...prevFormData,
+          siteManagerIds: prevFormData.siteManagerIds.filter(
+            (id: string) => id !== userId
+          ),
+        };
+      } else {
+        return {
+          ...prevFormData,
+          siteManagerIds: [...prevFormData.siteManagerIds, userId],
+        };
+      }
+    });
+  };
 
   const handleUpdateValue = (
     e: React.ChangeEvent<
@@ -104,7 +136,7 @@ const Updatesite = ({ site }: { site: Site }) => {
             onChange={handleUpdateValue}
           />
         </label>
-        <label>
+        {/* <label>
           <span>Site Managers</span>
           <input
             type="text"
@@ -126,7 +158,44 @@ const Updatesite = ({ site }: { site: Site }) => {
           placeholder="mobiles"
           onChange={handleUpdateValue}
         ></textarea>
-      </label>
+      </label> */}
+        <label>
+          <span>Site Managers</span>
+          <div className="form-control w-100 rounded-0 p-2">
+            {isLoading ? (
+              <p>Loading users...</p>
+            ) : isError ? (
+              <p>Error loading users</p>
+            ) : (
+              siteAdmins?.map((user: User) => (
+                <label key={user._id}>
+                  <input
+                    type="checkbox"
+                    value={user._id}
+                    checked={formData.siteManagerIds.includes(user._id)}
+                    onChange={() => handleUserSelection(user._id)}
+                  />
+                  {user.firstName}
+                </label>
+              ))
+            )}
+          </div>
+        </label>
+      </div>
+      <div className="my-4">
+        <label>
+          <span>Mobiles</span>
+        </label>
+        <textarea
+          name="mobiles"
+          cols={100}
+          rows={10}
+          value={formData.mobiles.join(",")}
+          className="w-100 p-2 border"
+          placeholder="mobiles"
+          onChange={handleUpdateValue}
+        ></textarea>
+      </div>
       <div className="mt-4">
         <ToastContainer />
       </div>
