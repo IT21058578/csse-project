@@ -94,7 +94,7 @@ describe('Items Test suite', () => {
     expect(result.imageUrls).toEqual(createItemDto.imageUrls);
     expect(result.companyId).toBe(createItemDto.companyId);
     expect(result.createdAt).toBeInstanceOf(Date);
-    expect(result.createdBy).toBe(user._id);
+    expect(result.createdBy).toBe(user?._id);
     expect(companiesService_getCompany).toBeCalledTimes(1);
     expect(itemModel_create).toBeCalledTimes(1);
   });
@@ -178,7 +178,7 @@ describe('Items Test suite', () => {
     expect(result.name).toBe(editItemDto.name);
     expect(result.imageUrls).toEqual(editItemDto.imageUrls);
     expect(result.updatedAt).toBeInstanceOf(Date);
-    expect(result.updatedBy).toBe(user._id);
+    expect(result.updatedBy).toBe(user?._id);
     expect(result.save).toBeCalledTimes(1);
     expect(itemModel_findById).toBeCalledTimes(1);
     expect(itemModel_find).toBeCalledTimes(1);

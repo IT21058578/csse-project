@@ -42,14 +42,14 @@ export class UsersService {
   async updateUser(id: string, userDto: CreateUserDto): Promise<UserDocument> {
     this.logger.log(`Attempting to find user with id '${id}'`);
     const updatedUser = await this.userModel.findByIdAndUpdate(id, userDto);
-
+    
     if (updatedUser === null) {
       this.logger.warn(`Could not find an existing user with id '${id}'`);
       throw new BadRequestException(ErrorMessage.USER_NOT_FOUND, {
         description: `User with id '${id}' was not found`,
       });
     }
-    return updatedUser.toJSON();
+    return updatedUser;
   }
 
   async getUser(id: string): Promise<UserDocument> {
@@ -63,7 +63,7 @@ export class UsersService {
       });
     }
 
-    return existingUser.toJSON();
+    return existingUser;
   }
 
   async getUserByEmail(email: string): Promise<UserDocument> {
@@ -77,7 +77,7 @@ export class UsersService {
       });
     }
 
-    return existingUser.toJSON();
+    return existingUser;
   }
 
   async deleteUser(id: string) {
@@ -107,7 +107,7 @@ export class UsersService {
 
     relevantUser.siteIds = [...user.siteIds, siteId];
     relevantUser.updatedAt = new Date();
-    relevantUser.updatedBy = user._id;
+    relevantUser.updatedBy = user?._id;
     return await relevantUser.save();
   }
 
@@ -123,7 +123,7 @@ export class UsersService {
 
     relevantUser.siteIds = relevantUser.siteIds.filter((id) => id !== siteId);
     relevantUser.updatedAt = new Date();
-    relevantUser.updatedBy = user._id;
+    relevantUser.updatedBy = user?._id;
     return await relevantUser.save();
   }
 

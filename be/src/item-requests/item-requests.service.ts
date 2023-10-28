@@ -99,7 +99,7 @@ export class ItemRequestsService {
       price,
       status,
       createdAt: new Date(),
-      createdBy: user._id,
+      createdBy: user?._id,
     });
 
     // Send approval request to random lowest level staff only if it needs approval.
@@ -114,7 +114,7 @@ export class ItemRequestsService {
       status: ApprovalStatus.PENDING,
       approvedBy: selectedAdmin.id,
       createdAt: new Date(),
-      createdBy: user._id,
+      createdBy: user?._id,
     });
     return savedProcurement;
   }
@@ -140,7 +140,7 @@ export class ItemRequestsService {
     existingProcurement.supplierId =
       supplierId ?? existingProcurement.supplierId;
     existingProcurement.itemId = itemId ?? existingProcurement.itemId;
-    existingProcurement.updatedBy = user._id;
+    existingProcurement.updatedBy = user?._id;
     existingProcurement.updatedAt = new Date();
 
     // Re-validate according to new values

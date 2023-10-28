@@ -39,7 +39,7 @@ export class ItemsService {
       imageUrls,
       companyId,
       createdAt: new Date(),
-      createdBy: user._id,
+      createdBy: user?._id,
     });
 
     return savedItem;
@@ -64,7 +64,7 @@ export class ItemsService {
     existingItem.name = name ?? existingItem.name;
     existingItem.imageUrls = imageUrls ?? existingItem.imageUrls;
     existingItem.updatedAt = new Date();
-    existingItem.updatedBy = user._id;
+    existingItem.updatedBy = user?._id;
     const savedItem = await existingItem.save();
 
     return savedItem;

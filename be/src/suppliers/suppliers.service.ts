@@ -38,7 +38,7 @@ export class SuppliersService {
       email,
       items,
       createdAt: new Date(),
-      createdBy: user._id,
+      createdBy: user?._id,
     });
     const savedSupplier = await newSupplier.save();
     return savedSupplier.toJSON();
@@ -59,7 +59,7 @@ export class SuppliersService {
     supplier.items = items;
     supplier.mobiles = mobiles;
     supplier.updatedAt = new Date();
-    supplier.updatedBy = user._id;
+    supplier.updatedBy = user?._id;
 
     const savedSupplier = await supplier.save();
     return savedSupplier.toJSON();

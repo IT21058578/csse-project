@@ -26,7 +26,7 @@ export class AuthGuard implements CanActivate {
     if (!token) {
       this.logger.debug(`Could not authenticate user`);
       return true;
-    }
+    }              
     try {
       const id = await this.jwtTokenService.verifyAccessToken(token);
       const user = await this.usersService.getUser(id);
@@ -35,7 +35,6 @@ export class AuthGuard implements CanActivate {
       request['user'] = userJson;
     } catch {
       this.logger.debug(`Could not authenticate user`);
-
       this.logger.warn(
         `User attempted to access resources with an invalid token`,
       );

@@ -32,7 +32,7 @@ export class SitesService {
       companyId,
       siteManagerIds,
       createdAt: new Date(),
-      createdBy: user._id,
+      createdBy: user?._id,
     });
     const savedSite = await newSite.save();
 
@@ -53,7 +53,7 @@ export class SitesService {
     existingSite.mobiles = mobiles;
     existingSite.siteManagerIds = siteManagerIds;
     existingSite.updatedAt = new Date();
-    existingSite.updatedBy = user._id;
+    existingSite.updatedBy = user?._id;
 
     const savedSite = await existingSite.save();
     return savedSite;

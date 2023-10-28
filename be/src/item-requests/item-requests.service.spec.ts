@@ -192,7 +192,7 @@ describe('ItemRequests Test suite', () => {
         qty: createProcurementDto.qty,
         approvedBy: expect.any(String),
         createdAt: expect.any(Date),
-        createdBy: user._id,
+        createdBy: user?._id,
       }),
     );
     when(approvalsService_selectRandomProcurementAdmin)
@@ -209,7 +209,7 @@ describe('ItemRequests Test suite', () => {
           price: expect.any(Number),
           status: ItemRequestStatus.PENDING_APPROVAL,
           createdAt: expect.any(Date),
-          createdBy: user._id,
+          createdBy: user?._id,
         }),
       )
       .mockImplementation((arg1: any) => arg1);
@@ -486,7 +486,7 @@ describe('ItemRequests Test suite', () => {
     expect(result.qty).toBe(editProcurementDto.qty);
     expect(result.supplierId).toBe(editProcurementDto.supplierId);
     expect(result.itemId).toBe(editProcurementDto.itemId);
-    expect(result.updatedBy).toBe(user._id);
+    expect(result.updatedBy).toBe(user?._id);
     expect(result.updatedAt).toBeInstanceOf(Date);
     expect(existingProcurement.save).toBeCalledTimes(1);
     expect(companiesService_getCompany).toBeCalledTimes(1);

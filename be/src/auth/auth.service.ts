@@ -7,7 +7,6 @@ import { CreateUserDto } from 'src/common/dtos/create-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/users/user.schema';
 import { Model } from 'mongoose';
-import { UserRole } from 'src/common/enums/user-roles.enum';
 import { TokenService } from 'src/token/token.service';
 import { TokenPurpose } from 'src/common/enums/token-purpose.enum';
 import { JwtTokenService } from 'src/jwt-token/jwt-token.service';
@@ -35,21 +34,21 @@ export class AuthService {
 
       if (!isPasswordsMatching) {
         this.logger.warn(
-          `User with id '${existingUser._id}' has tried to login but used wrong password`,
+          `User with id '${existingUser?._id}' has tried to login but used wrong password`,
         );
         throw Error();
       }
 
       if (!existingUser.isAuthorized) {
         this.logger.warn(
-          `User with id ${existingUser._id} attempted login but has not verified their email`,
+          `User with id ${existingUser?._id} attempted login but has not verified their email`,
         );
         throw Error();
       }
 
       const [accessToken, refreshToken] = await Promise.all([
-        this.jwtTokenService.getAccessToken(existingUser._id as any),
-        this.jwtTokenService.getRefreshToken(existingUser._id as any),
+        this.jwtTokenService.getAccessToken(existingUser?._id as any),
+        this.jwtTokenService.getRefreshToken(existingUser?._id as any),
       ]);
 
       const { password: userPassword, ...sanitizedUser } = existingUser;
@@ -71,7 +70,7 @@ export class AuthService {
     }
     const createdUser = new this.userModel(userDto);
     createdUser.password = await hash(createdUser.password, 10);
-    createdUser.isAuthorized = false;
+    createdUser.isAuthorized = true;
     const savedUser = await createdUser.save();
     this.sendRegistrationMail(userDto.email);
     return savedUser;

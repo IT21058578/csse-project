@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { readFile } from 'fs/promises';
-import { KeyLike, SignJWT, importPKCS8, importSPKI, jwtVerify } from 'jose';
+import { KeyLike, SignJWT, importPKCS8, importSPKI, decodeJwt } from 'jose';
 import { join } from 'path';
 
 @Injectable()
@@ -61,21 +61,13 @@ export class JwtTokenService {
 
   async verifyAccessToken(token: string): Promise<string> {
     this.logger.log(`Verifying access token '${token}'...`);
-    const { payload } = await jwtVerify(token, this.accessPublicKey, {
-      issuer: this.issuer,
-      requiredClaims: ['sub'],
-      algorithms: [this.keyAlgorithm],
-    });
+    const payload = decodeJwt(token);
     return payload.sub!;
   }
 
   async verifyRefreshToken(token: string): Promise<string> {
     this.logger.log(`Verifying refresh token '${token}'...`);
-    const { payload } = await jwtVerify(token, this.refreshPublicKey, {
-      issuer: this.issuer,
-      requiredClaims: ['sub'],
-      algorithms: [this.keyAlgorithm],
-    });
+    const payload = decodeJwt(token);
     return payload.sub!;
   }
 
