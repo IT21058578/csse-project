@@ -8,7 +8,7 @@ import {
   View,
   Dimensions,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
@@ -17,12 +17,28 @@ import { Ionicons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import AppTextInput from "../components/AppTextInput";
+import { useLoginMutation } from "../Redux/API/AuthApiSlice";
 
 const { height } = Dimensions.get("window");
 
 type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 
 const LoginScreen: React.FC<Props> = ({ navigation: { navigate } }) => {
+
+  const [sendUserInfo, result] = useLoginMutation();
+  const [data, setData] = useState({
+    email: "dinukad@gmail.com",
+    password: "password",
+  });
+
+  const handleChange = (name: any, text: any) => {
+    setData({ ...data, [name]: text });
+  };
+
+  const handleLogin = async () => {
+    sendUserInfo(data);
+  };
+
   return (
     <SafeAreaView>
       <View
@@ -46,8 +62,13 @@ const LoginScreen: React.FC<Props> = ({ navigation: { navigate } }) => {
             marginVertical: Spacing * 2,
           }}
         >
-          <AppTextInput placeholder="Email" />
-          <AppTextInput placeholder="Password" />
+          <AppTextInput 
+            placeholder="Email"
+            onChangeText={(text) => handleChange("email", text)} />
+
+          <AppTextInput 
+            placeholder="Password" 
+            onChangeText={(text) => handleChange("password", text)} />
         </View>
 
         <View>
@@ -55,7 +76,7 @@ const LoginScreen: React.FC<Props> = ({ navigation: { navigate } }) => {
             style={{
               fontFamily: Font["poppins-semiBold"],
               fontSize: FontSize.small,
-              color: Colors.primary,
+              color: Colors.text,
               alignSelf: "flex-end",
             }}
           >
@@ -64,10 +85,10 @@ const LoginScreen: React.FC<Props> = ({ navigation: { navigate } }) => {
         </View>
 
         <TouchableOpacity
-          onPress={() => navigate("NewRequisition")}
+          onPress={() => navigate("Home")}
           style={{
             padding: Spacing * 2,
-            backgroundColor: Colors.primary,
+            backgroundColor: Colors.text,
             marginVertical: Spacing * 2,
             borderRadius: Spacing,
             shadowColor: Colors.primary,

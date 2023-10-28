@@ -7,10 +7,11 @@ import RegisterScreen from "../screens/RegisterScreen";
 import Welcome from "../screens/WelcomeScreen";
 import Home from "../screens/HomeScreen";
 import BottomTab from "./BottomTab";
-// import PersonalRoomSchedule from "../screens/PersonalRoomSchedule";
 
 import { RootStackParamList } from "../types";
 import AddTask from "../screens/AddReq";
+import Notifications from "../screens/Notifications";
+import ContainerFrame from "../components/ContainerFrame";
 
 const theme = {
   ...DefaultTheme,
@@ -42,8 +43,9 @@ function RootNavigator() {
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="BottomTab" component={BottomTab} />
-      {/* <Stack.Screen name="PersonalRoomSchedule" component={PersonalRoomSchedule} /> */}
+      <Stack.Screen name="Notifications" component={Notifications} />
       <Stack.Screen name="NewRequisition" component={AddTask} />
+      <Stack.Screen name="HomeCont" component={ContainerFrame} />
     </Stack.Navigator>
   );
 }

@@ -3,6 +3,7 @@ import { Text, StyleSheet, View } from "react-native";
 import { Image } from "expo-image";
 import Font from "../constants/Font";
 import { FontSize, Color, Border } from "../Styles/GlobalStyles";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const ContainerFrame = () => {
   return (
@@ -10,6 +11,9 @@ const ContainerFrame = () => {
       <View style={[styles.frame1, styles.frameLayout]}>
         <Text style={styles.dash}>Dashboard</Text>
         <Text style={styles.letsMakeThis}>Procurement procedures</Text>
+      </View>
+      <View style={{marginLeft:80, paddingTop:10}}>
+        {/* <Icon name='bell' size={14} onPress={() => navigate("Notifications")}/> */}
       </View>
       <View style={styles.frame2}>
         <Image
@@ -32,7 +36,7 @@ const styles = StyleSheet.create({
     lineHeight: 31,
     fontWeight: "bold",
     fontFamily: Font["poppins-regular"],
-    color: Color.midnightblue,
+    color: "black",
     textAlign: "left",
   },
   letsMakeThis: {
@@ -65,7 +69,7 @@ const styles = StyleSheet.create({
     width: 39,
     height: 39,
     alignItems: "center",
-    marginLeft: 106,
+    marginLeft: 10,
     overflow: "hidden",
   },
   frame: {

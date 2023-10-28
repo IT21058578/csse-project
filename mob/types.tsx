@@ -27,6 +27,8 @@ export type RootStackParamList = {
   RoomDetails: undefined;
   AddTask: undefined;
   NewRequisition: undefined;
+  Notifications: undefined;
+  HomeCont: undefined;
   Screen1: undefined;
   Screen2: undefined;
   Screen3: undefined;

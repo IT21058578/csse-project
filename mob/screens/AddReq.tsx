@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Image, Text, ScrollView, Pressable } from "react-native";
-import { NativeBaseProvider, Input ,TextArea, useNativeBase } from "native-base";
+import { NativeBaseProvider, Input ,TextArea, useNativeBase, Flex } from "native-base";
 import DropDownPicker from 'react-native-dropdown-picker';
 import Colors from "../constants/Colors";
 import Font from "../constants/Font";
@@ -47,6 +47,17 @@ const AddReq = () => {
 
     const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 
+    const [supplierList, setSupplierList] = useState([
+        {label: 'Supplier 1', value: 'supplier1'},
+        {label: 'Supplier 2', value: 'supplier2'},
+        // ... Add more suppliers as needed
+    ]);
+    
+    const [fundingSourceList, setFundingSourceList] = useState([
+        {label: 'Funding Source 1', value: 'fundingSource1'},
+        {label: 'Funding Source 2', value: 'fundingSource2'},
+        // ... Add more funding sources as needed
+    ]);
 
     const handleCreateReq = async () => {
         const ReqData = {
@@ -58,7 +69,6 @@ const AddReq = () => {
             fundingSource: fundingSource,
             addNotes: addNotes,
         }
-
         
 
         try {
@@ -85,13 +95,13 @@ const AddReq = () => {
        <View>
         <View style={styles.container0}>
             <View style={styles.box0}>
-                <Pressable style={styles.rectangle} onPress={handleBackNav}>
+                {/* <Pressable style={styles.rectangle} onPress={handleBackNav}>
                     <Image style={styles.backImg} source={require('../assets/Arrow.png')} />
-                </Pressable>
+                </Pressable> */}
                 <Text style={styles.typo1}>Purchase Requisition</Text>
             </View>
         </View>
-            <ScrollView contentContainerStyle={styles.container}>
+            <ScrollView contentContainerStyle={styles.container} nestedScrollEnabled={true}>
             <View style={styles.box1}>
                 <Text style={styles.typoBoddy}>Item Details</Text>
             </View>
@@ -113,35 +123,43 @@ const AddReq = () => {
             </View>
             <View style={styles.box1}>
                 <NativeBaseProvider>
-                <TextArea
-                    h={20}
-                    placeholder="Enter Description"
-                    w="100%"
-                    backgroundColor={Colors.colorGhostwhite}
-                    maxW={400} 
-                    autoCompleteType="off" 
-                    onChangeText={setQuantity}
-                    />
+                    <Input variant="underlined" placeholder="Enter quantity" onChangeText={setQuantity}/>
                 </NativeBaseProvider>
             </View>
             <View style={styles.box1}>
                 <Text style={styles.typoBoddy}>Supplier</Text>
             </View>
             <View style={styles.box2}>
-                <NativeBaseProvider>
-                    <Input variant="underlined" placeholder="Enter supplier" onChangeText={setSupplier}/>
-                </NativeBaseProvider>
+                {/* <NativeBaseProvider> */}
+                    <DropDownPicker
+                        items={supplierList}
+                        defaultValue={supplier}
+                        containerStyle={{height: 40}}
+                        style={{backgroundColor: '#fafafa'}}
+                        dropDownStyle={{backgroundColor: '#fafafa'}}
+                        onChangeItem={item => setSupplier(item.value)}
+                    />
+                    {/* <Input variant="underlined" placeholder="Enter supplier" onChangeText={setSupplier}/> */}
+                {/* </NativeBaseProvider> */}
             </View>
             <View style={styles.box1}>
                 <Text style={styles.typoBoddy}>Delivery Information</Text>
             </View>
             <View style={styles.box2}>
                 <NativeBaseProvider>
-                    <Input variant="underlined" placeholder="Enter Delivery Info" onChangeText={setSupplier}/>
+                    <TextArea
+                        h={20}
+                        placeholder="Enter Delivery Information"
+                        w="100%"
+                        backgroundColor={Colors.colorGhostwhite}
+                        maxW={400} 
+                        autoCompleteType="off" 
+                        onChangeText={setDeliveryInfo}
+                    />
                 </NativeBaseProvider>
             </View>
             <View style={styles.box1}>
-                <Text style={styles.typoBoddy}>Date</Text>
+                <Text style={styles.typoBoddy}>Delivery Date</Text>
             </View>
             <View style={styles.box2}>
                 <Calendar onSelectDate={handleDateSelect} selected={selectedDate} />
@@ -151,7 +169,15 @@ const AddReq = () => {
             </View>
             <View style={styles.box2}>
                 <NativeBaseProvider>
-                    <Input variant="underlined" placeholder="Enter Funding Source" onChangeText={setFundingSource}/>
+                    <DropDownPicker
+                        items={fundingSourceList}
+                        defaultValue={fundingSource}
+                        containerStyle={{height: 40}}
+                        style={{backgroundColor: '#fafafa'}}
+                        dropDownStyle={{backgroundColor: '#fafafa'}}
+                        onChangeItem={item => setFundingSource(item.value)}
+                    />
+                    {/* <Input variant="underlined" placeholder="Enter Funding Source" onChangeText={setFundingSource}/> */}
                 </NativeBaseProvider>
             </View>
             <View style={styles.box1}>
@@ -162,11 +188,20 @@ const AddReq = () => {
                     <Input variant="underlined" placeholder="Enter Additional notes" onChangeText={setAddNotes}/>
                 </NativeBaseProvider>
             </View>
-            <View style={styles.box1}>
+            <View style={{...styles.box1, flexDirection: 'row'}}>
             <NativeBaseProvider>
                 <Button size="lg" 
                     backgroundColor={Colors.text} 
                     borderRadius={10} 
+                    width={'95%'}
+                    onPress={handleBackNav}> Cancel 
+                </Button>
+            </NativeBaseProvider>
+            <NativeBaseProvider>
+                <Button size="lg" 
+                    backgroundColor={Colors.text} 
+                    borderRadius={10} 
+                    width={'95%'}
                     onPress={() => handleCreateReq()}> Submit 
                 </Button>
             </NativeBaseProvider>
@@ -216,7 +251,7 @@ const styles = StyleSheet.create({
         marginBottom:50,
     },
     typo1: {
-        marginLeft:80,
+        marginLeft:40,
         marginTop:4,
         color: Colors.darkblue,
         fontFamily: Font['poppins-semiBold'],

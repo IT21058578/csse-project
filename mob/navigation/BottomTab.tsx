@@ -2,8 +2,8 @@ import React from 'react'
 import BerlinTabBarNavigator from '../components/navBottom/Tabs';
 import {Ionicons as Icon} from '@expo/vector-icons'
 // import Home from '../screens/HomeScreen';
-import PersonalRoomSchedule from "../screens/PersonalRoomSchedule";
-import CreatedTasks from '../screens/CreatedTasks';
+// import PersonalRoomSchedule from "../screens/PersonalRoomSchedule";
+// import CreatedTasks from '../screens/CreatedTasks';
 import Profile from '../screens/Profile';
 import Register from '../screens/RegisterScreen';
 
@@ -54,7 +54,7 @@ export default () => (
             }}
         /> */}
 
-        <Tabs.Screen
+        {/* <Tabs.Screen
             name="TabTwo"
             component={PersonalRoomSchedule}
             options={{
@@ -66,7 +66,7 @@ export default () => (
                     />
                 ),
             }}
-        />
+        /> */}
         <Tabs.Screen
             name="TabThree"
             // component={CreatedTasks}

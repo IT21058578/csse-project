@@ -7,16 +7,20 @@ import { Color, FontSize, Padding, Border } from "../Styles/GlobalStyles";
 import { scheduleTypes } from "../types";
 import HomeScheduleBox from "../components/schedule/homeScheduleBox";
 import { schedulesApi } from "../data/virtualData";
-import { useGetAllPersonalDaySchedulesQuery } from "../Redux/API/schedules.api.slice";
+// import { useGetAllPersonalDaySchedulesQuery } from "../Redux/API/schedules.api.slice";
 import BottomTab from "../navigation/BottomTab";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../types";
 
-const Home = () => {
+type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
-  const {
-    data,
-    data: scheduleList,
-    isLoading,
-  } = useGetAllPersonalDaySchedulesQuery("api/scheduleApi");
+const Home: React.FC<Props> = ({ navigation: { navigate } }) => {
+
+  // const {
+  //   data,
+  //   data: scheduleList,
+  //   isLoading,
+  // } = useGetAllPersonalDaySchedulesQuery("api/scheduleApi");
 
   return (
     <View style={styles.home}>
@@ -77,13 +81,13 @@ const Home = () => {
         contentContainerStyle={styles.frameScrollViewContent}
       >
 
-        {isLoading ? (
+        {/* {isLoading ? (
           <Text>Loading...</Text>
         ) : (
           schedulesApi.map((schedule: scheduleTypes) => (
             <HomeScheduleBox {...schedule} key={schedule.id}/>
           ))
-        )}
+        )} */}
 
       </ScrollView>
       <BottomTab />
@@ -93,7 +97,7 @@ const Home = () => {
 
 const styles = StyleSheet.create({
   viewAllBtn: {
-    color: "#393f93",
+    color: "black",
     fontSize: 12,
     fontFamily: Font["poppins-regular"],
   },
@@ -224,7 +228,7 @@ const styles = StyleSheet.create({
     width: 100,
     left: 0,
     position: "absolute",
-    color: Color.midnightblue,
+    color: "black",
     fontFamily: Font["poppins-semiBold"],
     fontWeight: "600",
   },
