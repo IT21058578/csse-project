@@ -51,7 +51,7 @@ export class AuthService {
         this.jwtTokenService.getRefreshToken(existingUser?._id as any),
       ]);
 
-      const { password: userPassword, ...sanitizedUser } = existingUser;
+      const { password: userPassword, ...sanitizedUser } = existingUser.toJSON();
       return { tokens: { accessToken, refreshToken }, user: sanitizedUser };
     } catch (error) {
       this.logger.warn(`Failed to login user with email '${email}'`);
