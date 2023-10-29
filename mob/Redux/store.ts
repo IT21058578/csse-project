@@ -8,7 +8,7 @@ import { itemApiSlice } from "./API/ItemApiSlice"
 import { itemrequestApiSlice } from "./API/ItemRequestApiSlice"
 import { siteApiSlice } from "./API/SitesApiSlice"
 import { supplierApiSlice } from "./API/SuppliersApiSlice"
-import { usersApiSlice } from "./API/users.api.slice"
+import { usersApiSlice } from "./API/usersApiSlice"
 import { userSlice } from "./slices/userSlice"
 
 export const store = configureStore({

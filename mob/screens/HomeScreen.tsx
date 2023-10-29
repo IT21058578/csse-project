@@ -28,40 +28,9 @@ const Home: React.FC<Props> = ({ navigation: { navigate } }) => {
       <View style={styles.frameParent}>
 
         <ContainerFrame />
-{/* 
-        <Text style={[styles.myTask, styles.taskTypo]}>My Task</Text>
-
-        <View style={[styles.frame2, styles.frameLayout1]}>
-          <View style={[styles.tasksForDayParent, styles.parentLayout]}>
-            <Text style={styles.personal}>Tasks For Day</Text>
-            <Text style={[styles.text3, styles.textTypo]}>12</Text>
-          </View>
-
-          <View style={[styles.totalSheduledTimeParent, styles.parentLayout]}>
-            <Text style={styles.personal}>Total Sheduled Time</Text>
-            <Text style={[styles.text3, styles.textTypo]}>8h 15min</Text>
-          </View>
-        </View>
-
-        <View style={[styles.frame1, styles.frameLayout1]}>
-          <View style={[styles.personalParent, styles.parentLayout1]}>
-            <Text style={styles.personal}>Personal</Text>
-            <Text style={[styles.text, styles.textTypo]}>3</Text>
-          </View>
-
-          <View style={[styles.workParent, styles.parentLayout1]}>
-            <Text style={styles.personal}>Work</Text>
-            <Text style={[styles.text, styles.textTypo]}>7</Text>
-          </View>
-
-          <View style={[styles.educationParent, styles.parentLayout1]}>
-            <Text style={styles.personal}>Education</Text>
-            <Text style={[styles.text, styles.textTypo]}>2</Text>
-          </View>
-        </View> */}
 
         <View style={[styles.frame, styles.frameFlexBox]}>
-          <Text style={[styles.todayTask, styles.taskTypo]}>PENDING REQUISITION</Text>
+          <Text style={[styles.todayTask, styles.taskTypo]}>REQUISITIONS</Text>
           <Button
             style={styles.viewAll}
             mode="text"
@@ -114,7 +83,7 @@ const styles = StyleSheet.create({
   },
   taskTypo: {
     textAlign: "left",
-    color: Color.midnightblue,
+    color: 'black',
     fontFamily: Font["poppins-semiBold"],
     fontWeight: "600",
     fontSize: FontSize.size_5xl,
@@ -171,7 +140,7 @@ const styles = StyleSheet.create({
     borderRadius: Border.br_mini,
   },
   todayTask: {
-    width: 140,
+    width: 240,
   },
   viewAll: {
     marginLeft: 119,
@@ -293,6 +262,7 @@ const styles = StyleSheet.create({
   },
   frame3: {
     flex: 1,
+    minHeight: 200,
   },
   home: {
     backgroundColor: Color.white,
