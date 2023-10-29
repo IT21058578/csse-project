@@ -4,10 +4,10 @@ import { Button } from "react-native-paper";
 import ContainerFrame from "../components/ContainerFrame";
 import Font from "../constants/Font";
 import { Color, FontSize, Padding, Border } from "../Styles/GlobalStyles";
-import { scheduleTypes } from "../types";
+import { Requests, scheduleTypes } from "../types";
 import HomeScheduleBox from "../components/schedule/homeScheduleBox";
-import { schedulesApi } from "../data/virtualData";
-// import { useGetAllPersonalDaySchedulesQuery } from "../Redux/API/schedules.api.slice";
+import { requisitions } from "../data/virtualData";
+import { useGetAllitemrequestsQuery } from "../Redux/API/ItemRequestApiSlice";
 import BottomTab from "../navigation/BottomTab";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
@@ -16,11 +16,11 @@ type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 const Home: React.FC<Props> = ({ navigation: { navigate } }) => {
 
-  // const {
-  //   data,
-  //   data: scheduleList,
-  //   isLoading,
-  // } = useGetAllPersonalDaySchedulesQuery("api/scheduleApi");
+  const {
+    data,
+    data: procurementsList,
+    isLoading,
+  } = useGetAllitemrequestsQuery("api/procurements");
 
   return (
     <View style={styles.home}>
@@ -81,13 +81,13 @@ const Home: React.FC<Props> = ({ navigation: { navigate } }) => {
         contentContainerStyle={styles.frameScrollViewContent}
       >
 
-        {/* {isLoading ? (
+        {isLoading ? (
           <Text>Loading...</Text>
         ) : (
-          schedulesApi.map((schedule: scheduleTypes) => (
-            <HomeScheduleBox {...schedule} key={schedule.id}/>
+          requisitions.map((request: Requests) => (
+            <HomeScheduleBox {...request} key={request._id}/>
           ))
-        )} */}
+        )}
 
       </ScrollView>
       <BottomTab />

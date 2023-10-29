@@ -1,26 +1,32 @@
-export const schedulesApi = [
+export const requisitions = [
     {
-     id: 1,
-     title:'Pending Requisition 1',
-     startTime:'07.00',
-     endTime:'07.15',
-     date:'2023.09.12',
-     room:'SE Project Group'
+     _id: '1',
+     details:'Pending Requisition 1',
+     quantity:'Cements - 12',
+     supplier:'Lanva',
+     deliveryInfo:'address info',
+     deliveryDate:'2023.09.12',
+     fundingSource:'BOC',
+     addNotes: 'additional notes'
     },
     {
-     id: 2,
-     title:'Pending Requisition 2',
-     startTime:'07.00',
-     endTime:'07.15',
-     date:'2023.09.12',
-     room:'SE Project Group'
+        _id: '2',
+        details:'Pending Requisition 1',
+        quantity:'Cements - 12',
+        supplier:'Lanva',
+        deliveryInfo:'address info',
+        deliveryDate:'2023.09.12',
+        fundingSource:'BOC',
+        addNotes: 'additional notes'
     },
     {
-     id: 3,
-     title:'Pending Requisition 3',
-     startTime:'07.00',
-     endTime:'07.15',
-     date:'2023.09.12',
-     room:'SE Project Group'
+        _id: '3',
+        details:'Pending Requisition 1',
+        quantity:'Cements - 12',
+        supplier:'Lanva',
+        deliveryInfo:'address info',
+        deliveryDate:'2023.09.12',
+        fundingSource:'BOC',
+        addNotes: 'additional notes'
     },
 ]

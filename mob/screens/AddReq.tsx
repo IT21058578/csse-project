@@ -15,9 +15,10 @@ import Calendar from "../components/Calendar/calender";
 import moment, { Moment } from 'moment';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { useGetAllUsersQuery } from "../Redux/API/users.api.slice";
+import { useGetAllUsersQuery } from "../Redux/API/usersApiSlice";
 import  Toast from 'react-native-toast-message';
 import { useAppSelector } from "../hooks/redux-hooks";
+import AddReqHead from "../components/AddReqHead";
 
 
 const AddReq = () => {
@@ -93,6 +94,7 @@ const AddReq = () => {
 
     return (
        <View>
+        <AddReqHead />
         <View style={styles.container0}>
             <View style={styles.box0}>
                 {/* <Pressable style={styles.rectangle} onPress={handleBackNav}>
@@ -130,7 +132,7 @@ const AddReq = () => {
                 <Text style={styles.typoBoddy}>Supplier</Text>
             </View>
             <View style={styles.box2}>
-                {/* <NativeBaseProvider> */}
+                <NativeBaseProvider>
                     <DropDownPicker
                         items={supplierList}
                         defaultValue={supplier}
@@ -140,7 +142,7 @@ const AddReq = () => {
                         onChangeItem={item => setSupplier(item.value)}
                     />
                     {/* <Input variant="underlined" placeholder="Enter supplier" onChangeText={setSupplier}/> */}
-                {/* </NativeBaseProvider> */}
+                </NativeBaseProvider>
             </View>
             <View style={styles.box1}>
                 <Text style={styles.typoBoddy}>Delivery Information</Text>

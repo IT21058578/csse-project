@@ -205,9 +205,9 @@ export interface Requests {
   _id: string;
   details: string;
   quantity: string;
-  supplier: number;
+  supplier: string;
   deliveryInfo: string;
-  deliveryDate: Date;
+  deliveryDate: string;
   fundingSource: string;
   addNotes: string;
 }
