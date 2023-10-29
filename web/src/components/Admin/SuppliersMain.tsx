@@ -12,8 +12,6 @@ import {
 import { getItem } from "../../Utils/Generals";
 import RoutePaths from "../../config";
 import { useGetAllitemsQuery } from "../../store/apiquery/ItemApiSlice";
-const isLogged = getItem(RoutePaths.token);
-const users = !isLogged ? null : JSON.parse(getItem("user") || "");
 
 const Updatesupplier = ({ supplier }: { supplier: Supplier }) => {
   const [updateData, setUpdateData] = useState(supplier);
@@ -385,6 +383,9 @@ const AddOrEditsupplier = ({ supplier }: { supplier: null | Supplier }) => {
   } = useGetAllitemsQuery("api/items");
 
   const [createsupplier, result] = useCreatesupplierMutation();
+
+  const isLogged = getItem(RoutePaths.token);
+  const users = !isLogged ? null : JSON.parse(getItem("user") || "");
 
   const [dataUser, setData] = useState(users);
 

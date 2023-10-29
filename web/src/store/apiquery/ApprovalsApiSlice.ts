@@ -19,6 +19,11 @@ export const approvalApiSlice = createApi({
   tagTypes: ["approvals"],
 
   endpoints: (builder) => ({
+    getAllapprovals: builder.query({
+      query: () => "/approvals/search",
+      providesTags: ["approvals"],
+    }),
+
     getapproval: builder.query({
       query: (id: string) => `/approvals/${id}`,
       providesTags: ["approvals"],
@@ -35,5 +40,8 @@ export const approvalApiSlice = createApi({
   }),
 });
 
-export const { useGetapprovalQuery, usePassApprovalMutation } =
-  approvalApiSlice;
+export const {
+  useGetAllapprovalsQuery,
+  useGetapprovalQuery,
+  usePassApprovalMutation,
+} = approvalApiSlice;

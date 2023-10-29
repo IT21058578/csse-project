@@ -11,8 +11,6 @@ import {
 import { getItem } from "../../Utils/Generals";
 import RoutePaths from "../../config";
 import { useGetAllUsersQuery } from "../../store/apiquery/usersApiSlice";
-const isLogged = getItem(RoutePaths.token);
-const users = !isLogged ? null : JSON.parse(getItem("user") || "");
 
 const Updatesite = ({ site }: { site: Site }) => {
   const [updateData, setUpdateData] = useState(site);
@@ -25,6 +23,9 @@ const Updatesite = ({ site }: { site: Site }) => {
     data: SiteMangerList,
     isError,
   } = useGetAllUsersQuery("users/search");
+
+  const isLogged = getItem(RoutePaths.token);
+  const users = !isLogged ? null : JSON.parse(getItem("user") || "");
 
   const [dataUser, setData] = useState(users);
 
@@ -221,6 +222,8 @@ const Updatesite = ({ site }: { site: Site }) => {
 
 const AddOrEditsite = ({ site }: { site: null | Site }) => {
   const [createsite, result] = useCreatesiteMutation();
+  const isLogged = getItem(RoutePaths.token);
+  const users = !isLogged ? null : JSON.parse(getItem("user") || "");
   const [dataUser, setData] = useState(users);
 
   const {

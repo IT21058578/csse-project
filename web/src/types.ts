@@ -63,6 +63,7 @@ type UserRole =
   | "SITE_ADMIN";
 
 export interface Approval {
+  _id: string;
   companyId: string;
   procurementId: string;
   approvedBy: string;

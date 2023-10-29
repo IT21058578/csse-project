@@ -8,10 +8,10 @@ import { useGetAllUsersQuery } from "../../store/apiquery/usersApiSlice";
 import { useGetAllsuppliersQuery } from "../../store/apiquery/SuppliersApiSlice";
 import { useGetAllitemsQuery } from "../../store/apiquery/ItemApiSlice";
 import { useGetAllsitesQuery } from "../../store/apiquery/SitesApiSlice";
-const isLogged = getItem(RoutePaths.token);
-const users = !isLogged ? null : JSON.parse(getItem("user") || "");
 
 const DashMain = () => {
+  const isLogged = getItem(RoutePaths.token);
+  const users = !isLogged ? null : JSON.parse(getItem("user") || "");
   const [dataUser, setData] = useState(users);
 
   const { data: orders } = useGetAllitemrequestsQuery("api/procurements");

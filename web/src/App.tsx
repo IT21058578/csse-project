@@ -20,6 +20,7 @@ import UserMain from "./components/Admin/UsersMain";
 import CompanyAdminPanel from "./views/Admin/CompanyAdminPanal";
 import ApprovedOrdersMain from "./components/Admin/ApprovedOrders";
 import PartialyApprovedOrdersMain from "./components/Admin/PartialyApprovedOrders";
+import DisApprovedOrdersMain from "./components/Admin/DisapprovedOrders";
 
 function App() {
   return (
@@ -81,6 +82,12 @@ function App() {
           path={RoutePaths.adminApprovedOrders}
           element={
             <CompanyAdminPanel currentComponent={<ApprovedOrdersMain />} />
+          }
+        ></Route>
+        <Route
+          path={RoutePaths.adminDApprovedOrders}
+          element={
+            <CompanyAdminPanel currentComponent={<DisApprovedOrdersMain />} />
           }
         ></Route>
         <Route

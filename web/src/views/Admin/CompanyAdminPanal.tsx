@@ -104,6 +104,14 @@ const CompanyAdminPanel = ({
             </div>
             <div>
               <Link
+                to={RoutePaths.adminDApprovedOrders}
+                className={toggleLinkClass(RoutePaths.adminDApprovedOrders)}
+              >
+                DisApproved Orders<i className="bi bi-people float-end"></i>
+              </Link>
+            </div>
+            <div>
+              <Link
                 to={RoutePaths.adminPApprovedOrders}
                 className={toggleLinkClass(RoutePaths.adminPApprovedOrders)}
               >

@@ -47,7 +47,7 @@ const ListOfOrders = ({
   );
 
   const filteredOrdersByStatus = filteredOrdersByCompany?.filter(
-    (order: ItemRequest) => order?.status === "APPROVED"
+    (order: ItemRequest) => order?.status === "DISAPPROVED"
   );
 
   // Filter products based on the search input
@@ -132,7 +132,7 @@ const ListOfOrders = ({
   );
 };
 
-const ApprovedOrdersMain = () => {
+const DisApprovedOrdersMain = () => {
   const [page, setPage] = useState("list");
   const [currentOrder, setCurrentOrder] = useState(null);
 
@@ -150,4 +150,4 @@ const ApprovedOrdersMain = () => {
   );
 };
 
-export default ApprovedOrdersMain;
+export default DisApprovedOrdersMain;

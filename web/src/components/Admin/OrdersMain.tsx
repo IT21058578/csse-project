@@ -4,24 +4,41 @@ import Spinner from "../Spinner";
 import { HandleResult } from "../HandleResult";
 import { ToastContainer, toast } from "react-toastify";
 import {
-  useGetAllitemrequestsQuery,
-  useGetitemrequestQuery,
-} from "../../store/apiquery/ItemRequestApiSlice";
-import { usePassApprovalMutation } from "../../store/apiquery/ApprovalsApiSlice";
-import { ItemRequest } from "../../types";
+  useGetAllapprovalsQuery,
+  usePassApprovalMutation,
+} from "../../store/apiquery/ApprovalsApiSlice";
 import { Approval } from "../../types";
 import { getItem } from "../../Utils/Generals";
 import RoutePaths from "../../config";
-const isLogged = getItem(RoutePaths.token);
-const user = !isLogged ? null : JSON.parse(getItem("user") || "");
+import { useGetAllUsersQuery } from "../../store/apiquery/usersApiSlice";
 
-const UpdateOrders = ({ itemRequest }: { itemRequest: ItemRequest }) => {
+const UpdateOrders = ({ itemRequest }: { itemRequest: Approval }) => {
   const [updateData, setUpdateData] = useState(itemRequest);
   const [updateOrders, udpateResult] = usePassApprovalMutation();
 
   const [formData, setFormData] = useState({
     refferredTo: "",
     description: "",
+  });
+
+  const isLogged = getItem(RoutePaths.token);
+  const user = !isLogged ? null : JSON.parse(getItem("user") || "");
+
+  const [data, setData] = useState(user);
+
+  const {
+    isLoading,
+    data: usersList,
+    isSuccess,
+    isError,
+  } = useGetAllUsersQuery("api/users");
+
+  const siteAdmins = usersList?.content.filter((user: any) => {
+    return (
+      (user.roles.includes("SITE_ADMIN") ||
+        user.roles.includes("PROCUREMENT_ADMIN")) &&
+      user.companyId === data.companyId
+    );
   });
 
   const [passApproval, passApprovalResult] = usePassApprovalMutation();
@@ -72,33 +89,56 @@ const UpdateOrders = ({ itemRequest }: { itemRequest: ItemRequest }) => {
     }
   };
 
+  const handleapprove = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const result = await passApproval({
+        id: itemRequest._id,
+        isApproved: true,
+      });
+
+      if ("data" in result && result.data) {
+        console.log("Item request approved successfully");
+      } else if ("error" in result && result.error) {
+        console.error("Item request approval failed", result.error);
+      }
+    } catch (error) {
+      console.error("Item request approval failed", error);
+    }
+  };
+
   return (
     <div className="item-request-detail">
       <h2>Item Request Details</h2>
       <div>
         <p>Item Request ID: {itemRequest._id}</p>
-        <p>Supplier ID: {itemRequest.supplierId}</p>
-        <p>Item ID: {itemRequest.itemId}</p>
-        <p>Site ID: {itemRequest.siteId}</p>
-        <p>Quantity: {itemRequest.qty}</p>
-        <p>Price: {itemRequest.price}</p>
+        <p>Company ID: {itemRequest.companyId}</p>
+        <p>Procument ID: {itemRequest.procurementId}</p>
+        <p>Status: {itemRequest.status}</p>
         {/* Display other item request details here */}
       </div>
 
       <form action="" method="patch" className="checkout-service p-3">
         <input type="hidden" name="id" value={updateData._id} />
         <h3>Approval</h3>
+
         <label className="w-100">
-          <span>Refered To</span>
-          <input
-            type="text"
+          <span>Referred To</span>
+          <select
             name="refferredTo"
             value={formData.refferredTo}
             className="form-control w-100 rounded-0 p-2"
-            placeholder="User Id"
             onChange={handleUpdateValue}
-          />
+          >
+            <option value="">Select User ID</option>
+            {siteAdmins?.map((user: any) => (
+              <option key={user._id} value={user._id}>
+                {user.firstName}:{user._id}
+              </option>
+            ))}
+          </select>
         </label>
+
         <label className="w-100">
           <span>Description</span>
           <input
@@ -129,14 +169,23 @@ const UpdateOrders = ({ itemRequest }: { itemRequest: ItemRequest }) => {
                 className="fd-btn w-25 text-center border-0"
                 onClick={handleApprove}
               >
-                Approve
+                Partially Approve
               </button>
               <br></br>
               <button
                 className="fd-btn w-25 text-center border-0"
+                style={{ background: "red" }}
                 onClick={handleDisapprove}
               >
                 Disapprove
+              </button>
+              <br></br>
+              <button
+                className="fd-btn w-25 text-center border-0"
+                style={{ background: "green" }}
+                onClick={handleapprove}
+              >
+                Approve
               </button>
             </div>
           )}
@@ -153,7 +202,7 @@ const ListOfOrders = ({
   setOrders: Function;
   setPage: Function;
 }) => {
-  const parseOrders = (Orders: ItemRequest) => {
+  const parseOrders = (Orders: Approval) => {
     setOrders(Orders);
     setPage("add");
   };
@@ -162,7 +211,12 @@ const ListOfOrders = ({
     data: OrdersList,
     isSuccess,
     isError,
-  } = useGetAllitemrequestsQuery("api/procurements");
+  } = useGetAllapprovalsQuery("api/approvels");
+
+  console.log("list", OrdersList);
+
+  const isLogged = getItem(RoutePaths.token);
+  const user = !isLogged ? null : JSON.parse(getItem("user") || "");
 
   const [data, setData] = useState(user);
 
@@ -173,17 +227,17 @@ const ListOfOrders = ({
   let count = 0;
 
   const filteredOrdersByCompany = OrdersList?.content?.filter(
-    (order: ItemRequest) => order?.companyId === data.companyId
+    (order: Approval) => order?.companyId === data.companyId
   );
 
   const filteredOrdersByStatus = filteredOrdersByCompany?.filter(
-    (order: ItemRequest) => order?.status === "PENDING_APPROVAL"
+    (order: Approval) => order?.status === "PENDING"
   );
 
   // Filter products based on the search input
   const filteredOrders = filteredOrdersByStatus?.filter(
-    (order: ItemRequest) =>
-      order.siteId.toLowerCase().includes(searchInput.toLowerCase()) ||
+    (order: Approval) =>
+      order.companyId.toLowerCase().includes(searchInput.toLowerCase()) ||
       order.status.toLowerCase().includes(searchInput.toLowerCase())
   );
 
@@ -191,15 +245,13 @@ const ListOfOrders = ({
     isLoading || isError
       ? null
       : isSuccess
-      ? filteredOrders.map((Orders: ItemRequest) => {
+      ? filteredOrders.map((Orders: Approval) => {
           return (
             <tr className="p-3" key={Orders._id}>
               <td scope="row w-25">{++count}</td>
               <td>{Orders._id}</td>
-              <td>{Orders.supplierId}</td>
-              <td>{Orders.itemId}</td>
-              <td>{Orders.siteId}</td>
-              <td>{Orders.qty}</td>
+              <td>{Orders.companyId}</td>
+              <td>{Orders.procurementId}</td>
               <td>
                 <span
                   style={{
@@ -247,16 +299,10 @@ const ListOfOrders = ({
                 Order ID
               </th>
               <th scope="col" className="p-3">
-                Suplier ID
+                Company ID
               </th>
               <th scope="col" className="p-3">
-                ITEM ID
-              </th>
-              <th scope="col" className="p-3">
-                SITE ID
-              </th>
-              <th scope="col" className="p-3">
-                QTY
+                Procurement ID
               </th>
               <th scope="col" className="p-3">
                 STATUS

@@ -10,8 +10,6 @@ import {
 } from "../../store/apiquery/ItemApiSlice";
 import { getItem } from "../../Utils/Generals";
 import RoutePaths from "../../config";
-const isLogged = getItem(RoutePaths.token);
-const users = !isLogged ? null : JSON.parse(getItem("user") || "");
 
 const Updateitem = ({ item }: { item: Item }) => {
   const [updateData, setUpdateData] = useState(item);
@@ -132,6 +130,8 @@ const Updateitem = ({ item }: { item: Item }) => {
 
 const AddOrEdititem = ({ item }: { item: null | Item }) => {
   const [createitem, result] = useCreateitemMutation();
+  const isLogged = getItem(RoutePaths.token);
+  const users = !isLogged ? null : JSON.parse(getItem("user") || "");
   const [dataUser, setData] = useState(users);
 
   const [formData, setFormData] = useState({

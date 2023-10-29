@@ -30,7 +30,7 @@ export const itemrequestApiSlice = createApi({
     }),
 
     createitemrequest: builder.mutation({
-      query: ({ formData }) => ({
+      query: (formData) => ({
         url: "/procurements",
         method: "POST",
         body: formData,
@@ -54,7 +54,6 @@ export const itemrequestApiSlice = createApi({
       }),
       invalidatesTags: ["procurements"],
     }),
-      
   }),
 });
 

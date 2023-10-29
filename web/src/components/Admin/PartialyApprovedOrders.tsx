@@ -12,8 +12,6 @@ import { ItemRequest } from "../../types";
 import { Approval } from "../../types";
 import { getItem } from "../../Utils/Generals";
 import RoutePaths from "../../config";
-const isLogged = getItem(RoutePaths.token);
-const user = !isLogged ? null : JSON.parse(getItem("user") || "");
 
 const UpdateOrders = ({ itemRequest }: { itemRequest: ItemRequest }) => {
   const [updateData, setUpdateData] = useState(itemRequest);
@@ -180,6 +178,8 @@ const ListOfOrders = ({
 
   // search bar coding
   const [searchInput, setSearchInput] = useState<string>("");
+  const isLogged = getItem(RoutePaths.token);
+  const user = !isLogged ? null : JSON.parse(getItem("user") || "");
   const [data, setData] = useState(user);
 
   let content: React.ReactNode;

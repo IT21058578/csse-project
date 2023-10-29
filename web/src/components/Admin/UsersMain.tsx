@@ -10,11 +10,11 @@ import RoutePaths from "../../config";
 import { getItem } from "../../Utils/Generals";
 import { useGetAllsitesQuery } from "../../store/apiquery/SitesApiSlice";
 
-const isLogged = getItem(RoutePaths.token);
-const users = !isLogged ? null : JSON.parse(getItem("user") || "");
-
 const AddOrEdituser = ({ user }: { user: null | CreateUserDto }) => {
   const [createuser, result] = useRegisterMutation();
+
+  const isLogged = getItem(RoutePaths.token);
+  const users = !isLogged ? null : JSON.parse(getItem("user") || "");
 
   const [dataUser, setData] = useState(users);
 
