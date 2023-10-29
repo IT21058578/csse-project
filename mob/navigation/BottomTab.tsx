@@ -6,6 +6,7 @@ import {Ionicons as Icon} from '@expo/vector-icons'
 // import CreatedTasks from '../screens/CreatedTasks';
 import Profile from '../screens/Profile';
 import Register from '../screens/RegisterScreen';
+import Home from '../screens/HomeScreen';
 
 const Tabs = BerlinTabBarNavigator()
 
@@ -27,7 +28,7 @@ export default () => (
                     initialRouteName="TabOne"
                     tabBarOptions={{
                      labelStyle: {fontSize: 12, marginTop: 5, fontWeight: 'bold'},
-                                           activeTintColor: "#7A28CB",
+                                           activeTintColor: "black",
                                            inactiveTintColor: "#9e9e9e",
                                            activeBackgroundColor: "#e5cfff",
                                            activeTabColor:'#7A28CB'
@@ -40,7 +41,7 @@ export default () => (
                     }}
     >
         {/* <Tabs.Screen
-            name="TabOne"
+            name="Home"
             component={Home}
             options={{
                 tabBarIcon: ({focused, color}: any) => (
@@ -55,7 +56,7 @@ export default () => (
         /> */}
 
         {/* <Tabs.Screen
-            name="TabTwo"
+            name="Activity"
             component={PersonalRoomSchedule}
             options={{
                 tabBarIcon: ({focused, color}: any) => (
@@ -68,7 +69,7 @@ export default () => (
             }}
         /> */}
         <Tabs.Screen
-            name="TabThree"
+            name="New"
             // component={CreatedTasks}
             component={Register}
             options={{
@@ -76,21 +77,21 @@ export default () => (
                     <TabBarIcon
                         focused={focused}
                         tintColor={color}
-                        name="rocket"
+                        name="add"
                     />
                 ),
             }}
         />
 
         <Tabs.Screen
-            name="FourthTab"
+            name="Profile"
             component={Profile}
             options={{
                 tabBarIcon: ({focused, color}: any) => (
                     <TabBarIcon
                         focused={focused}
                         tintColor={color}
-                        name="ios-notifications"
+                        name="person"
                     />
                 ),
             }}

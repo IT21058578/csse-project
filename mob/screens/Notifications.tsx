@@ -60,7 +60,7 @@ const Notifications: React.FC = () => {
                     renderItem={({ item }) => (
                         <View style={styles.notificationItem}>
                             <Icon name="bell" size={24} color="grey"/>
-                            <View style={{flex: 1, marginLeft: 10}}> {/* Use flex to avoid overlapping with Icon */}
+                            <View style={{flex: 1, marginLeft: 10}}> 
                                 <Text style={styles.notificationText}>{item.text}</Text>
                                 <Text style={styles.timeAgoText}>{timeAgo(item.timestamp)}</Text>
                             </View>
