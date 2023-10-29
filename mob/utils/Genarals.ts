@@ -2,6 +2,7 @@ import { useLocation } from "react-router-dom";
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import RoutePaths from "./RoutePaths";
 
+
 export const toggleLinkClass = (
   path: string,
   activeClass: string = active,

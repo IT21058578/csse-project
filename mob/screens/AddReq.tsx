@@ -42,36 +42,25 @@ const AddReq = () => {
     const [details,setDetails] = useState('');
     const [quantity,setQuantity] = useState('');
     const [supplier,setSupplier] = useState('');
-    const [deliveryInfo,setDeliveryInfo] = useState('');
-    const [fundingSource,setFundingSource] = useState('');
-    const [addNotes,setAddNotes] = useState('');
+    const [site,setSite] = useState('');
+    // const [deliveryInfo,setDeliveryInfo] = useState('');
+    // const [fundingSource,setFundingSource] = useState('');
+    // const [addNotes,setAddNotes] = useState('');
 
-    const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
-
-    const [supplierList, setSupplierList] = useState([
-        {label: 'Supplier 1', value: 'supplier1'},
-        {label: 'Supplier 2', value: 'supplier2'},
-        // ... Add more suppliers as needed
-    ]);
-    
-    const [fundingSourceList, setFundingSourceList] = useState([
-        {label: 'Funding Source 1', value: 'fundingSource1'},
-        {label: 'Funding Source 2', value: 'fundingSource2'},
-        // ... Add more funding sources as needed
-    ]);
 
     const handleCreateReq = async () => {
         const ReqData = {
-            details: details, 
-            quantity: quantity, 
-            supplier: supplier,
-            deliveryInfo: deliveryInfo,
-            deliveryDate: selectedDate,
-            fundingSource: fundingSource,
-            addNotes: addNotes,
+            itemId: details, 
+            qty: Number(quantity), 
+            supplierId: supplier,
+            siteId: site
+            // deliveryInfo: deliveryInfo,
+            // deliveryDate: selectedDate,
+            // fundingSource: fundingSource,
+            // addNotes: addNotes,
         }
         
-
+        console.log(ReqData);    
         try {
             const response = await newReq(ReqData).unwrap();
 
@@ -81,20 +70,19 @@ const AddReq = () => {
                     text1: 'Request Adding successful.',
                 });
         
-                // navigation.navigate("CTasks");
+                navigation.navigate("Home");
             }
           } catch (error) {
                 Toast.show({
                     type: 'error',
                     text1: 'Request Adding is unsuccessful.',
                 });
-                console.log("error")
+                console.log(error)
         }
     }
 
     return (
        <View>
-        <AddReqHead />
         <View style={styles.container0}>
             <View style={styles.box0}>
                 {/* <Pressable style={styles.rectangle} onPress={handleBackNav}>
@@ -125,26 +113,42 @@ const AddReq = () => {
             </View>
             <View style={styles.box1}>
                 <NativeBaseProvider>
-                    <Input variant="underlined" placeholder="Enter quantity" onChangeText={setQuantity}/>
+                    <Input  variant="underlined" placeholder="Enter quantity" onChangeText={setQuantity}/>
                 </NativeBaseProvider>
             </View>
             <View style={styles.box1}>
                 <Text style={styles.typoBoddy}>Supplier</Text>
             </View>
             <View style={styles.box2}>
-                <NativeBaseProvider>
-                    <DropDownPicker
-                        items={supplierList}
-                        defaultValue={supplier}
-                        containerStyle={{height: 40}}
-                        style={{backgroundColor: '#fafafa'}}
-                        dropDownStyle={{backgroundColor: '#fafafa'}}
-                        onChangeItem={item => setSupplier(item.value)}
+            <NativeBaseProvider>
+                    <TextArea
+                        h={20}
+                        placeholder="Enter Item Details"
+                        w="100%"
+                        backgroundColor={Colors.colorGhostwhite}
+                        maxW={400} 
+                        autoCompleteType="off" 
+                        onChangeText={setSupplier}
                     />
-                    {/* <Input variant="underlined" placeholder="Enter supplier" onChangeText={setSupplier}/> */}
                 </NativeBaseProvider>
             </View>
             <View style={styles.box1}>
+                <Text style={styles.typoBoddy}>Site</Text>
+            </View>
+            <View style={styles.box2}>
+            <NativeBaseProvider>
+                    <TextArea
+                        h={20}
+                        placeholder="Enter Item Details"
+                        w="100%"
+                        backgroundColor={Colors.colorGhostwhite}
+                        maxW={400} 
+                        autoCompleteType="off" 
+                        onChangeText={setSite}
+                    />
+                </NativeBaseProvider>
+            </View>
+            {/* <View style={styles.box1}>
                 <Text style={styles.typoBoddy}>Delivery Information</Text>
             </View>
             <View style={styles.box2}>
@@ -159,8 +163,8 @@ const AddReq = () => {
                         onChangeText={setDeliveryInfo}
                     />
                 </NativeBaseProvider>
-            </View>
-            <View style={styles.box1}>
+            </View> */}
+            {/* <View style={styles.box1}>
                 <Text style={styles.typoBoddy}>Delivery Date</Text>
             </View>
             <View style={styles.box2}>
@@ -168,8 +172,8 @@ const AddReq = () => {
             </View>
             <View style={styles.box1}>
                 <Text style={styles.typoBoddy}>Funding Source</Text>
-            </View>
-            <View style={styles.box2}>
+            </View> */}
+            {/* <View style={styles.box2}>
                 <NativeBaseProvider>
                     <DropDownPicker
                         items={fundingSourceList}
@@ -177,19 +181,18 @@ const AddReq = () => {
                         containerStyle={{height: 40}}
                         style={{backgroundColor: '#fafafa'}}
                         dropDownStyle={{backgroundColor: '#fafafa'}}
-                        onChangeItem={item => setFundingSource(item.value)}
+                        onChangeItem={(item:any) => setFundingSource(item.value)}
                     />
-                    {/* <Input variant="underlined" placeholder="Enter Funding Source" onChangeText={setFundingSource}/> */}
                 </NativeBaseProvider>
             </View>
             <View style={styles.box1}>
                 <Text style={styles.typoBoddy}>Additional Notes</Text>
-            </View>
-            <View style={styles.box2}>
+            </View> */}
+            {/* <View style={styles.box2}>
                 <NativeBaseProvider>
                     <Input variant="underlined" placeholder="Enter Additional notes" onChangeText={setAddNotes}/>
                 </NativeBaseProvider>
-            </View>
+            </View> */}
             <View style={{...styles.box1, flexDirection: 'row'}}>
             <NativeBaseProvider>
                 <Button size="lg" 

@@ -11,10 +11,10 @@ export const authApiSlice = createApi({
     endpoints : (builder) => ({
 
         login: builder.mutation({
-            query : (category) => ({
+            query : (data) => ({
                 url : `/auth/login`,
                 method : 'POST',
-                body : category,
+                body : data,
             }),
            invalidatesTags : ['Auth']
         }),

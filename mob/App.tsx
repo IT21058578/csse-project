@@ -7,6 +7,9 @@ import Navigation from "./navigation";
 import { Provider } from "react-redux";
 import React from "react";
 import { store } from "./Redux/store";
+import { LogBox } from 'react-native';
+LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
+LogBox.ignoreAllLogs();//Ignore all log notifications
 
 export default function App() {
   const [fontsLoaded] = useFonts(fonts);

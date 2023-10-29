@@ -4,11 +4,10 @@ import { Button } from "react-native-paper";
 import ContainerFrame from "../components/ContainerFrame";
 import Font from "../constants/Font";
 import { Color, FontSize, Padding, Border } from "../Styles/GlobalStyles";
-import { Requests, scheduleTypes } from "../types";
+import { ItemRequest, Requests, scheduleTypes } from "../types";
 import HomeScheduleBox from "../components/schedule/homeScheduleBox";
 import { requisitions } from "../data/virtualData";
 import { useGetAllitemrequestsQuery } from "../Redux/API/ItemRequestApiSlice";
-import BottomTab from "../navigation/BottomTab";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 
@@ -53,13 +52,12 @@ const Home: React.FC<Props> = ({ navigation: { navigate } }) => {
         {isLoading ? (
           <Text>Loading...</Text>
         ) : (
-          requisitions.map((request: Requests) => (
+          procurementsList?.content.map((request: ItemRequest) => (
             <HomeScheduleBox {...request} key={request._id}/>
           ))
         )}
 
       </ScrollView>
-      <BottomTab />
     </View>
   );
 };

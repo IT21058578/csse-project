@@ -7,6 +7,7 @@ import {Ionicons as Icon} from '@expo/vector-icons'
 import Profile from '../screens/Profile';
 import Register from '../screens/RegisterScreen';
 import Home from '../screens/HomeScreen';
+import AddReq from '../screens/AddReq';
 
 const Tabs = BerlinTabBarNavigator()
 
@@ -40,7 +41,7 @@ export default () => (
                         tabBarBackground: "#ffffff",
                     }}
     >
-        {/* <Tabs.Screen
+        <Tabs.Screen
             name="Home"
             component={Home}
             options={{
@@ -53,7 +54,7 @@ export default () => (
                 ),
 
             }}
-        /> */}
+        />
 
         {/* <Tabs.Screen
             name="Activity"
@@ -71,7 +72,7 @@ export default () => (
         <Tabs.Screen
             name="New"
             // component={CreatedTasks}
-            component={Register}
+            component={AddReq}
             options={{
                 tabBarIcon: ({focused, color}: any) => (
                     <TabBarIcon

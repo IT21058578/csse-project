@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import  Toast from 'react-native-toast-message';
-import { setItem } from "./Genarals";
 import { useNavigation } from "@react-navigation/native";
 import RoutePaths from "./RoutePaths";
 import { useAppDispatch } from "../hooks/redux-hooks";
 import { setUser } from "../Redux/slices/userSlice";
+import { setItem } from "./Genarals";
 
 export const HandleResult = ({ result }: { result: any }) => {
     const navigation = useNavigation();
@@ -47,6 +47,8 @@ export const HandleResult = ({ result }: { result: any }) => {
         type: 'success',
         text1: 'Login successful.',
       });
+      navigation.navigate("BottomTab");
+
     }
   }, [result]);
 

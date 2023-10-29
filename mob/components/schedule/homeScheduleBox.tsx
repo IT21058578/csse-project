@@ -2,10 +2,10 @@ import React from "react";
 import { Text, StyleSheet, View } from "react-native";
 import { Button } from "react-native-paper";
 import Font from "../../constants/Font";
-import { Requests } from "../../types";
+import { ItemRequest, Requests } from "../../types";
 import { Color,FontSize, Padding, Border } from "../../Styles/GlobalStyles";
 
-const HomeScheduleBox = (props : Requests) => {
+const HomeScheduleBox = (props : ItemRequest) => {
     return(
         <View style={[styles.frameContainer, styles.frameLayout]}>
          
@@ -13,9 +13,9 @@ const HomeScheduleBox = (props : Requests) => {
           {/* <View style={styles.frameChild} />                                                                                                                                                                                                                                                                                                                                                                                                                              QQQQQ */}
           <View style={styles.projectProgressMeetingParent}>
             <Text style={styles.projectProgressMeeting}>
-              {props.details}
+              {props.status}
             </Text>
-            {/* <Text style={styles.text4}>{props.startTime} - {props.endTime}</Text> */}
+            <Text style={styles.text4}>{props.qty}</Text>
           </View>
         </View>
 

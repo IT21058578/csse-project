@@ -1,7 +1,6 @@
 const RoutePaths = {
 
     token: 'token',
-    // roomId: 'roomId'
     
 
 }

@@ -211,3 +211,26 @@ export interface Requests {
   fundingSource: string;
   addNotes: string;
 }
+
+
+export interface ItemRequest {
+  _id: string;
+  companyId: string;
+  supplierId: string;
+  itemId: string;
+  siteId: string;
+  qty: number;
+  status: keyof typeof ItemRequestStatus;
+  price: number;
+}
+
+const ItemRequestStatus = {
+  PENDING_APPROVAL: "PENDING_APPROVAL",
+  PARTIALLY_APPROVED: "PARTIALLY_APPROVED",
+  APPROVED: "APPROVED",
+  PARTIALLY_DELIVERED: "PARTIALLY_DELIVERED",
+  DELIVERED: "DELIVERED",
+  PENDING_INVOICE: "PENDING_INVOICE",
+  COMPLETED: "COMPLETED",
+  DISAPPROVED: "DISAPPROVED",
+} as const;

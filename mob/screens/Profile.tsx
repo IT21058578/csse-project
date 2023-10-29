@@ -4,6 +4,7 @@ import { StyleSheet } from "react-native";
 import Font from "../constants/Font";
 import Colors from "../constants/Colors";
 import FontSize from "../constants/FontSize";
+import React from "react";
 
 const Profile = () => {
 

@@ -18,6 +18,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import AppTextInput from "../components/AppTextInput";
 import { useLoginMutation } from "../Redux/API/AuthApiSlice";
+import { HandleResult } from "../Utils/HandleResults";
 
 const { height } = Dimensions.get("window");
 
@@ -27,8 +28,8 @@ const LoginScreen: React.FC<Props> = ({ navigation: { navigate } }) => {
 
   const [sendUserInfo, result] = useLoginMutation();
   const [data, setData] = useState({
-    email: "dinukad@gmail.com",
-    password: "password",
+    email: "",
+    password: "",
   });
 
   const handleChange = (name: any, text: any) => {
@@ -85,7 +86,7 @@ const LoginScreen: React.FC<Props> = ({ navigation: { navigate } }) => {
         </View>
 
         <TouchableOpacity
-          onPress={() => navigate("Home")}
+          onPress={handleLogin}
           style={{
             padding: Spacing * 2,
             backgroundColor: Colors.text,
@@ -111,6 +112,8 @@ const LoginScreen: React.FC<Props> = ({ navigation: { navigate } }) => {
             Login
           </Text>
         </TouchableOpacity>
+
+        <HandleResult result={result} />
         
         <ImageBackground
           style={{
