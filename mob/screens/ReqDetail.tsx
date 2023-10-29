@@ -65,7 +65,7 @@ const RequestDetail = (props: { route: any }) => {
               source={require("../assets/Arrow.png")}
             />
           </Pressable>
-          <Text style={styles.typo1}>Task Detail</Text>
+          <AddReqHead />
         </View>
       </View>
       <ScrollView contentContainerStyle={styles.container}>
