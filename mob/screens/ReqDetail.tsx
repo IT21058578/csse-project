@@ -14,18 +14,19 @@ import FontSize from "../constants/FontSize";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { TaskType } from "../types";
-import { useGettaskQuery } from "../Redux/API/tasks.api.slice";
+import { useGetitemrequestQuery } from "../Redux/API/ItemRequestApiSlice";
 import { FC } from "react";
-import { useGetUserQuery } from "../Redux/API/users.api.slice";
+import { useGetUserQuery } from "../Redux/API/usersApiSlice";
+import AddReqHead from "../components/AddReqHead";
 // import { DateUtils } from "../utils/DateUtils";
 
-const TaskDetail = (props: { route: any }) => {
+const RequestDetail = (props: { route: any }) => {
   const { route } = props;
-  const taskId = route?.params?.taskId;
+  const requestId = route?.params?.requestId;
 
   const navigate = useNavigation();
 
-  const { data: task, isFetching: isTaskFetching } = useGettaskQuery(taskId);
+  const { data: request, isFetching: isTaskFetching } = useGetitemrequestQuery(requestId);
 
   const handleBackNav = () => {
     navigate.goBack();
@@ -44,7 +45,7 @@ const TaskDetail = (props: { route: any }) => {
                 source={require("../assets/Arrow.png")}
               />
             </Pressable>
-            <Text style={styles.typo1}>Task Detail</Text>
+            <AddReqHead />
           </View>
         </View>
         <View>
@@ -69,10 +70,10 @@ const TaskDetail = (props: { route: any }) => {
       </View>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.box1}>
-          <Text style={styles.typoTitle}>Task : {task?.name}</Text>
+          <Text style={styles.typoTitle}>Task : {request?.name}</Text>
         </View>
         
-        {task?.description && (
+        {request?.description && (
           <View style={styles.box1}>
             <LinearGradient
               style={styles.box12}
@@ -91,7 +92,7 @@ const TaskDetail = (props: { route: any }) => {
                 Description
               </Text>
               <Text style={[styles.typoBoddy, { color: "#FFFFFF" }]}>
-                {task?.description}
+                {request?.description}
               </Text>
             </LinearGradient>
           </View>
@@ -107,7 +108,7 @@ const TaskDetail = (props: { route: any }) => {
               { color: Colors.darkblue, fontFamily: Font["poppins-bold"] },
             ]}
           >
-            {task?.roomName}
+            {request?.roomName}
           </Text>
         </View>
         <View style={styles.box1}>
@@ -117,7 +118,7 @@ const TaskDetail = (props: { route: any }) => {
           <Text style={styles.typoBoddy}>Assign Members</Text>
         </View>
         <View style={styles.box3}>
-          {task?.assignedUserIds.map((userId: string) => (
+          {request?.assignedUserIds.map((userId: string) => (
             <TaskAssignedMemberItem id={userId} key={userId} />
           ))}
         </View>
@@ -147,7 +148,7 @@ const TaskAssignedMemberItem: FC<{ id: string }> = (props) => {
   );
 };
 
-export default TaskDetail;
+export default RequestDetail;
 
 const styles = StyleSheet.create({
   container: {
